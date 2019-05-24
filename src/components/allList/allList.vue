@@ -211,11 +211,11 @@
               childList.push(17)
               break;
             case '账户管理':
-              parentList.push(5)
+              parentList.push(18)
               childList.push(19)
               break;
             case '角色管理':
-              parentList.push(5)
+              parentList.push(18)
               childList.push(20)
               break;
           }
@@ -282,6 +282,7 @@
         this.axios.get(this.common.getApi() + '/sys/api/authority/getAllAuthority').then((res) => {
                 if(res.data.success){
                  this.form = res.data.obj.list
+                  console.log(res.data.obj.list);
                   
                  var childList = []
                   res.data.obj.list.map(item =>{

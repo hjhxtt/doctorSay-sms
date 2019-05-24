@@ -10,13 +10,13 @@
   		      active-text-color="#13B5BB"
   		      router
   		      >
-  			    <el-submenu v-for="(item,index) in menuList" :key="index" :index='item.id'>
+  			    <el-submenu v-for="item in menuList" :key="item.id" :index='item.id'>
   			      <template slot="title">
   			        <i :class="item.icon"></i>
   			        <span>{{item.title}}</span>
   			      </template>
   			      <el-menu-item-group >
-  			        <el-menu-item v-for="child in item.children" :key="child.id" :index='child.index'>{{child.childtitle}}</el-menu-item>
+  			        <el-menu-item v-for="child in item.children" :key="child.url" :index='child.url'>{{child.authorityName}}</el-menu-item>
   			      </el-menu-item-group>
   			    </el-submenu>
   		    </el-menu>
@@ -37,20 +37,20 @@ export default {
           icon:'el-icon-star-on',
           children:[
             {
-              index:'/vipInformation',
-              childtitle:'会员信息'
+              url:'/vipInformation',
+              authorityName:'会员信息'
             },
             {
-              index:'/vipQcAudit',
-              childtitle:'电话QC记录'
+              url:'/vipQcAudit',
+              authorityName:'电话QC记录'
             },
             {
-              index:'/vipZyzAudit',
-              childtitle:'执业证审核'
+              url:'/vipZyzAudit',
+              authorityName:'执业证审核'
             },
             {
-              index:'/vipIntegration',
-              childtitle:'积分管理'
+              url:'/vipIntegration',
+              authorityName:'积分管理'
             },  
           ]
         },
@@ -60,16 +60,16 @@ export default {
           icon:'el-icon-goods',
           children:[
             {
-              index:'/goodsSeries',
-              childtitle:'商品系列'
+              url:'/goodsSeries',
+              authorityName:'商品系列'
             }, 
             {
-              index:'/goodsAdmin',
-              childtitle:'商品管理'
+              url:'/goodsAdmin',
+              authorityName:'商品管理'
             }, 
             {
-              index:'/goodsOrder',
-              childtitle:'订单列表'
+              url:'/goodsOrder',
+              authorityName:'订单列表'
             }, 
           ]
         },        
@@ -79,8 +79,8 @@ export default {
           icon:'el-icon-setting',
           children:[
             {
-              index:'/proManage',
-              childtitle:'项目管理'
+              url:'/proManage',
+              authorityName:'项目管理'
             },            
           ]
         },
@@ -90,24 +90,24 @@ export default {
           icon:'el-icon-edit-outline',
           children:[
             {
-              index:'/settingBanner',
-              childtitle:'banner配置'
+              url:'/settingBanner',
+              authorityName:'banner配置'
             }, 
             {
-              index:'/settingNotice',
-              childtitle:'网站公告'
+              url:'/settingNotice',
+              authorityName:'网站公告'
             },   
             {
-              index:'/settingQuestion',
-              childtitle:'常见问题'
+              url:'/settingQuestion',
+              authorityName:'常见问题'
             },
             {
-              index:'/settingRule',
-              childtitle:'兑换规则'
+              url:'/settingRule',
+              authorityName:'兑换规则'
             },
             {
-              index:'/settingFeedback',
-              childtitle:'业务联系'
+              url:'/settingFeedback',
+              authorityName:'业务联系'
             },
           ]
         },
@@ -117,12 +117,12 @@ export default {
           icon:'el-icon-edit-outline',
           children:[
             {
-              index:'/manAccount',
-              childtitle:'账户管理'
+              url:'/manAccount',
+              authorityName:'账户管理'
             },
             {
-              index:'/manRole',
-              childtitle:'角色管理'
+              url:'/manRole',
+              authorityName:'角色管理'
             },
           ]
         },        
@@ -130,10 +130,36 @@ export default {
     }
   },
   mounted() {
-    //this.getUserList()
-    this.getInfoById()
+    this.getAuthority()
   },
   methods: {
+    getAuthority(){
+      this.axios.get(this.common.getApi() + '/sys/api/auth/getAuthority').then(res=>{
+            if(res.data.success){
+              var newList = []
+              res.data.obj.map((e,i)=>{
+                console.log(e.authorityName);
+                newList.push({
+                  id:String(i+1),
+                  title:e.authorityName,
+                  children:e.sonList
+                })
+              })
+              newList[0].icon = 'el-icon-star-on';
+              newList[1].icon = 'el-icon-goods';
+              newList[2].icon = 'el-icon-setting';
+              newList[3].icon = 'el-icon-edit-outline';
+              newList[4].icon = 'el-icon-edit-outline';
+              console.log(newList[0]);
+             console.log(newList);
+             
+              this.menuList = newList
+            }else{
+              this.$message.error(res.data.msg);
+            }
+            
+        })
+    },
     //根据用户角色id来拿到列表
     getInfoById(){
       //todo动态改变这个id

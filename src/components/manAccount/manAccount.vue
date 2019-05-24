@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="manAccount-warpper">
         <el-dialog
           :title="diaTitle"
           :visible.sync="centerDialogVisible"
@@ -106,12 +106,20 @@
               </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+          small
+          layout="prev, pager, next"
+          :total="pageTotal"
+          :page-size="pageSize"
+          @current-change="go">
+        </el-pagination>
     </div>
 </template>
 <script>
     export default {
         data(){
             return {
+                pageTotal:null,
                 diaTitle:'添加账户信息',
                 centerDialogVisible: false,
                 userInfo: {
@@ -128,13 +136,16 @@
                 }, ],
                 adminList: [],
                 pageIndex:1,
-                pageSize:8,
+                pageSize:6,
                 value2:true,
                 value:'',
                 editId :null
             }
         },
         methods:{
+          go(currentPage){
+            this.getUserList(currentPage,this.pageSize)
+          },
           cancel(){
             this.userInfo.userName = ''
                       this.value = ''
@@ -150,7 +161,7 @@
                   }
                 }).then((res) => {
                   if(res.data.success){
-                    this.getUserList()
+                    this.getUserList(this.pageSize,this.pageSize)
                     this.$message.success(res.data.msg)
                     console.log('1');
                     
@@ -174,7 +185,7 @@
                 }
               }).then((res) => {
                 if(res.data.success){
-                  this.getUserList()
+                  this.getUserList(this.pageSize,this.pageSize)
                   this.$message.success(res.data.msg)
                   
                 }else{
@@ -287,18 +298,17 @@
             rows.splice(index, 1);
           },
           //获取管理员列表
-          getUserList(){
+          getUserList(pageIndex,pageSize){
             this.axios.get(this.common.getApi() + '/sys/api/user/getUserList',{
             params:{
                 userName: 'root',
                 userRole:2,
-                pageIndex:this.pageIndex,
-                pageSize:this.pageSize,
+                pageIndex:pageIndex,
+                pageSize:pageSize,
             },
           }).then((res) => {
             if(res.data.success){
-                
-
+                this.pageTotal = res.data.obj.pager.total
                 res.data.obj.list.map(e=>{
                     if (e.stopFlag === 0 ) {
                       e.stopFlag = true
@@ -337,7 +347,7 @@
                     if(res.data.success){
                       this.userInfo.userName = ''
                       this.value = ''
-                      this.getUserList()
+                      this.getUserList(this.pageSize,this.pageSize)
                       this.$message.success(res.data.msg)
                       this.centerDialogVisible = false
                     }else{
@@ -361,7 +371,7 @@
                   this.userInfo.userName = ''
                   this.$message.success(res.data.msg)
                   this.centerDialogVisible = false
-                  this.getUserList()
+                  this.getUserList(this.pageSize,this.pageSize)
                 }else{
                   this.$message.error(res.data.msg)
                 }
@@ -375,7 +385,7 @@
           },
         },
         mounted() {
-          this.getUserList()
+          this.getUserList(this.pageIndex,this.pageSize)
           this.getRoleList()
         },
     }
@@ -392,4 +402,8 @@
     .el-dialog .el-button{
         width: 100px;
     }
+    .manAccount-warpper .el-pagination {
+    text-align: center;
+    margin-top: 20px;
+}
 </style>

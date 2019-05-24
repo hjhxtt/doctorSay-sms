@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainRole-wraper">
         <el-button type="primary" @click="addRole">添加</el-button>
         <el-table
         :data="tableData4"
@@ -53,14 +53,22 @@
               </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+          small
+          layout="prev, pager, next"
+          :total="pageTotal"
+          :page-size="pageSize"
+          @current-change="go">
+        </el-pagination>
     </div>
 </template>
 <script>
     export default {
         data(){
             return {
+              pageTotal:null,
               pageIndex:1,
-              pageSize:10,
+              pageSize:8,
                 value:'',
                 userInfo: {
                   userName: '',
@@ -98,9 +106,13 @@
             }
         },
         mounted() {
-          this.getRoleList()
+          this.getRoleList(this.pageIndex,this.pageSize)
         },
         methods:{
+          go(currentPage){
+              this.getRoleList(currentPage,this.pageSize)
+              
+          },
             //开关状态
             turnStopFlag(row,data){
               let state = data?0:1
@@ -156,15 +168,16 @@
                 }
               })
             },
-            getRoleList(){
+            getRoleList(pageIndex,pageSize){
               this.axios.get(this.common.getApi() + '/sys/api/role/getRoleList',{
                 params:{
-                  pageIndex:this.pageIndex,
-                  pageSize:this.pageSize
+                  pageIndex:pageIndex,
+                  pageSize:pageSize
                 }
               }).then((res) => {
                 if(res.data.success){
                   console.log(res.data.obj.list );
+                  this.pageTotal = res.data.obj.pager.total
                   res.data.obj.list.map(e=>{
                     if (e.stopFlag === 0 ) {
                       e.stopFlag = true
@@ -187,5 +200,8 @@
     }
 </script>
 <style scoped>
-
+  .mainRole-wraper .el-pagination {
+    text-align: center;
+    margin-top: 20px;
+}
 </style>
