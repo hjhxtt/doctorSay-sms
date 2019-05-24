@@ -64,11 +64,29 @@
        }
        return i;
     }
-    var date = new Date(this.sendTime);
+
+
+
+     
+    
+        
+
+                var date = new Date(this.sendTime);
+
+              function pad2(n) { return n < 10 ? '0' + n : n }
+
+                var date = new Date(this.sendTime);
+                var data1 = date.getFullYear().toString() + pad2(date.getMonth() + 1) + pad2(date.getDate()) + pad2(date.getHours()) + pad2(date.getMinutes()) + pad2(date.getSeconds());
+
+              console.log(data1);
+              
+        
+    
+
+
     // var date_value=String(date.getFullYear())  + String((date.getMonth() + 1))  + String(date.getDate())  + String(checkTime(date.getHours()))  + String(checkTime(date.getMinutes()))  + String(checkTime(date.getSeconds()));
-    var date_value=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + checkTime(date.getHours()) + ':' + checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
+    //var date_value=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + checkTime(date.getHours()) + ':' + checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
     //最后显示yyyy-MM-dd hh:mm:ss
-    console.log(date_value);
 
         if(this.message=='' || this.testTel == '' || this.sendTime == '' || this.taskName == ''){
             this.$message({
@@ -82,7 +100,7 @@
         let para = {
           id : Number(sessionStorage.getItem('nweid')),
           testMobile : this.testTel,
-          sendTime : date_value,
+          sendTime : data1,
           content : this.message,
           taskName : this.taskName
         }

@@ -317,8 +317,8 @@
                     }
                   })
 
-                console.log(this.adminList);
                 this.adminList=res.data.obj.list
+                console.log(this.adminList);
             }else{
               this.$message.error(res.data.msg);
             }

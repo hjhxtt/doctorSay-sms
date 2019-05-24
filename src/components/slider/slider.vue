@@ -31,101 +31,101 @@ export default {
   data(){
     return {
       menuList:[
-        {
-          id:'1',
-          title: '会员管理',
-          icon:'el-icon-star-on',
-          children:[
-            {
-              url:'/vipInformation',
-              authorityName:'会员信息'
-            },
-            {
-              url:'/vipQcAudit',
-              authorityName:'电话QC记录'
-            },
-            {
-              url:'/vipZyzAudit',
-              authorityName:'执业证审核'
-            },
-            {
-              url:'/vipIntegration',
-              authorityName:'积分管理'
-            },  
-          ]
-        },
-        {
-          id:'2',
-          title: '商城管理',
-          icon:'el-icon-goods',
-          children:[
-            {
-              url:'/goodsSeries',
-              authorityName:'商品系列'
-            }, 
-            {
-              url:'/goodsAdmin',
-              authorityName:'商品管理'
-            }, 
-            {
-              url:'/goodsOrder',
-              authorityName:'订单列表'
-            }, 
-          ]
-        },        
-        {
-          id:'3',
-          title: '调研项目管理',
-          icon:'el-icon-setting',
-          children:[
-            {
-              url:'/proManage',
-              authorityName:'项目管理'
-            },            
-          ]
-        },
-        {
-          id:'4',
-          title: '网站信息维护',
-          icon:'el-icon-edit-outline',
-          children:[
-            {
-              url:'/settingBanner',
-              authorityName:'banner配置'
-            }, 
-            {
-              url:'/settingNotice',
-              authorityName:'网站公告'
-            },   
-            {
-              url:'/settingQuestion',
-              authorityName:'常见问题'
-            },
-            {
-              url:'/settingRule',
-              authorityName:'兑换规则'
-            },
-            {
-              url:'/settingFeedback',
-              authorityName:'业务联系'
-            },
-          ]
-        },
-        {
-          id:'5',
-          title: '系统管理',
-          icon:'el-icon-edit-outline',
-          children:[
-            {
-              url:'/manAccount',
-              authorityName:'账户管理'
-            },
-            {
-              url:'/manRole',
-              authorityName:'角色管理'
-            },
-          ]
-        },        
+        // {
+        //   id:'1',
+        //   title: '会员管理',
+        //   icon:'el-icon-star-on',
+        //   children:[
+        //     {
+        //       url:'/vipInformation',
+        //       authorityName:'会员信息'
+        //     },
+        //     {
+        //       url:'/vipQcAudit',
+        //       authorityName:'电话QC记录'
+        //     },
+        //     {
+        //       url:'/vipZyzAudit',
+        //       authorityName:'执业证审核'
+        //     },
+        //     {
+        //       url:'/vipIntegration',
+        //       authorityName:'积分管理'
+        //     },  
+        //   ]
+        // },
+        // {
+        //   id:'2',
+        //   title: '商城管理',
+        //   icon:'el-icon-goods',
+        //   children:[
+        //     {
+        //       url:'/goodsSeries',
+        //       authorityName:'商品系列'
+        //     }, 
+        //     {
+        //       url:'/goodsAdmin',
+        //       authorityName:'商品管理'
+        //     }, 
+        //     {
+        //       url:'/goodsOrder',
+        //       authorityName:'订单列表'
+        //     }, 
+        //   ]
+        // },        
+        // {
+        //   id:'3',
+        //   title: '调研项目管理',
+        //   icon:'el-icon-setting',
+        //   children:[
+        //     {
+        //       url:'/proManage',
+        //       authorityName:'项目管理'
+        //     },            
+        //   ]
+        // },
+        // {
+        //   id:'4',
+        //   title: '网站信息维护',
+        //   icon:'el-icon-edit-outline',
+        //   children:[
+        //     {
+        //       url:'/settingBanner',
+        //       authorityName:'banner配置'
+        //     }, 
+        //     {
+        //       url:'/settingNotice',
+        //       authorityName:'网站公告'
+        //     },   
+        //     {
+        //       url:'/settingQuestion',
+        //       authorityName:'常见问题'
+        //     },
+        //     {
+        //       url:'/settingRule',
+        //       authorityName:'兑换规则'
+        //     },
+        //     {
+        //       url:'/settingFeedback',
+        //       authorityName:'业务联系'
+        //     },
+        //   ]
+        // },
+        // {
+        //   id:'5',
+        //   title: '系统管理',
+        //   icon:'el-icon-edit-outline',
+        //   children:[
+        //     {
+        //       url:'/manAccount',
+        //       authorityName:'账户管理'
+        //     },
+        //     {
+        //       url:'/manRole',
+        //       authorityName:'角色管理'
+        //     },
+        //   ]
+        // },        
       ]
     }
   },
@@ -145,13 +145,22 @@ export default {
                   children:e.sonList
                 })
               })
-              newList[0].icon = 'el-icon-star-on';
-              newList[1].icon = 'el-icon-goods';
-              newList[2].icon = 'el-icon-setting';
-              newList[3].icon = 'el-icon-edit-outline';
-              newList[4].icon = 'el-icon-edit-outline';
-              console.log(newList[0]);
-             console.log(newList);
+
+                newList.map((e,i)=>{
+                  if(i == 0){
+                    e.icon= 'el-icon-star-on'
+                  }else if(i == 1){
+                    e.icon= 'el-icon-goods'
+                  }else if(i == 2){
+                    e.icon= 'el-icon-setting'
+                  }else if(i == 3){
+                    e.icon= 'el-icon-edit-outline'
+                  }else if(i == 4){
+                    e.icon= 'el-icon-edit-outline'
+                  }
+                })
+
+              console.log(newList);
              
               this.menuList = newList
             }else{
