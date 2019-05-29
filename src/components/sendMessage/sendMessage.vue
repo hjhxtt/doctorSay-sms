@@ -84,9 +84,9 @@
     
 
 
-    // var date_value=String(date.getFullYear())  + String((date.getMonth() + 1))  + String(date.getDate())  + String(checkTime(date.getHours()))  + String(checkTime(date.getMinutes()))  + String(checkTime(date.getSeconds()));
-    //var date_value=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + checkTime(date.getHours()) + ':' + checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
-    //最后显示yyyy-MM-dd hh:mm:ss
+          // var date_value=String(date.getFullYear())  + String((date.getMonth() + 1))  + String(date.getDate())  + String(checkTime(date.getHours()))  + String(checkTime(date.getMinutes()))  + String(checkTime(date.getSeconds()));
+          //var date_value=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + checkTime(date.getHours()) + ':' + checkTime(date.getMinutes()) + ':' + checkTime(date.getSeconds());
+          //最后显示yyyy-MM-dd hh:mm:ss
 
         if(this.message=='' || this.testTel == '' || this.sendTime == '' || this.taskName == ''){
             this.$message({

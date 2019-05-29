@@ -116,6 +116,7 @@
 				localStorage.removeItem('isLogin')
 				this.isLogin=false
 				this.$router.push('/login')
+				this.$store.state.openTab=[]
 			},
 	    //tab标签点击时，切换相应的路由
 	    tabClick(tab){

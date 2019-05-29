@@ -83,7 +83,9 @@
             </el-table-column>
             <el-table-column
               fixed="right"
-              label="操作">
+              label="操作"
+              width="160"
+              >
               <template slot-scope="scope">
                 <el-button
                   @click.native.prevent="editRole(scope.row,'edit')"

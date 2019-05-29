@@ -53,12 +53,10 @@
     },
     methods: {
       login(){
-            
             if(this.userInfo.userName=='' || this.userInfo.password==''){
               this.$message.error('请输入用户名和密码')
               return false
             }
-
             var params = {
                 userName:this.userInfo.userName,
                 password : this.userInfo.password
@@ -80,13 +78,6 @@
               this.$message.error(res.data.msg);
             }
           })
-      },
-      submitForm(formName) {
-        //写死的账号密码
-        if(this.userInfo.userName !=='root' || this.userInfo.password !=='root'){
-          this.$message.error('用户名或密码有误，请重新输入')
-          return false
-        }
       },
     }
   }

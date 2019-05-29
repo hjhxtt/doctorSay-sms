@@ -165,6 +165,7 @@ export default {
               this.menuList = newList
             }else{
               this.$message.error(res.data.msg);
+              this.$router.push('/login')
             }
             
         })

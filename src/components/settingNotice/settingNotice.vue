@@ -14,12 +14,12 @@
         prop="title"
         label="标题">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         label="内容">
         <template slot-scope="scope">
           <div v-html="scope.row.content"></div>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="click"
         label="点击次数">
@@ -32,8 +32,7 @@
         fixed="right"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="upLine(scope.row)">上线</el-button>
-          <el-button type="text" size="small" @click="downLine(scope.row)">下线</el-button>
+          <el-button type="text" size="small" @click="upLine(scope.row)" v-html="scope.row.displayFlag===1?'下线公告':'上线公告'"></el-button>
           <el-button type="text" size="small" @click="editshow(scope.row)">编辑</el-button>
           <el-button type="text" size="small" @click="showSureDialog(scope.row)">删除</el-button>
         </template>
@@ -100,12 +99,6 @@
 
 <script>
   export default {
-    methods: {
-      handleClick(row) {
-        console.log(row);
-      }
-    },
-
     data() {
       return {
         adddialogVisible: false,
@@ -144,10 +137,18 @@
     methods: {
       upLine(ele){
         //todo
+        var flag 
+        if(ele.displayFlag === 1){
+          flag = 0
+        }else{
+          flag = 1
+        }
+        console.log(flag);
+        
         let params = {
           params:{
                   id: ele.id,
-                  state: 1
+                  state: flag
                 }
         }
         this.axios.get(this.common.getApi() + '/sys/api/message/turnStopFlag',
@@ -158,7 +159,7 @@
                 if(res.data.success){
                   this.$message({
                     type: 'success',
-                    message: '上线成功'
+                    message: '修改成功'
                   })
                   this.getMessageList(this.pageIndex,this.pageSize);
                 }else{
@@ -285,13 +286,14 @@
           }
         }).then((res) => {
           this.tableData = res.data.obj.list;
+          console.log(this.tableData);
+          
 //        for(var i = 0; i < this.tableData.length; i++){
 //          if(this.tableData[i].bannerType == 0){
 //            this.tableData[i].skipUrl = '/'
 //          }
 //        }
           this.pageTotal = res.data.obj.pager.total;
-          console.log(this.pageTotal);
         })
       },
       go(currentPage){
