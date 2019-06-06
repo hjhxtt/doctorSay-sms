@@ -63,12 +63,13 @@
         </el-table-column>
         <el-table-column
           prop="projectId"
+          width="120"
           label="项目编号">
         </el-table-column>
         <el-table-column
           prop="projectName"
           label="项目标题"
-          width="130">
+          width="200">
         </el-table-column>
         <el-table-column
           prop="projectState"
@@ -85,12 +86,12 @@
         <el-table-column
           prop="projectPutTime"
           label="发布时间"
-          width="130">
+          width="90">
         </el-table-column>
         <el-table-column
           prop="projectEndTime"
           label="结束时间"
-          width="130">
+          width="90">
         </el-table-column>
         <el-table-column
           prop="projectJoinNum"
@@ -98,10 +99,12 @@
         </el-table-column>
         <el-table-column
           prop="finishNum"
+          width="60"
           label="完成量">
         </el-table-column>
         <el-table-column
           prop="projectSampleTotal"
+          width="60"
           label="样本数">
         </el-table-column>
         <el-table-column
@@ -142,7 +145,7 @@
       },
       pageTotal:0,
       pageIndex: 1,
-      pageSize:12,
+      pageSize:30,
       tableData3:[],
       dialogVisible:false,
       editform:{
@@ -314,5 +317,11 @@
   .proManage-wrapper .el-pagination{
     text-align: center;
     margin-top: 20px;
+  }
+  .proManage-wrapper .el-table--mini td, .el-table--mini th {
+    padding:0;
+}
+  .proManage-wrapper .el-button--small{
+    padding: 5px 5px;
   }
 </style>

@@ -27,18 +27,20 @@
           <div slot="tip" class="el-upload__tip">只能上传csv文件</div>
         </el-upload>
       </el-form-item>
-      <!-- <el-form-item>
-        <el-button type="primary" @click="download">下载参数文本</el-button>
-      </el-form-item> -->
       <el-form-item>
+        <el-button type="primary" @click="download">下载参数文本</el-button>
+      </el-form-item>
+      <el-form-item style="margin-left:170px;">
+        
         <template slot="label">
-          <el-select v-model="form.choose_param">
+          <el-select  v-model="form.choose_param">
             <el-option label="删除未使用的参数" value="0"></el-option>
+            <el-option label="删除全部参数" value="2"></el-option>
           </el-select>
         </template>
-        <el-button type="primary" @click="deleteParam">删除</el-button>
+        <el-button type="primary" @click="deleteParam">删除参数文本</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item style="margin-left:170px;">
         <template slot="label">
           <el-input
             type="textarea"
@@ -47,8 +49,8 @@
             v-model="telArr">
           </el-input>
         </template>
-        <el-button type="primary" @click="deleteTel()">删除</el-button>
-      </el-form-item>
+      </el-form-item >
+      <el-button style="margin-left:170px;" type="primary" @click="deleteTel()">删除参与记录</el-button>
     </el-form>
   </div>
 </template>
@@ -174,7 +176,8 @@
         })
       },
       download(){
-        location.href = this.common.getApi() + "/sys/api/projectPara/downloadParam";
+        //todo
+        location.href = this.common.getApi() + "/sys/api/projectPara/downloadParam/?id="+this.form.pro_id;
       },
       getProject(){
         this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
@@ -209,5 +212,9 @@
 
   .proParameter-wrapper .upload-demo{
     width: 30%;
+  }
+  .el-textarea__inner{
+    height: 150px !important;
+    width: 380px;
   }
 </style>

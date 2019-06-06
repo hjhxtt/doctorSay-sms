@@ -2,7 +2,9 @@
   <div class="proStatistics-wrapper">
     <div class="title">
       <i class="el-icon-edit"></i><span>项目进度</span>
+      <p style="float:right;" > <span style="font-size:14px;">项目id：{{pro_id}}</span><span style="font-size:14px;margin-right:0px;">项目名称：{{pro_name}}</span></p>
     </div>
+    
     
     <div class="statistics-content">
       <div class="head">
@@ -59,13 +61,42 @@
         lossRate:'',
         sNum:'',
         qNum:'',
-        cNum:''
+        cNum:'',
+        pro_id:'',
+        pro_name:'',
       }
     },
     mounted(){
       this.getProjectProgress();
+      this.getProject()
     },
     methods:{
+      getProject(){
+        this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
+          params: {
+            params:{
+              id: Number(sessionStorage.getItem("id"))
+                    //id: Number(this.$route.query.id)
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.success){
+            console.log(res.data.obj);
+            this.pro_id = res.data.obj.id;
+            this.pro_name = res.data.obj.projectName;
+
+            console.log(this.pro_id);
+            console.log(this.pro_name);
+            
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
       getProjectProgress(index, rows){
         this.axios.get(this.common.getApi() + '/sys/api/project/getProjectProgress',{
           params:{
@@ -80,14 +111,15 @@
         }).then((res) => {
           if(res.data.success){
             this.projectJoinNum = res.data.obj.projectJoinNum;
-            this.mailJoinNum = res.data.obj.projectJoinNum;
-            this.responseRate = res.data.obj.projectJoinNum;
-            this.permeability = res.data.obj.projectJoinNum;
-            this.facilityValue = res.data.obj.projectJoinNum;
-            this.lossRate = res.data.obj.projectJoinNum;
-            this.sNum = res.data.obj.projectJoinNum;
-            this.qNum = res.data.obj.projectJoinNum;
-            this.cNum = res.data.obj.projectJoinNum;
+            this.mailJoinNum = res.data.obj.mailJoinNum;
+            this.responseRate = res.data.obj.responseRate;
+            this.permeability = res.data.obj.permeability;
+            this.facilityValue = res.data.obj.facilityValue;
+            this.lossRate = res.data.obj.lossRate;
+            this.sNum = res.data.obj.sNum;
+            this.qNum = res.data.obj.qNum;
+            this.cNum = res.data.obj.cNum;
+            
           }else{
             this.$message.error(res.data.msg);
           }

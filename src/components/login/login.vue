@@ -126,7 +126,7 @@
 </style>
 <style type="text/css">
 
-    .el-form-item__content{
+    .register_bg .el-form-item__content{
       margin-left: 0 !important;
     }
 

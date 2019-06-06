@@ -55,6 +55,12 @@
           <el-option v-for="item in zc_2_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>  
       </el-form-item>
+      <el-form-item label="执业证类型" prop="membercertificatetype">
+        <el-select v-model="form.membercertificatetype" style="width: 200px;">
+          <el-option v-for="item in member_options" :label="item.label" :value="item.id" :key="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      
       <el-form-item label="证件号" prop="memberidcard">
         <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
@@ -106,6 +112,7 @@
         <div>医院等级：{{grade}}</div>
         <div>医院性质：{{hospitalNature}}</div>
         <div>医院类型：{{hospitalType}}</div>
+        <div>专科类型：--</div>
         <div>床位数：{{numberOfBeds}}</div>
       </el-form-item>
       
@@ -169,6 +176,14 @@
   export default {
     data() {
       return {
+        member_options:[
+          {label:"医师资格证", id:1},
+          {label:"医师执业证", id:2},
+          {label:"护士资格证", id:3},
+          {label:"药师资格证", id:4},
+          {label:"药师执业证", id:5},
+          {label:"护士执业证", id:8},
+        ],
         form: {
           memberHandphone: null,
           smscode: null,
@@ -200,6 +215,7 @@
           inputhospital: null,
           province:null,
           graduationInstitutions:null,
+          membercertificatetype:null//职业证类型
         },
         rules: {
           memberHandphone: [
@@ -274,7 +290,6 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.isload = true;
-//          console.log(this.form_1.inputhospital);
             var fkHospitalId = null;
             if(this.form.inputhospital == ""){
               fkHospitalId = Number(this.form.fkHospitalId);
@@ -290,6 +305,10 @@
             }else{
               memberSex = "女"
             }
+            
+
+
+
             this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
               params:{
                 id: Number(sessionStorage.getItem("userid")),
@@ -316,6 +335,7 @@
                 graduationInstitutions: this.form.graduationInstitutions,
                 beginTime: Number(this.form.beginTime.slice(0,2)),
                 endTime: Number(this.form.endTime.slice(0,2)),
+                membercertificatetype:this.form.membercertificatetype//职业证
               },
             }).then((res) => {
               this.isload = false                
@@ -363,7 +383,6 @@
             this.form.memberstation = res.data.obj.memberstation;
             this.form.memberidcard = res.data.obj.memberidcard;
             this.form.administrativeposition = res.data.obj.administrativeposition;
-            console.log(this.form.memberstation)
             this.getStationById();
             this.form.membertechnical = res.data.obj.membertechnical;
             if(this.form.membertechnical.length != 0){
@@ -373,7 +392,6 @@
                 a.push(Number(this.form.membertechnical[i]));
               }
               this.form.membertechnical = a;
-              console.log(this.form.membertechnical);
               this.getFieldsById();
             }
             this.form.membersectionoffice = res.data.obj.membersectionoffice;
@@ -388,7 +406,6 @@
             }else{
               this.form.fkHospitalId = res.data.obj.fkHospitalId.toString();              
             }
-            console.log(this.form.fkHospitalId);
             this.form.memberhospital = res.data.obj.memberhospital;
 //          this.form.inputhospital = res.data.obj.memberhospital;
             this.form.memberEducation = res.data.obj.memberEducation;
@@ -415,9 +432,31 @@
                 b.push(Number(this.form.societyid[i]));
               }
               this.form.societyid = b;
-              console.log(this.form.societyid);
             }
             this.form.graduationInstitutions = res.data.obj.graduationInstitutions;
+
+            switch (res.data.obj.membercertificatetype) {
+              case 1:
+                  this.form.membercertificatetype = "医师资格证"
+                break;
+              case 2:
+                  this.form.membercertificatetype = "医师执业证"
+                break;
+
+                case 3:
+                  this.form.membercertificatetype = "护士资格证"
+                break;
+                case 4:
+                  this.form.membercertificatetype = "药师资格证"
+                break;
+                case 5:
+                  this.form.membercertificatetype = "药师执业证"
+                break;
+                case 6:
+                  this.form.membercertificatetype = "护士执业证"
+                break;
+            }
+
             this.getGraduateById(Number(this.form.graduationInstitutions));
           }
         })                 
@@ -495,7 +534,6 @@
         })        
       },
       getSonFields1(parentId){
-        console.log(parentId);
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
             params:{
               params:{
@@ -512,10 +550,8 @@
             }
           })
         //}
-        console.log(this.field_2_options);
       },
       getSonFields2(parentId){
-        console.log(parentId);
         this.field_2_options = [];
         for(var i = 0; i < parentId.length; i++){
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
@@ -534,10 +570,8 @@
             }
           })
         }
-        console.log(this.field_2_options);
       },      
       getFieldsById(){
-        console.log(this.form.membertechnical);
         this.form.medical_field_1 = [];
         for(var i = 0; i < this.form.membertechnical.length;i++){
           this.axios.get(this.common.getApi() + '/sys/api/fields/getFieldsById',{
@@ -715,7 +749,6 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          console.log(res);
           if(res.data.code == '200'){
             this.meeting_options = res.data.obj
           }

@@ -2,6 +2,7 @@
   <div class="vipIntegrationRecord-wrapper">
     <div class="title">
       <i class="el-icon-search"></i><span>会员积分记录</span>
+      <p style="float:right;" > <span style="font-size:14px;">用户id：{{id}}</span><span style="font-size:14px;margin-right:0px;">用户名：{{name}}</span></p>
     </div>
     <div style="margin-bottom: 15px;padding-left:20px ;">总计{{total_num}}分</div>
     <el-table
@@ -45,11 +46,15 @@
       pageSize:5,
       tableData:[],
       total_num:null,
+      id:'',
+      name:'',
     }
   },
   mounted(){
     this.getMemberIngretalRecord(this.pageIndex,this.pageSize);
     this.getMemberIngretalRecordCount();
+    this.id = sessionStorage.getItem('userid')
+    this.name = sessionStorage.getItem('userName')
   },
   methods:{
     getMemberIngretalRecord(pageIndex,pageSize){

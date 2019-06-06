@@ -67,21 +67,6 @@
         <el-form-item label="推荐人:">
           <el-input style="width:200px;" v-model="form.recommandCode"></el-input>
         </el-form-item>
-        <el-form-item label="推荐码">
-          <el-input style="width:200px;" v-model="form.smscode"></el-input>
-        </el-form-item>
-        <el-form-item label="上传证书:">
-          <el-select style="width: 200px;" v-model="form.certificateState">
-            <el-option label="未上传" value="0"></el-option>
-            <el-option label="已上传" value="1"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="参与项目ID:">
-          <el-input style="width:200px;" v-model="form.projectId"></el-input>
-        </el-form-item>
-        <el-form-item label="完成项目ID:">
-          <el-input style="width:200px;" v-model="form.completeProjectId"></el-input>
-        </el-form-item>
         <el-form-item label="所在省份:">
           <el-select style="width: 200px;" v-model="form.provinceId" @change="getCityByProvince(form.provinceId)">
             <el-option v-for="item in province_options" :key="item.provinceId" :label="item.provinceName" :value="item.provinceId"></el-option>
@@ -91,6 +76,26 @@
           <el-select style="width: 200px;" v-model="form.cityId">
             <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="推荐码">
+          <el-input style="width:200px;" v-model="form.smscode"></el-input>
+        </el-form-item>
+        <el-form-item label="性别 :">
+          <el-select style="width: 200px;" v-model="form.sex">
+            <el-option label="男" value="0"></el-option>
+            <el-option label="女" value="1"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="出生年份:">
+          <el-date-picker
+            type="year"
+            style="width: 200px;"
+            v-model="form.birDate"
+            value-format="yyyy">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="会员邮箱:">
+          <el-input style="width:200px;" v-model="form.memberEmail"></el-input>
         </el-form-item>
         <el-form-item label="会员医龄">
           <el-date-picker
@@ -107,14 +112,7 @@
             value-format="yyyy">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="出生年份:">
-          <el-date-picker
-            type="year"
-            style="width: 200px;"
-            v-model="form.birDate"
-            value-format="yyyy">
-          </el-date-picker>
-        </el-form-item>
+        
         <el-form-item label="会员职称:">
           <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1)" style="width: 98px;">
             <el-option v-for="item in zc_1_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
@@ -128,25 +126,21 @@
             <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="性别 :">
-          <el-select style="width: 200px;" v-model="form.sex">
-            <el-option label="男" value="0"></el-option>
-            <el-option label="女" value="1"></el-option>
+        <el-form-item label="是否填证件号:">
+          <el-select style="width: 200px;" v-model="form.memberidcardState">
+            <el-option label="未填" value=0></el-option>
+            <el-option label="已填" value=1></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="注册时间 :">
-          <el-date-picker
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            style="width: 200px;"
-            v-model="form.register_time"
-            value-format="yyyy-MM-dd">
-          </el-date-picker>
         </el-form-item>
         <el-form-item label="证件编号 :">
           <el-input v-model="form.memberidcard" style="width:200px;"></el-input>
+        </el-form-item>
+
+        <el-form-item label="上传证书:">
+          <el-select style="width: 200px;" v-model="form.certificateState">
+            <el-option label="未上传" value="0"></el-option>
+            <el-option label="已上传" value="1"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="从医领域:">
           <el-select v-model="form.fields_1" @change="getSonFields(form.fields_1)" style="width: 98px;">
@@ -169,8 +163,16 @@
             <el-option v-for="item in hospital_2_options" :value="item.sectionofficeid" :label="item.sectionofficename" :key="item.sectionofficeid"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="会员邮件:">
-          <el-input style="width:200px;" v-model="form.memberEmail"></el-input>
+        <el-form-item label="注册时间 :">
+          <el-date-picker
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            style="width: 200px;"
+            v-model="form.register_time"
+            value-format="yyyy-MM-dd">
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="活跃度:">
           <el-select style="width: 70px;" v-model="form.fizzType">
@@ -185,12 +187,13 @@
             <el-option label="忠诚" value=4></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="是否填证件号:">
-          <el-select style="width: 200px;" v-model="form.memberidcardState">
-            <el-option label="未填" value=0></el-option>
-            <el-option label="已填" value=1></el-option>
-          </el-select>
+        <el-form-item label="参与项目ID:">
+          <el-input style="width:200px;" v-model="form.projectId"></el-input>
         </el-form-item>
+        <el-form-item label="完成项目ID:">
+          <el-input style="width:200px;" v-model="form.completeProjectId"></el-input>
+        </el-form-item>
+        
         <el-checkbox-group v-model="form.checklist" style="padding-left: 120px;margin-bottom: 20px;">
           <el-checkbox label="0">搜索未审核通过</el-checkbox>
           <el-checkbox label="1">搜索未激活会员</el-checkbox>
@@ -228,6 +231,7 @@
       label="用户id">
     </el-table-column>
     <el-table-column
+      width="100"
       prop="memberHandphone"
       label="用户名">
     </el-table-column>
@@ -292,7 +296,7 @@
     <el-table-column
       fixed="right"
       label="操作"
-      width="150">
+      width="300">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toEdit(scope.row)">编辑</el-button>
         <el-button type="text" size="small" style="margin-left: 0;" @click="showdialog(scope.row)">设置审核状态</el-button>
@@ -392,7 +396,7 @@
         level_options:[],
         total:null,
         pageIndex: 1,
-        pageSize:5,
+        pageSize:30,
         userid:null,
         multipleSelection:null,
         ids:null,
@@ -934,7 +938,9 @@
         this.$router.push({ path: 'vipRecommendRecord'});
       },
       toIntegrationRecord(row){
+        
         sessionStorage.setItem('userid',row.id);
+        sessionStorage.setItem('userName',row.memberRealname);
         this.$router.push({ path: 'vipIntegrationRecord'});
       },
       toActivity(row){

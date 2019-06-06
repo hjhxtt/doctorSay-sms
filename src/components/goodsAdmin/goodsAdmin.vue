@@ -138,7 +138,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="兑换人数：">
-          <el-select style="width: 60px;" v-model="type">
+          <el-select style="width: 90px;" v-model="type">
             <el-option label=">=" value="0"></el-option>
             <el-option label="<=" value="1"></el-option>
           </el-select>
@@ -193,7 +193,7 @@
         label="价格（积分）">
       </el-table-column>
       <el-table-column
-        label="随略图">
+        label="缩略图">
         <template slot-scope="scope">
           <img :src="baseurl+scope.row.giftpicurl" alt="" width="100%"/>
         </template>
@@ -203,8 +203,9 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="editshow(scope.row)">编辑</el-button>
-          <el-button type="text" size="small" @click="changeGrounding(scope.row)">上架/下架</el-button>
+          <el-button type="text" size="small" @click="changeGrounding(scope.row)"  v-html="scope.row.giftstaus=='下架奖品'?'上架':'下架'"></el-button>
         </template>
+        
       </el-table-column> 
     </el-table>    
     <el-pagination
@@ -372,7 +373,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          this.tableData = res.data.obj.list;
+          this.tableData = res.data.obj.list
           for(var i = 0; i < this.tableData.length; i++){
             if(this.tableData[i].giftstaus == 0){
               this.tableData[i].giftstaus = "正常商品"
@@ -384,6 +385,7 @@
               this.tableData[i].giftstaus = "待审核商品"
             }
           }
+
           this.pageTotal = res.data.obj.pager.total;
           console.log(this.pageTotal);
         })

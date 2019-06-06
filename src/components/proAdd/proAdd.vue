@@ -34,13 +34,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="4" v-if="ruleForm.add_type == 1">
-          <el-form-item label="S加分" prop="s_value" style="margin-bottom: 0;">
-            <el-input v-model.number="ruleForm.s_value" class=""></el-input>
+          <el-form-item label="S加分" prop="s_value" style="margin-bottom: 0; width:100px;">
+            <el-input v-model.number="ruleForm.s_value" class="" style="width:80px;"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="4" v-if="ruleForm.add_type == 1">
-          <el-form-item label="Q加分" prop="q_value" style="margin-bottom: 0;">
-            <el-input v-model.number="ruleForm.q_value" class=""></el-input>
+          <el-form-item label="Q加分" prop="q_value" style="margin-bottom: 0; width:100px;">
+            <el-input v-model.number="ruleForm.q_value" class="" style="width:80px;"></el-input>
           </el-form-item>
         </el-col>
       </el-form-item>
@@ -131,7 +131,7 @@
           ],
           pro_id:[
             { required: true, message: '请输入项目id', trigger: 'blur' },
-            { type: 'number', message: '完成奖励必须为数字值'}
+            { type: 'number', message: '项目id必须为数字值'}
           ],
           pro_num:[
             { required: true, message: '请输入项目编号', trigger: 'blur' },
@@ -154,11 +154,11 @@
           ],
           s_value:[
             { required: true, message: '请输入S加分', trigger: 'blur' },
-            { type: 'number', message: '完成奖励必须为数字值'}
+            { type: 'number', message: 'S加分必须为数字值'}
           ],
           q_value:[
             { required: true, message: '请输入Q加分', trigger: 'blur' },
-            { type: 'number', message: '完成奖励必须为数字值'}
+            { type: 'number', message: 'Q加分必须为数字值'}
           ],
           start_date:[
             { required: true, message: '请选择发布时间', trigger: 'change' }

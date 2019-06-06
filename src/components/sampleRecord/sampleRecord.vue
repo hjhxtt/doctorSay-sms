@@ -3,6 +3,7 @@
     <div class="title">
       <i class="el-icon-edit"></i>
       <span>项目抽样记录</span>抽样总人数 {{cy_number}}
+      <p style="float:right;" > <span style="font-size:14px;">项目id：{{pro_id}}</span><span style="font-size:14px;margin-right:20px;">项目名称：{{pro_name}}</span></p>
     </div>
     <el-table
       :data="tableData"
@@ -11,6 +12,7 @@
       <el-table-column
         fixed
         prop="sampleTime"
+        width="160"
         label="抽样时间">
       </el-table-column>
       <!--<el-table-column
@@ -23,22 +25,31 @@
       </el-table-column>
       <el-table-column
         prop="sampleNumber"
-        label="抽样人数">
+        label="抽样人数"
+        width="80"
+        >
       </el-table-column>
       <el-table-column
         prop="sampleno"
-        label="批次">
+        label="批次"
+        width="80"
+        >
       </el-table-column>
       <el-table-column
         prop="smsno"
-        label="短信次数">
+        label="短信次数"
+        width="80"
+        >
       </el-table-column>
       <el-table-column
         prop="emailno"
-        label="邮件次数">
+        label="邮件次数"
+        width="80"
+        >
       </el-table-column>
       <el-table-column
         fixed="right"
+        width="160"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="sendEmail(scope.$index,scope.row)">发送邮件</el-button>
@@ -54,8 +65,38 @@
     mounted(){
       this.getSampleRecord();
       this.getSampleTotal();
+      this.getProject()
+    },
+    data() {
+      return {
+        pro_id:'',
+        pro_name:'',
+      }
     },
     methods: {
+      getProject(){
+        this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
+          params: {
+            params:{
+              id: Number(sessionStorage.getItem("id"))
+//            id: Number(this.$route.query.id)
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.success){
+            console.log(res.data.obj);
+            this.pro_id = res.data.obj.id;
+            this.pro_name = res.data.obj.projectName;
+            
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
       sendEmail(index,data){
         //console.log(sessionStorage)
         console.log(this.tableData)
@@ -142,5 +183,8 @@
   .sampleRecord-wrapper .title i{
     font-size: 17px;
     margin-right: 5px;
+  }
+  .sampleRecord-wrapper .el-table td{
+    padding: 5px 0;
   }
 </style>

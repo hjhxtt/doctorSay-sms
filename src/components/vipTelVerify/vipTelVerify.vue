@@ -334,6 +334,7 @@
       console.log(qcinfo)
       this.qcform.mobilenum = qcinfo.mobilenum;
       this.qcform.telnum = qcinfo.telnum;
+      debugger
       this.qcform.state = qcinfo.state.toString();
       this.qcform.week = qcinfo.week.toString();
       this.qcform.comment = qcinfo.comment;

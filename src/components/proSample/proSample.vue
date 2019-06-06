@@ -1,5 +1,6 @@
 <template>
   <div class="proSample-wrapper">
+    <p style="float:right;" > <span style="font-size:14px;">项目id：{{pro_id}}</span><span style="font-size:14px;margin-right:20px;">项目名称：{{pro_name}}</span></p>
     <div class="title">
       已定义项目抽样条件列表（当前项目参数使用量：{{hasSampleCount}}/{{total}}）
       <el-button type="primary" size="mini" @click="toaddParam">添加抽样条件</el-button>
@@ -14,7 +15,7 @@
         <el-table-column
           prop="sampleName"
           label="条件名称"
-          width="90">
+          width="300">
         </el-table-column>
         <el-table-column
           prop="sampleContent"
@@ -57,7 +58,7 @@
           <el-checkbox v-for="(item,index) in state_options" :label="item.name" :key="item.value" @change="getInType(item,index)"></el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item>
+      <!-- <el-form-item>
         <el-checkbox v-model="not_checked">排他项目ID：</el-checkbox>
         <el-input v-model="notid_input" placeholder="多个项目使用“,”分隔" style="width: 228px;margin-right: 10px;"></el-input>
         <el-radio v-model="not_radio" label="0">未参与指定项目</el-radio>
@@ -65,13 +66,14 @@
         <el-checkbox-group v-model="not_checkList" style="padding-left: 518px;" v-if="not_radio == 1">
           <el-checkbox v-for="(item,index) in state_options" :label="item.name" :key="item.value" @change="getNotType(item,index)"></el-checkbox>
         </el-checkbox-group>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item>
         <el-button type="success" @click="getSampleTotal" :loading="isload1">检索可抽样人数</el-button>
         <span v-if="isshownum">可抽样人数{{sampleNumber}}人</span>
       </el-form-item>
-      <el-form-item label="本次可抽样人数：">
+      <el-form-item label="本次抽样人数：">
         <el-input v-model="can_sample" style="width: 228px;"></el-input>
+        <span v-if="this.peopleNum != ''" style="color:red;margin-left:10px;">抽样已完成,本次抽样人数: {{this.peopleNum}}人</span>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="doSampleQuestion" :loading="isload2">对选中条件开始抽样</el-button>
@@ -84,6 +86,9 @@
   export default {
     data() {
       return {
+        peopleNum:'',
+        pro_id:'',
+        pro_name:'',
         isload1: false,
         isload2: false,
         tableData3: [],
@@ -95,12 +100,12 @@
         not_checked: false,
         inid_input:'',
         notid_input:'',
-        in_radio:'',
+        in_radio:'0',
         not_radio: '',
         in_checkList:[],
         not_checkList:[],
         can_sample:'',
-        isjoin_radio: '',
+        isjoin_radio: '0',
         is_choose_join:false,
         questionIdList:[],
         sampleTimeEntity:null,
@@ -122,8 +127,34 @@
     mounted(){
       this.getSampleQuestionList();
       this.getSampleCount();
+      this.getProject()
     },
     methods:{
+      getProject(){
+        this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
+          params: {
+            params:{
+              id: Number(sessionStorage.getItem("id"))
+//            id: Number(this.$route.query.id)
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.success){
+            console.log(res.data.obj);
+            this.pro_id = res.data.obj.id;
+            this.pro_name = res.data.obj.projectName;
+            console.log(this.pro_id);
+            console.log(this.pro_name);
+            
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
       handleSelectionChange(val) {
         this.multipleSelection = val;
         console.log(this.multipleSelection);
@@ -167,7 +198,7 @@
       },
       //对选中条件开始抽样
       doSampleQuestion(){
-
+        this.peopleNum = ''
         if(this.can_sample == ''){
           this.$message({
           message: '抽样人数不可为空',
@@ -271,6 +302,9 @@
               type: 'success',
               message: '抽样成功'
             })
+            //todo
+            this.peopleNum = this.can_sample
+            this.can_sample = ''
           }else{
             this.$message.error(res.data.msg);
           }
@@ -456,7 +490,7 @@
   }
 
   .proSample-wrapper .el-table{
-    width: 66%;
+    width: 90%;
     margin: 0 auto;
   }
 

@@ -147,11 +147,11 @@
           ],
           s_value:[
             { required: true, message: '请输入S加分', trigger: 'blur' },
-            { type: 'number', message: '完成奖励必须为数字值'}
+            { type: 'number', message: 'S加分必须为数字值'}
           ],
           q_value:[
             { required: true, message: '请输入Q加分', trigger: 'blur' },
-            { type: 'number', message: '完成奖励必须为数字值'}
+            { type: 'number', message: 'Q加分必须为数字值'}
           ],
           start_date:[
             { required: true, message: '请选择发布时间', trigger: 'change' }

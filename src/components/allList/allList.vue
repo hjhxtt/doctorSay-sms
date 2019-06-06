@@ -340,11 +340,14 @@
     margin-left: 80px;
     margin-bottom: 50px;
   }
-  .title{
+  /* .title{
     margin: 20px 0;
     font-weight: 700;
     margin-left: -20px;
-  }
+  } */
+   /* .el-input__inner{
+    width: 200px;
+  } */
   .qxlb{
     margin: 50px 0;
   }
@@ -359,13 +362,11 @@
   .butt{
     margin-top: 50px;
   }
-  .el-input__inner{
-    width: 200px;
-  }
+ 
   .el-form-item__label {
     text-align: right;
     float: left;
-    font-size: 16px;
+    font-size: 14px;
     color: #606266;
     line-height: 40px;
     padding: 0 12px 0 0;

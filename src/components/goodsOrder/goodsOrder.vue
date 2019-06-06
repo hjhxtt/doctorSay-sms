@@ -69,7 +69,7 @@
       ref="multipleTable"
       :data="tableData"
       tooltip-effect="dark"
-      style="width: 100%"
+      style="width: 100%;"
       border
       @selection-change="handleSelectionChange">
       <el-table-column
@@ -78,18 +78,22 @@
       </el-table-column>
       <el-table-column
         prop="id"
+        width="80"
         label="订单ID">
       </el-table-column>
       <el-table-column
         prop="userid"
+        width="100"
         label="会员ID">
       </el-table-column>
       <el-table-column
         prop="memberRealname"
+        width="100"
         label="会员账号">
       </el-table-column>
       <el-table-column
         prop="deliverstatus"
+        width="80"
         label="审核状态">
       </el-table-column>
       <el-table-column
@@ -102,6 +106,7 @@
       </el-table-column>
       <el-table-column
         prop="giftprize"
+        width="110"
         label="价格（积分）">
       </el-table-column>
       <el-table-column
@@ -110,6 +115,7 @@
       </el-table-column>
       <el-table-column
         fixed="right"
+        width="100"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="showdialog(scope.row)">审核</el-button>
@@ -158,7 +164,7 @@
         categoryList:[],
         multipleSelection: [],
         pageIndex: 1,
-        pageSize: 6,
+        pageSize: 30,
         pageTotal: null,
         rules: {
           giftname: [
@@ -302,7 +308,7 @@
       getConvertGifsList(pageIndex,pageSize){
         this.id = this.id?Number(this.id): null;
         this.userid = this.userid?Number(this.userid): null;
-        this.deliverstatus = this.deliverstatus?Number(this.deliverstatus): null;
+        var deliverstatus = this.deliverstatus?Number(this.deliverstatus): null;
         this.axios.get(this.common.getApi() + '/sys/api/convertgifs/getConvertGifsList',{
           params:{
             pageIndex: pageIndex,
@@ -311,7 +317,7 @@
               categoryName: this.categoryName,
               id: this.id,
               userid: this.userid,
-              deliverstatus: this.deliverstatus,
+              deliverstatus: deliverstatus,
               converttime: this.converttime
             }
           }
@@ -320,6 +326,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
+          
           this.tableData = res.data.obj.list;
           for(var i = 0; i < this.tableData.length; i++){
             if(this.tableData[i].deliverstatus == 0){

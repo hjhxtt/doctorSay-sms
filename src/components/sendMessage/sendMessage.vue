@@ -111,7 +111,7 @@
                 if(res.data.success){
                   this.$message({
                     type: 'success',
-                    message: '添加成功'
+                    message: '成功'
                   })
                 }else{
                   this.$message.error(res.data.msg)

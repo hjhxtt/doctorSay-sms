@@ -1,5 +1,5 @@
 <template>
-    <el-aside>
+    <el-aside style="width:220px;">
     	<el-row class="tac" style="height: 100%;">
   		  <el-col style="height: 100%;">
   		    <el-menu
@@ -134,6 +134,7 @@ export default {
   },
   methods: {
     getAuthority(){
+      var $this = this
       this.axios.get(this.common.getApi() + '/sys/api/auth/getAuthority').then(res=>{
             if(res.data.success){
               var newList = []
@@ -165,7 +166,7 @@ export default {
               this.menuList = newList
             }else{
               this.$message.error(res.data.msg);
-              this.$router.push('/login')
+              $this.$router.push('/login')
             }
             
         })
@@ -358,10 +359,12 @@ export default {
 <style>
 	.el-aside,.tac{
 		height: 100%;
+    
 	}
 	
 	.slider{
 	  height: 100%;
+    width: 300px;
 	}
 	
 	.el-menu-item-group__title{

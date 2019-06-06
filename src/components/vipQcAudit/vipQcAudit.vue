@@ -49,14 +49,14 @@
           <el-input style="width: 200px;" v-model="realName"></el-input>
         </el-form-item>
         <el-form-item label="拨科电数 ：" title="拨打科室电话次数">
-          <el-select style="width: 76px;" v-model="roomtype">
+          <el-select style="width: 90px;" v-model="roomtype">
             <el-option label=">=" value=0></el-option>
             <el-option label="<=" value=1></el-option>
           </el-select>
           <el-input style="width: 120px;" v-model="roomenum"></el-input>
         </el-form-item>
         <el-form-item label="拨手机数  ：" title="拨打手机电话次数">
-          <el-select style="width: 76px;" v-model="mobiletype">
+          <el-select style="width: 90px;" v-model="mobiletype">
             <el-option label=">=" value=0></el-option>
             <el-option label="<=" value=1></el-option>
           </el-select>

@@ -40,8 +40,8 @@
       <el-table-column
         label="执业证书">
          <template slot-scope="scope">
-            <img :src="baseurl + scope.row.filename" alt="" />
-            <img :src="baseurl + scope.row.secondfilename" alt="" />
+            <img style="height:60px;" :src="baseurl + scope.row.filename" alt="" @click="bigSize('first',scope.row)" />
+            <img style="height:60px;" :src="baseurl + scope.row.secondfilename" alt="" @click="bigSize('second',scope.row)" />
         </template>
       </el-table-column>
       <el-table-column
@@ -64,6 +64,9 @@
       :page-size="pageSize"
       @current-change="go">
     </el-pagination>
+    <div class="bigPic" v-if="showPic" @click="showPic=false">
+      <img :src="picUrl" alt="" >
+    </div>
   </div>
 </template>
 
@@ -71,21 +74,36 @@
   export default {
     data() {
       return {
+        picUrl:'',
         tableData: [],
         pageIndex:1,
-        pageSize:6,
+        pageSize:30,
         pageTotal:null,
         memberName:null,
         memberMobile:null,
         memberId:null,
         state:null,
-        baseurl: baseurl
+        baseurl: baseurl,
+        showPic:false
       }
     },
     mounted(){
       this.getCertificateMemberList(this.pageIndex,this.pageSize);
     },
     methods: {
+      bigSize(type,row){
+        console.log(row);
+        
+        this.showPic = true
+        if(type == "first"){
+          this.picUrl = this.baseurl + row.filename
+        }else{
+          this.picUrl = this.baseurl + row.secondfilename
+        }
+        console.log(this.picUrl);
+        
+        
+      },
       resetForm(){
         this.memberId = null;
         this.memberMobile = null;
@@ -185,5 +203,22 @@
   .vipZyzAudit-wrapper .el-pagination{
     text-align: center;
     margin-top: 20px;
-  }   
+  } 
+  .bigPic{
+    width: 100vw;
+    height: 100vh;
+    background:rgba(0,0,0,.3);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+  }  
+  .bigPic img{
+    max-width: 70vw;
+    max-height: 70vh;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%)
+  }  
 </style>
