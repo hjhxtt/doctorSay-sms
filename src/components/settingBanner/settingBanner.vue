@@ -2,6 +2,7 @@
   <div class="settingBanner-wrapper">
     <el-button type="primary" @click="adddialogVisible = true" style="margin-bottom: 20px;">增加</el-button>
     <el-table
+      :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       :data="tableData"
       border
       size="mini"

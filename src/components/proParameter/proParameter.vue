@@ -217,4 +217,13 @@
     height: 150px !important;
     width: 380px;
   }
+  .el-input.is-disabled .el-input__inner{
+    color:#666;
+  }
+  .el-input__inner::placeholder{
+    color:#666;
+  }
+  .el-textarea__inner::placeholder{
+    color:#666;
+  }
 </style>

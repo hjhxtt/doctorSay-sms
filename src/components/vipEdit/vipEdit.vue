@@ -79,6 +79,10 @@
           <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
+      
+      <!-- <el-form-item label="从医领域" prop="medical_field_2" style="width:518px;"> 
+        <el-input type="text" @focus="visi=true"></el-input>
+      </el-form-item> -->
       <el-form-item label="从医领域" prop="medical_field_2"> 
         <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
           <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
@@ -169,6 +173,34 @@
         <el-button type="primary" @click="submitForm('form')" :loading="isload">保存</el-button>
       </el-form-item> 
     </el-form>
+    <!-- <el-dialog title="列表" width="800px" :visible.sync="visi">
+      <div class="info_body">
+        <div class="box" style="overflow-y:scroll;">
+          
+
+
+
+          <div style="margin: 15px 0;"></div>
+          <el-checkbox-group v-model="form.medical_field_1"  @change="getSonFields2(form.medical_field_1)">
+            <el-checkbox v-for="item in field_1_options"  :label="item.id"  :key="item.id"  >{{item.fieldname}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        
+
+
+
+        <div class="box" style="overflow-y:scroll;">
+          <div style="margin: 15px 0;"></div>
+          <el-checkbox-group v-model="form.membertechnical" @change="">
+            <el-checkbox v-for="item in field_2_options" :label="item.id" :key="item.id">{{item.fieldname}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visi = false">取 消</el-button>
+        <el-button type="primary" @click="visi = false">确 定</el-button>
+      </span>
+    </el-dialog> -->
   </div>
 </template>
 
@@ -176,6 +208,13 @@
   export default {
     data() {
       return {
+        checkAll: false,
+        checkedCities: ['上海', '北京'],
+        cities: ['上海', '北京', '广州', '深圳'],
+        isIndeterminate: true,
+        checkList:'',
+        checkList1:'',
+        visi:false,
         member_options:[
           {label:"医师资格证", id:1},
           {label:"医师执业证", id:2},
@@ -286,6 +325,11 @@
       this.getSociety();
     },
     methods: {
+      handleCheckedCitiesChange(value) {
+        let checkedCount = value.length;
+        this.checkAll = checkedCount === this.cities.length;
+        this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -552,6 +596,7 @@
         //}
       },
       getSonFields2(parentId){
+        
         this.field_2_options = [];
         for(var i = 0; i < parentId.length; i++){
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
@@ -796,4 +841,26 @@
 </script>
 
 <style>
+  .info_body{
+    border:1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .info_body .box{
+    height: 300px;
+    width: 300px;
+    margin:0 20px;
+  }
+  .el-checkbox {
+    display: block;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-right: 30px;
+}
 </style>

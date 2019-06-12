@@ -5,6 +5,7 @@
       :data="tableData"
       border
       size="mini"
+      :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       style="width: 100%">
       <el-table-column
         type="index"

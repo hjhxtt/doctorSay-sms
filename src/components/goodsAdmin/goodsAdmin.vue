@@ -156,6 +156,8 @@
     <el-table
       ref="multipleTable"
       :data="tableData"
+      v-loading="loading"
+      :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       tooltip-effect="dark"
       style="width: 100%"
       border
@@ -222,6 +224,7 @@
   export default {
     data() {
       return {
+        loading:true,
         baseurl: baseurl,
         dialogAddVisible:false,
         dialogEditVisible:false,
@@ -351,6 +354,7 @@
         })        
       },
       getGiftsList(pageIndex,pageSize){
+        this.loading = true
         var countEntity = null;
         if(this.type && this.count){
          countEntity = {type:Number(this.type),count:Number(this.count)}
@@ -385,7 +389,7 @@
               this.tableData[i].giftstaus = "待审核商品"
             }
           }
-
+          this.loading =false
           this.pageTotal = res.data.obj.pager.total;
           console.log(this.pageTotal);
         })

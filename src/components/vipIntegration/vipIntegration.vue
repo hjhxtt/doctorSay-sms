@@ -70,6 +70,10 @@ export default {
         this.fileParam = file;
       },
       submitUpload(){
+        if(this.fileParam === ''){
+          this.$message.error('积分文本不能为空')
+          return false
+        }
         this.uploadForm.append('file', this.fileParam[0].raw);
         this.axios.post(this.common.getApi() + '/sys/api/memberintegral/uploadIntegral',this.uploadForm,{
           headers: {
@@ -127,5 +131,8 @@ export default {
 
   .vipIntegration-wrapper .intr-txt p{
     color: blue;
+  }
+  .vipIntegration-wrapper  .el-upload-list{
+    width: 240px;
   }
 </style>

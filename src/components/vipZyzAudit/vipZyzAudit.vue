@@ -23,7 +23,9 @@
     <el-table
       :data="tableData"
       border
+      v-loading="loading"
       style="width: 100%"
+      :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       size="mini">
       <el-table-column
         prop="id"
@@ -74,6 +76,7 @@
   export default {
     data() {
       return {
+        loading:true,
         picUrl:'',
         tableData: [],
         pageIndex:1,
@@ -110,6 +113,7 @@
         this.memberName = null;
       },
       getCertificateMemberList(pageIndex,pageSize){
+        this.loading = true
         this.axios.get(this.common.getApi() + '/sys/api/audit/getCertificateMemberList',{
           params:{
             pageIndex: pageIndex,
@@ -151,6 +155,7 @@
                 this.tableData[i].isblackname = "测试"
               }
             }
+            this.loading = false
           }else{
             this.$message.error(res.data.msg);
           }

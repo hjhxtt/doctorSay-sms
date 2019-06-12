@@ -213,13 +213,15 @@
       </el-form>
     </div>
     <div class="title">
-      <i class="el-icon-search"></i><span>会员搜索结果</span>
+      <i class="el-icon-search"></i><span>会员搜索结果</span><span v-if="total" style="color:red;font-size:14px;">共{{total}}条数据</span><span v-else style="color:red;font-size:14px;">共0条数据</span>
     </div>
     <el-table
     :data="tableData"
+    v-loading="loading"
     border
     size="mini"
     style="width: 100%"
+    :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
     ref="multipleTable"
     @selection-change="handleSelectionChange">
     <el-table-column
@@ -346,6 +348,7 @@
   export default {
     data () {
       return {
+        loading:true,
         tableData: [],
         form:{
           memberName: null,
@@ -419,7 +422,11 @@
         },
       };
     },
+    beforeDestroy() {
+      sessionStorage.setItem('form',JSON.stringify(this.form) )
+    },
     mounted(){
+      
       this.getProvince();
       this.getStationDuties();
       this.getAdminiStraion();
@@ -427,6 +434,9 @@
       this.getParentOffice();
       this.getHospitalLevel();
       this.getMemberList(this.pageIndex,this.pageSize);
+      if ( Boolean(sessionStorage.getItem('form'))) {
+        this.form = JSON.parse(sessionStorage.getItem('form'))
+      }
     },
     methods: {
       resetForm(formName) {
@@ -691,6 +701,7 @@
         this.getMemberList(currentPage,this.pageSize);
       },
       getMemberList(pageIndex,pageSize){
+        this.loading = true
         console.log(pageIndex)
         this.axios.post(this.common.getApi() + '/sys/api/member/getMemberList',{
           pageIndex:pageIndex,
@@ -726,6 +737,7 @@
             membertechnical: this.form.membertechnical
           },
         }).then((res) => {
+          
           if(res.data.success){
             for(var i = 0; i < res.data.obj.list.length; i++){
               //性别
@@ -775,6 +787,7 @@
             }
             this.tableData = res.data.obj.list;
             this.total = res.data.obj.pager.total;
+            this.loading = false
           }else{
             this.$message.error(res.data.msg);
           }

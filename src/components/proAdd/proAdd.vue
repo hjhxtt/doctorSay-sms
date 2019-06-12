@@ -15,6 +15,16 @@
       <el-form-item label="项目标题" prop="pro_title">
         <el-input v-model="ruleForm.pro_title" class="inputlength"></el-input>
       </el-form-item>
+      <el-form-item label="项目状态" prop="pro_state">
+          <el-select v-model="ruleForm.pro_state" size="">
+            <el-option label="正在进行" value="0"></el-option>
+            <el-option label="已完成" value="1"></el-option>
+            <el-option label="等待积分处理" value="2"></el-option>
+            <el-option label="暂停" value="3"></el-option>
+            <el-option label="尚未开始" value="5"></el-option>
+            <el-option label="项目撤销" value="6"></el-option>
+          </el-select>
+      </el-form-item>
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="ruleForm.name" class="inputlength"></el-input>
       </el-form-item>
@@ -118,7 +128,9 @@
           hdopid:'',//hdopid
           time: '',//问卷时长
           add_jf:'',//加分
-          welcome_txt:''
+          welcome_txt:'',
+          pro_state:''//状态
+
         },
         typeSelect: [
 
@@ -141,6 +153,9 @@
           ],
           name:[
             { required: true, message: '请输入客户名称', trigger: 'blur' },
+          ],
+          pro_state:[
+            { required: true, message: '请选择状态', trigger: 'change' },
           ],
           add_type: [
             { required: true, message: '请选择加分类别', trigger: 'change' }
@@ -230,7 +245,8 @@
                 recompointnum: Number(this.ruleForm.add_jf),
                 hdopid: this.ruleForm.hdopid,
                 surveylenth: Number(this.ruleForm.time),
-                welcomecontent: this.ruleForm.welcome_txt
+                welcomecontent: this.ruleForm.welcome_txt,
+                projectState: this.ruleForm.pro_state,
               }
             }).then((res) => {
               this.isload = false;

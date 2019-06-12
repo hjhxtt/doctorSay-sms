@@ -68,8 +68,10 @@
     <el-table
       ref="multipleTable"
       :data="tableData"
+      v-loading="loading"
       tooltip-effect="dark"
       style="width: 100%;"
+      :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       border
       @selection-change="handleSelectionChange">
       <el-table-column
@@ -83,12 +85,12 @@
       </el-table-column>
       <el-table-column
         prop="userid"
-        width="100"
+        width="80"
         label="会员ID">
       </el-table-column>
       <el-table-column
         prop="memberRealname"
-        width="100"
+        width="90"
         label="会员账号">
       </el-table-column>
       <el-table-column
@@ -98,6 +100,7 @@
       </el-table-column>
       <el-table-column
         prop="adress"
+        width="220"
         label="兑换联系信息">
       </el-table-column>
       <el-table-column
@@ -111,6 +114,7 @@
       </el-table-column>
       <el-table-column
         prop="converttime"
+        width="100"
         label="兑换时间">
       </el-table-column>
       <el-table-column
@@ -160,6 +164,7 @@
   export default {
     data() {
       return {
+        loading:true,
         tableData: [],
         categoryList:[],
         multipleSelection: [],
@@ -306,6 +311,7 @@
         }
       },
       getConvertGifsList(pageIndex,pageSize){
+        this.loading = true
         this.id = this.id?Number(this.id): null;
         this.userid = this.userid?Number(this.userid): null;
         var deliverstatus = this.deliverstatus?Number(this.deliverstatus): null;
@@ -339,6 +345,7 @@
           }
           this.pageTotal = res.data.obj.pager.total;
           console.log(this.pageTotal);
+          this.loading = false
         })
       },
       go(currentPage){

@@ -15,6 +15,16 @@
       <el-form-item label="项目编号" prop="pro_num">
         <el-input v-model="ruleForm.pro_num" class="inputlength"></el-input>
       </el-form-item>
+      <el-form-item label="项目状态" prop="pro_state">
+          <el-select v-model="ruleForm.pro_state" size="">
+            <el-option label="正在进行" :value="0"></el-option>
+            <el-option label="已完成" :value="1"></el-option>
+            <el-option label="等待积分处理" :value="2"></el-option>
+            <el-option label="暂停" :value="3"></el-option>
+            <el-option label="尚未开始" :value="5"></el-option>
+            <el-option label="项目撤销" :value="6"></el-option>
+          </el-select>
+      </el-form-item>
       <el-form-item label="客户名称" prop="name">
         <el-input v-model="ruleForm.name" class="inputlength"></el-input>
       </el-form-item>
@@ -114,7 +124,8 @@
           hdopid:'',//hdopid
           time: '',//问卷时长
           add_jf:'',//加分
-          welcome_txt:''
+          welcome_txt:'',
+          pro_state:''
         },
         typeSelect: [],
         checked:false,//
@@ -122,6 +133,9 @@
         rules: {
           type: [
             { required: true, message: '请选择调查类别', trigger: 'change' }
+          ],
+          pro_state:[
+            { required: true, message: '请选择状态', trigger: 'change' },
           ],
           pro_id:[
             { required: true, message: '请输入项目id', trigger: 'blur' },
@@ -214,6 +228,7 @@
           this.ruleForm.pro_id = res.data.obj.id;
           this.ruleForm.pro_num = res.data.obj.projectId;
           this.ruleForm.pro_title = res.data.obj.projectName;
+          this.ruleForm.pro_state = res.data.obj.projectState;
           this.ruleForm.name = res.data.obj.customer;
           this.ruleForm.add_type = res.data.obj.projecttype;
           if(res.data.obj.projecttype == 1){
@@ -250,6 +265,7 @@
             id: Number(this.ruleForm.pro_id),
             projectId: this.ruleForm.pro_num,
             projectName: this.ruleForm.pro_title,
+            projectState:this.ruleForm.pro_state,
             customer: this.ruleForm.name,
             projecttype: Number(this.ruleForm.add_type),
             projectPerson: this.ruleForm.jlr_name,

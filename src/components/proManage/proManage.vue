@@ -54,7 +54,9 @@
     <div class="table-wrapper">
       <el-table
         :data="tableData3"
+        v-loading="loading"
         border
+        :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
         style="width: 100%"
         size="mini">
         <el-table-column
@@ -77,10 +79,12 @@
         </el-table-column>
         <el-table-column
           prop="projectPerson"
+          width="90"
           label="记录人">
         </el-table-column>
         <el-table-column
           prop="projectIntegral"
+          width="80"
           label="完成奖励">
         </el-table-column>
         <el-table-column
@@ -95,6 +99,7 @@
         </el-table-column>
         <el-table-column
           prop="projectJoinNum"
+          width="80"
           label="已参与数">
         </el-table-column>
         <el-table-column
@@ -138,6 +143,7 @@
   name: 'slider',
   data(){
     return {
+      loading:true,
       formInline: {
         pro_id: null,
         pro_title: null,
@@ -145,7 +151,7 @@
       },
       pageTotal:0,
       pageIndex: 1,
-      pageSize:30,
+      pageSize:20,
       tableData3:[],
       dialogVisible:false,
       editform:{
@@ -201,6 +207,7 @@
       console.log('submit!');
     },
     getList(pageIndex,pageSize,id,projectName,projectState){
+      this.loading = true
       this.axios.get(this.common.getApi() + '/sys/api/project/getList',{
         params:{
           pageIndex: pageIndex,
@@ -234,6 +241,7 @@
         }
         this.pageTotal = res.data.obj.pager.total;
         console.log(this.pageTotal);
+        this.loading =false
       })
     },
     go(currentPage){

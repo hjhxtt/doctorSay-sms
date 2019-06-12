@@ -94,13 +94,25 @@
         </el-form-item>
         <el-form-item label="注册时间：">
           <el-date-picker
-            v-model="registerTime"
-            type="daterange"
+            v-model="registTimeBegin"
+            type="date"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            @change="time"
             value-format="yyyy-MM-dd">
-          </el-date-picker>          
+          </el-date-picker>
+           <span style="margin: 0 12px;">到</span>
+          <el-date-picker
+            v-model="registTimeEnd"
+            type="date"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            @change="time"
+            value-format="yyyy-MM-dd">
+          </el-date-picker>  
+
         </el-form-item>
         <!--<el-form-item >
           <el-button type="success" plain>待释放人数：0</el-button>
@@ -118,8 +130,10 @@
     </div>
     <el-table
     :data="tableData"
+    v-loading="loading"
     border
     size="mini"
+    :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
     style="width: 100%">
     <el-table-column
       prop="id"
@@ -180,6 +194,7 @@
   export default {
     data() {
       return {
+        loading:true,
         tableData: [],
         dialogVisible: false,
         teltime:null,
@@ -207,6 +222,10 @@
       this.getQcMemberList(this.pageIndex,this.pageSize)
     },
     methods: {
+      time(){
+        console.log(this.registerTime);
+        
+      },
       resetForm(){
         this.userId = null;
         this.mobile = null;
@@ -249,14 +268,13 @@
         })          
       },
       getQcMemberList(pageIndex,pageSize){
+        this.loading = true
         this.userId = this.userId?Number(this.userId):null;
         this.mobile = this.mobile?this.mobile:null;
         this.realName = this.realName?this.realName:null;
         this.studioPhone = this.roomtype && this.roomenum?{type: this.roomtype ,number: this.roomenum }:null;
         this.mobilePhone = this.mobiletype && this.mobilenum?{type: this.mobiletype ,number: this.mobilenum }:null;
         this.isCertificate = this.isCertificate?this.isCertificate:null; 
-        this.registTimeBegin = this.registerTime?this.registerTime[0]:null;
-        this.registTimeEnd = this.registerTime?this.registerTime[1]:null;
         this.beginTime = this.beginTime?Number(this.beginTime.slice(0,2)):null;
         this.endTime = this.endTime?Number(this.endTime.slice(0,2)):null;
         this.axios.get(this.common.getApi() + '/sys/api/audit/getQcMemberList',{
@@ -290,6 +308,7 @@
             this.tableData[i].phoneNum = this.tableData[i].phoneNum?this.tableData[i].phoneNum:0;
             this.tableData[i].mobileNum = this.tableData[i].mobileNum?this.tableData[i].mobileNum:0;
           }
+          this.loading = false
         })
       },
       goQcMemberAudit(){
@@ -357,5 +376,8 @@
   .vipQcAudit-wrapper .el-pagination{
     text-align: center;
     margin-top: 20px;
-  }     
+  }    
+ .vipQcAudit-wrapper .el-form-item--mini.el-form-item {
+   margin-bottom: 5px;
+ }
 </style>

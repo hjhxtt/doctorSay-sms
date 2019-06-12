@@ -59,11 +59,11 @@
       submitForm(formName) {
 
       function checkTime(i){
-       if (i<10){
-           i="0" + i
-       }
-       return i;
-    }
+              if (i<10){
+                  i="0" + i
+              }
+              return i;
+            }
 
 
 
@@ -111,8 +111,12 @@
                 if(res.data.success){
                   this.$message({
                     type: 'success',
-                    message: '成功'
+                    message: '发送成功'
                   })
+                  this.message=''
+                  this.testTel=''
+                  this.sendTime=''
+                  this.taskName=''
                 }else{
                   this.$message.error(res.data.msg)
                   console.log(res.data)
