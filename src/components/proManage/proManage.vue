@@ -167,8 +167,26 @@
   },
   mounted(){
     this.getList(this.pageIndex,this.pageSize,this.formInline.pro_id,this.formInline.pro_title,this.formInline.pro_state);
+    this.getCar()
   },
   methods:{
+    getCar(){
+      this.axios({
+      method: "GET",
+      url: 'https://testapi.che300.com/service/mortageQuery' ,
+      params:{
+      token:'00932aa74838efdb693018dfdc0814bd',
+      carNo:'川AG7V34',
+      vin:'LJDMAA225J0022594',
+      carType:'02',
+      carOwner:'杨梦云',
+      tel:'17621953379'
+      }
+      }).then((res) => {
+
+      console.log(res);
+      })
+      },
     resetForm(){
       this.formInline.pro_id = null;
       this.formInline.pro_title = null;
@@ -228,7 +246,7 @@
           if(this.tableData3[i].projectState == 0){
             this.tableData3[i].projectState = '正在进行'
           }else if(this.tableData3[i].projectState == 1){
-            this.tableData3[i].projectState = '已完成'
+            this.tableData3[i].projectState = '已结束'
           }else if(this.tableData3[i].projectState == 2){
             this.tableData3[i].projectState = '等待积分处理'
           }else if(this.tableData3[i].projectState == 3){

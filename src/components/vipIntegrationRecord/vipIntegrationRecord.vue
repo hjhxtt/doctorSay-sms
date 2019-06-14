@@ -11,10 +11,12 @@
       style="width: 100%">
       <el-table-column
         prop="integralrecordid"
+        width="150"
         label="记录编号">
       </el-table-column>
       <el-table-column
         prop="integral"
+        width="150"
         label="分数">
       </el-table-column>
       <el-table-column
@@ -23,6 +25,7 @@
       </el-table-column>
       <el-table-column
         prop="integralrecordtime"
+        width="200"
         label="时间">
       </el-table-column>
     </el-table>
@@ -101,6 +104,7 @@
         }
       }).then((res) => {
         console.log(res);
+        
         this.total_num = res.data.obj == null? 0 : res.data.obj;
       })
     }

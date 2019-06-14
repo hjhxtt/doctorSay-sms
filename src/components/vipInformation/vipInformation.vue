@@ -226,10 +226,11 @@
     @selection-change="handleSelectionChange">
     <el-table-column
       type="selection"
-      width="55">
+      width="30">
     </el-table-column>
     <el-table-column
       prop="id"
+      width="60"
       label="用户id">
     </el-table-column>
     <el-table-column
@@ -239,26 +240,32 @@
     </el-table-column>
     <el-table-column
       prop="memberRealname"
+      width="80"
       label="会员姓名">
     </el-table-column>
     <el-table-column
       prop="memberSex"
+      width="50"
       label="性别">
     </el-table-column>
     <el-table-column
       prop="memberFizz"
+      width="60"
       label="活跃度">
     </el-table-column>
     <el-table-column
       prop="memberState"
+      width="70"
       label="激活状态">
     </el-table-column>
     <el-table-column
       prop="province"
+       width="50"
       label="地区">
     </el-table-column>
     <el-table-column
       prop="city"
+       width="70"
       label="区域">
     </el-table-column>
     <el-table-column
@@ -267,6 +274,7 @@
     </el-table-column>
     <el-table-column
       prop="memberIntegral"
+      width="80"
       label="会员积分">
     </el-table-column>
     <!--<el-table-column
@@ -275,14 +283,17 @@
     </el-table-column>-->
     <el-table-column
       prop="recommendcode"
+      width="60"
       label="推荐码">
     </el-table-column>
     <el-table-column
       prop="isblackname"
+      width="80"
       label="会员状态">
     </el-table-column>
     <el-table-column
       fixed="right"
+      width="80"
       label="参与记录">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toJoinRecord(scope.row)">查看</el-button>
@@ -290,6 +301,7 @@
     </el-table-column>
     <el-table-column
       fixed="right"
+      width="80"
       label="推荐记录">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toRecommendRecord(scope.row)">查看</el-button>
@@ -298,7 +310,7 @@
     <el-table-column
       fixed="right"
       label="操作"
-      width="300">
+      width="200">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toEdit(scope.row)">编辑</el-button>
         <el-button type="text" size="small" style="margin-left: 0;" @click="showdialog(scope.row)">设置审核状态</el-button>
@@ -320,7 +332,14 @@
       width="30%"
       center>
       <div>
+        
         <el-form label-width="120px" ref="editform" :model="editform" style="margin-top: 2%;" :rules="rules">
+          <el-form-item label="会员id： ">
+            <el-input disabled :value="editform.id" style="width: 80%;"></el-input>
+          </el-form-item>
+          <el-form-item label="会员姓名： " >
+            <el-input disabled :value="editform.name" style="width: 80%;"></el-input>
+          </el-form-item>
           <el-form-item label="会员审核状态： " prop="isblackname">
             <el-select v-model="editform.isblackname" style="width: 80%;">
               <el-option value='0' label='未审核'></el-option>
@@ -419,6 +438,7 @@
         editform:{
           isblackname:null,
           id:null,
+          name:null
         },
       };
     },
@@ -433,15 +453,18 @@
       this.getParentFields();
       this.getParentOffice();
       this.getHospitalLevel();
-      this.getMemberList(this.pageIndex,this.pageSize);
+      
       if ( Boolean(sessionStorage.getItem('form'))) {
         this.form = JSON.parse(sessionStorage.getItem('form'))
+        this.getMemberList(this.pageIndex,this.pageSize);
+      }else{
+        this.getMemberList(this.pageIndex,this.pageSize);
       }
     },
     methods: {
       resetForm(formName) {
           this.form.memberName = null
-          this.form.id = null
+          this.form.memberId = null
           this.form.realName = null
           this.form.state = null
           this.form.auditState = null
@@ -486,6 +509,8 @@
       },
       showdialog(row){
         this.editform.id = row.id;
+        this.editform.name = row.memberRealname;
+        this.editform.isblackname = row.isblackname;
         this.editdialogVisible = true;
       },
       submitForm(formName){

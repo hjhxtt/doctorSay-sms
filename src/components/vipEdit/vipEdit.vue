@@ -81,13 +81,14 @@
       </el-form-item>
       
       <!-- <el-form-item label="从医领域" prop="medical_field_2" style="width:518px;"> 
-        <el-input type="text" @focus="visi=true"></el-input>
+        <el-button @click="visi=true">选择</el-button>
       </el-form-item> -->
       <el-form-item label="从医领域" prop="medical_field_2"> 
-        <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
+        <el-row><el-button @click="visi=true" style="margin-bottom:10px;">选择</el-button></el-row>
+        <!-- <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
           <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
-        <br />
+        <br /> -->
         <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;">
           <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
@@ -173,7 +174,7 @@
         <el-button type="primary" @click="submitForm('form')" :loading="isload">保存</el-button>
       </el-form-item> 
     </el-form>
-    <!-- <el-dialog title="列表" width="800px" :visible.sync="visi">
+    <el-dialog title="列表" width="800px" :visible.sync="visi">
       <div class="info_body">
         <div class="box" style="overflow-y:scroll;">
           
@@ -198,9 +199,9 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="visi = false">取 消</el-button>
-        <el-button type="primary" @click="visi = false">确 定</el-button>
+        <el-button type="primary" @click="listSelect">确 定</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
@@ -325,6 +326,9 @@
       this.getSociety();
     },
     methods: {
+      listSelect(){
+        this.visi = false
+      },
       handleCheckedCitiesChange(value) {
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.cities.length;

@@ -63,19 +63,19 @@
     </el-form>
     <el-form label-width="120px" size="mini" :inline-message='true'>
       <el-form-item label="推荐码" prop="memberHandphone" >
-        <el-input v-model="form.memberHandphone" disabled style="width: 200px;margin-right: 10px;"></el-input>{{form.smscode}}
+        <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>{{form.smscode}}
       </el-form-item>
       <el-form-item label="手机号码" prop="memberHandphone" >
-        <el-input v-model="form.memberHandphone" disabled style="width: 200px;margin-right: 10px;"></el-input>我们将只会使用该手机号码，已短信的形式通知您参加调查
+        <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>我们将只会使用该手机号码，已短信的形式通知您参加调查
       </el-form-item>
       <el-form-item label="真实姓名" prop="memberRealname" >
-        <el-input v-model="form.memberRealname" disabled style="width: 200px;margin-right: 10px;"></el-input>
+        <el-input v-model="form.memberRealname"  style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
       <el-form-item label="电子邮箱" prop="memberMail">
-        <el-input v-model="form.memberMail" disabled style="width: 200px;margin-right: 10px;"></el-input>
+        <el-input v-model="form.memberMail"  style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
       <el-form-item label="您的性别" prop="memberSex" >
-        <el-radio-group v-model="form.memberSex" disabled>
+        <el-radio-group v-model="form.memberSex" >
           <el-radio :label="0">男</el-radio>
           <el-radio :label="1">女</el-radio>
         </el-radio-group>
@@ -87,18 +87,18 @@
           type="year"
           placeholder="选择年份"
           value-format="yyyy"
-          disabled>
+          >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="科室电话" prop="departmentstle">
-        <el-input v-model="form.departmentstle" style="width: 200px;margin-right: 10px;" disabled></el-input>
+        <el-input v-model="form.departmentstle" style="width: 200px;margin-right: 10px;" ></el-input>
       </el-form-item>
       <el-form-item label="注册时间" prop="registerTime">
         <el-date-picker
           v-model="form.registerTime"
           type="datetime"
           placeholder="选择日期时间"
-          disabled>
+          >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="从医年份" prop="workdate">
@@ -108,62 +108,62 @@
           type="year"
           placeholder="选择年份"
           value-format="yyyy"
-          disabled>
+          >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="职称" prop="memberstation">
-        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1)" style="width: 98px;" disabled>
+        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1)" style="width: 98px;" >
           <el-option v-for="item in zc_1_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>
-        <el-select v-model="form.memberstation" style="width: 98px;" disabled>
+        <el-select v-model="form.memberstation" style="width: 98px;" >
           <el-option v-for="item in zc_2_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="证件号" prop="memberidcard">
-        <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;" disabled></el-input>
+        <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;" ></el-input>
       </el-form-item>
 
       <el-form-item label="工作科室" prop="membersectionoffice">
-        <el-select v-model="form.hospital_departments_1" style="width: 198px;" @change="getSonOffice(form.hospital_departments_1)" disabled>
+        <el-select v-model="form.hospital_departments_1" style="width: 198px;" @change="getSonOffice(form.hospital_departments_1)" >
           <el-option v-for="item in hospital_1_options" :label="item.sectionofficename" :key="item.sectionofficeid" :value="item.sectionofficeid"></el-option>
         </el-select>
-        <el-select v-model="form.membersectionoffice" style="width: 198px;" disabled>
+        <el-select v-model="form.membersectionoffice" style="width: 198px;" >
           <el-option v-for="item in hospital_2_options" :label="item.sectionofficename" :key="item.sectionofficeid" :value="item.sectionofficeid"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="行政职位" prop="administrativeposition">
-        <el-select v-model="form.administrativeposition" style="width: 200px;" disabled>
+        <el-select v-model="form.administrativeposition" style="width: 200px;" >
           <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="从医领域" prop="medical_field_2">
-        <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" disabled>
+        <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" >
           <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
         <br />
-        <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;" disabled>
+        <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;" >
           <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" disabled>
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" >
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" disabled>
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" >
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" disabled>
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" >
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
-        <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" disabled>
+        <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" >
           <el-option value="-1" label="其他"></el-option>
           <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br />
-        <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.inputhospital" disabled></el-input>
+        <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.inputhospital" ></el-input>
       </el-form-item>
       <el-form-item label="医院信息:" v-if = "form.fkHospitalId != -1">
         <div>医院级别：{{level}}</div>
@@ -174,26 +174,26 @@
       </el-form-item>
 
       <el-form-item label="加入的学会" prop="societyid">
-        <el-select v-model="form.societyid" multiple placeholder="请填写您参加过的学会" class="meetingInput" style="width: 400px;" disabled>
+        <el-select v-model="form.societyid" multiple placeholder="请填写您参加过的学会" class="meetingInput" style="width: 400px;" >
           <el-option v-for="item in meeting_options" :label="item.societyname" :key="item.id" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="最高学历" prop="memberEducation">
-        <el-select v-model="form.memberEducation" style="width: 200px;" disabled>
+        <el-select v-model="form.memberEducation" style="width: 200px;" >
           <el-option v-for="item in education_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="毕业时间"  prop="graduationTime" >
-        <el-date-picker v-model="form.graduationTime" type="year" placeholder="选择日期" value-format="yyyy" style="width: 200px;" disabled></el-date-picker>
+        <el-date-picker v-model="form.graduationTime" type="year" placeholder="选择日期" value-format="yyyy" style="width: 200px;" ></el-date-picker>
       </el-form-item>
 
       <el-form-item label="毕业院校" prop="graduationInstitutions">
-        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province)" disabled>
+        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province)" >
           <el-option v-for="item in province_options" :label="item.provinceName" :key="item.provinceId" :value="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择学校" v-model="form.graduationInstitutions" disabled>
+        <el-select placeholder="请选择学校" v-model="form.graduationInstitutions" >
           <el-option v-for="item in school_options" :label="item.graduatename" :key="item.graduateid" :value="item.graduateid"></el-option>
         </el-select>
       </el-form-item>
@@ -203,7 +203,7 @@
           placeholder="请选择起始时间"
           v-model="form.beginTime"
           style="width: 200px;"
-          disabled
+          
           :picker-options="{
             start: '06:00',
             step: '01:00',
@@ -214,7 +214,7 @@
         <el-time-select
           placeholder="请选择结束时间"
           v-model="form.endTime"
-          disabled
+          
           style="width: 200px;"
           :picker-options="{
             start: '06:00',
@@ -424,7 +424,11 @@
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
             this.form.memberMail = res.data.obj.memberMail;
-            this.form.memberSex = Number(res.data.obj.memberSex);
+            if(res.data.obj.memberSex == '男'){
+              this.form.memberSex = 0
+            }else{
+              this.form.memberSex = 1
+            }
             this.form.memberBirYear = res.data.obj.memberBirYear.toString();
             this.form.departmentstle = res.data.obj.departmentstle;
             this.form.workdate = res.data.obj.workdate.toString();

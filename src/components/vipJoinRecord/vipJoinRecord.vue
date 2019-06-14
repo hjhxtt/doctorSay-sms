@@ -9,22 +9,27 @@
       style="width: 100%">
       <el-table-column
         prop="projectId"
+        width="80"
         label="项目id">
       </el-table-column>
       <el-table-column
         prop="projectName"
+        width="200"
         label="项目名称">
       </el-table-column>
       <el-table-column
         prop="projectState"
+        width="100"
         label="项目状态">
       </el-table-column>
       <el-table-column
         prop="joinTime"
+        width="180"
         label="参与时间">
       </el-table-column>
       <el-table-column
         prop="state"
+        width="100"
         label="会员完成状态">
       </el-table-column>
       <el-table-column
@@ -78,7 +83,7 @@
           if(this.tableData[i].projectState == 0){
             this.tableData[i].projectState = "正在进行";
           }else if(this.tableData[i].projectState == 1){
-            this.tableData[i].projectState = "已完成";
+            this.tableData[i].projectState = "已结束";
           }else if(this.tableData[i].projectState == 2){
             this.tableData[i].projectState = "等待积分处理";
           }else if(this.tableData[i].projectState == 3){
@@ -91,7 +96,7 @@
           if(this.tableData[i].state == 0){
             this.tableData[i].state = "中途退出";
           }else if(this.tableData[i].state == 1){
-            this.tableData[i].state = "被甄别";
+            this.tableData[i].state = "不符合条件";
           }else if(this.tableData[i].state == 2){
             this.tableData[i].state = "配额满";
           }else if(this.tableData[i].state == 3){

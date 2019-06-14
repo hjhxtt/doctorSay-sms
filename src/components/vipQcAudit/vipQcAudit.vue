@@ -126,7 +126,7 @@
       </el-form>
     </div>
     <div class="title">
-      <i class="el-icon-search"></i><span>会员搜索结果</span>
+      <i class="el-icon-search"></i><span>会员搜索结果</span><span v-if="pageTotal" style="color:red;font-size:14px;">共{{pageTotal}}条数据</span><span v-else style="color:red;font-size:14px;">共0条数据</span>
     </div>
     <el-table
     :data="tableData"
@@ -137,18 +137,22 @@
     style="width: 100%">
     <el-table-column
       prop="id"
+      width="80"
       label="会员id">
     </el-table-column>
     <el-table-column
       prop="memberRealname"
+      width="80"
       label="姓名">
     </el-table-column>
     <el-table-column
       prop="memberZone"
+      width="80"
       label="地区">
     </el-table-column>
     <el-table-column
       prop="teltime"
+      width="120"
       label="拨打电话时段">
     </el-table-column>
     <el-table-column
@@ -161,6 +165,7 @@
     </el-table-column>
     <el-table-column
       prop="recommendcode"
+      width="80"
       label="推荐人">
     </el-table-column>
     <el-table-column
@@ -181,7 +186,6 @@
     </el-table-column>    
   </el-table>    
     <el-pagination
-      small
       layout="prev, pager, next"
       :total="pageTotal"
       :page-size="pageSize"
@@ -219,7 +223,58 @@
       };
     },
     mounted(){
+      if(Boolean(JSON.parse(sessionStorage.getItem('userId')))){
+        this.userId = JSON.parse(sessionStorage.getItem('userId'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('mobile')))){
+        this.mobile = JSON.parse(sessionStorage.getItem('mobile'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('realName')))){
+        this.realName = JSON.parse(sessionStorage.getItem('realName'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('roomtype')))){
+        this.roomtype = JSON.parse(sessionStorage.getItem('roomtype'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('roomenum')))){
+        this.roomenum = JSON.parse(sessionStorage.getItem('roomenum'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('mobiletype')))){
+        this.mobiletype = JSON.parse(sessionStorage.getItem('mobiletype'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('isCertificate')))){
+        this.isCertificate = JSON.parse(sessionStorage.getItem('isCertificate'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('beginTime')))){
+        this.beginTime = JSON.parse(sessionStorage.getItem('beginTime'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('endTime')))){
+        this.endTime = JSON.parse(sessionStorage.getItem('endTime'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('registerTime')))){
+        this.registerTime = JSON.parse(sessionStorage.getItem('registerTime'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('registTimeBegin')))){
+        this.registTimeBegin = JSON.parse(sessionStorage.getItem('registTimeBegin'))
+      }
+      if(Boolean(JSON.parse(sessionStorage.getItem('registTimeEnd')))){
+        this.registTimeEnd = JSON.parse(sessionStorage.getItem('registTimeEnd'))
+      }
+
+
       this.getQcMemberList(this.pageIndex,this.pageSize)
+    },
+    beforeDestroy() {
+        sessionStorage.setItem('userId',JSON.stringify(this.userId))
+        sessionStorage.setItem('mobile',JSON.stringify(this.mobile))
+        sessionStorage.setItem('realName',JSON.stringify(this.realName))
+        sessionStorage.setItem('roomtype',JSON.stringify(this.roomtype))
+        sessionStorage.setItem('roomenum',JSON.stringify(this.roomenum))
+        sessionStorage.setItem('mobiletype',JSON.stringify(this.mobiletype))
+        sessionStorage.setItem('isCertificate',JSON.stringify(this.isCertificate))
+        sessionStorage.setItem('beginTime',JSON.stringify(this.beginTime))
+        sessionStorage.setItem('endTime',JSON.stringify(this.endTime))
+        sessionStorage.setItem('registTimeBegin',JSON.stringify(this.registTimeBegin))
+        sessionStorage.setItem('registTimeEnd',JSON.stringify(this.registTimeEnd))
     },
     methods: {
       time(){
@@ -238,6 +293,8 @@
         this.beginTime = null;
         this.endTime = null;
         this.registerTime = null; 
+        this.registTimeBegin = null
+        this.registTimeEnd = null
       },
       handleClose(done) {
         this.$confirm('确认关闭？')
@@ -269,29 +326,29 @@
       },
       getQcMemberList(pageIndex,pageSize){
         this.loading = true
-        this.userId = this.userId?Number(this.userId):null;
-        this.mobile = this.mobile?this.mobile:null;
-        this.realName = this.realName?this.realName:null;
-        this.studioPhone = this.roomtype && this.roomenum?{type: this.roomtype ,number: this.roomenum }:null;
-        this.mobilePhone = this.mobiletype && this.mobilenum?{type: this.mobiletype ,number: this.mobilenum }:null;
-        this.isCertificate = this.isCertificate?this.isCertificate:null; 
-        this.beginTime = this.beginTime?Number(this.beginTime.slice(0,2)):null;
-        this.endTime = this.endTime?Number(this.endTime.slice(0,2)):null;
+        let userId = this.userId?Number(this.userId):null;
+        let mobile = this.mobile?this.mobile:null;
+        let realName = this.realName?this.realName:null;
+        let studioPhone = this.roomtype && this.roomenum?{type: this.roomtype ,number: this.roomenum }:null;
+        let mobilePhone = this.mobiletype && this.mobilenum?{type: this.mobiletype ,number: this.mobilenum }:null;
+        let isCertificate = this.isCertificate?this.isCertificate:null; 
+        let beginTime = this.beginTime?Number(this.beginTime.slice(0,2)):null;
+        let endTime = this.endTime?Number(this.endTime.slice(0,2)):null;
         this.axios.get(this.common.getApi() + '/sys/api/audit/getQcMemberList',{
           params:{
             pageIndex: pageIndex,
             pageSize: pageSize,
             params:{
-              userId: this.userId,
-              mobile: this.mobile,
-              realName: this.realName,
-              studioPhone: this.studioPhone,
-              mobilePhone: this.mobilePhone,
-              isCertificate: this.isCertificate,
+              userId: userId,
+              mobile:mobile,
+              realName: realName,
+              studioPhone: studioPhone,
+              mobilePhone: mobilePhone,
+              isCertificate: isCertificate,
               registTimeBegin: this.registTimeBegin,
               registTimeEnd: this.registTimeEnd,
-              beginTime: this.beginTime,
-              endTime: this.endTime,
+              beginTime: beginTime,
+              endTime: endTime,
             }
           }
         },{
@@ -299,6 +356,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
+          
           this.pageTotal = res.data.obj.pager.total;
           this.tableData = res.data.obj.list;
           for(var i = 0; i < this.tableData.length; i++){
@@ -333,6 +391,7 @@
         })           
       },      
       go(currentPage){
+        
         this.getQcMemberList(currentPage,this.pageSize);
       }      
     }    

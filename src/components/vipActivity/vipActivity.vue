@@ -4,6 +4,10 @@
       <el-form-item label="用户ID">
         <el-input v-model="form.id" style="width: 400px;" disabled></el-input>
       </el-form-item>
+      <el-form-item label="用户名">
+        <el-input v-model="form.memberRealname" style="width: 400px;" disabled></el-input>
+      </el-form-item>
+      
       <el-form-item label="用户活跃度" >
         <el-radio-group v-model="form.memberFizz">
           <el-radio :label="1">休眠用户</el-radio>
@@ -13,7 +17,7 @@
         </el-radio-group>        
       </el-form-item>
       <el-form-item>
-        <el-button type='primary' @click="onsubmit('form')">提交</el-button>
+        <el-button type='primary' @click="onsubmit('form')">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -47,7 +51,9 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
+            debugger
             this.form.memberFizz = res.data.obj.memberFizz;
+            this.form.memberRealname = res.data.obj.memberRealname;
           }
         })                 
       },

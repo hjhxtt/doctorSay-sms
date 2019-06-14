@@ -364,7 +364,6 @@ export default {
 	
 	.slider{
 	  height: 100%;
-    width: 300px;
 	}
 	
 	.el-menu-item-group__title{
