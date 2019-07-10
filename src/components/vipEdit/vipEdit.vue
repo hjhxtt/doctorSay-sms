@@ -1,8 +1,8 @@
 <template>
   <div class="vipEdit-wrapper">
     <el-form :model="form" :rules="rules" ref="form" label-width="120px" size="mini" :inline-message='true'>
-      <el-form-item label="推荐码" prop="memberHandphone" required>
-        <el-input v-model="form.memberHandphone" disabled style="width: 200px;margin-right: 10px;"></el-input>{{form.smscode}}
+      <el-form-item label="推荐人"  required>
+        <el-input v-model="form.recommendcode" disabled style="width: 200px;margin-right: 10px;"></el-input>我的推荐码：{{form.smscode}}
       </el-form-item>
       <el-form-item label="手机号码" prop="memberHandphone" required>
         <el-input v-model="form.memberHandphone" disabled style="width: 200px;margin-right: 10px;"></el-input>我们将只会使用该手机号码，已短信的形式通知您参加调查
@@ -48,7 +48,7 @@
         </el-date-picker>        
       </el-form-item>
       <el-form-item label="职称" prop="memberstation">
-        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1)" style="width: 98px;">
+        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1);clear();" style="width: 98px;">
           <el-option v-for="item in zc_1_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>
         <el-select v-model="form.memberstation" style="width: 98px;">
@@ -66,7 +66,7 @@
       </el-form-item>
       
       <el-form-item label="工作科室" prop="membersectionoffice">
-        <el-select v-model="form.hospital_departments_1" style="width: 198px;" @change="getSonOffice(form.hospital_departments_1)">
+        <el-select v-model="form.hospital_departments_1" style="width: 198px;" @change="getSonOffice(form.hospital_departments_1);clear2();">
           <el-option v-for="item in hospital_1_options" :label="item.sectionofficename" :key="item.sectionofficeid" :value="item.sectionofficeid"></el-option>
         </el-select>
         <el-select v-model="form.membersectionoffice" style="width: 198px;">
@@ -85,23 +85,26 @@
       </el-form-item> -->
       <el-form-item label="从医领域" prop="medical_field_2"> 
         <el-row><el-button @click="visi=true" style="margin-bottom:10px;">选择</el-button></el-row>
-        <!-- <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
-          <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
-        </el-select>
-        <br /> -->
+        <span style="display:none;">
+          <el-select  v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
+            <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
+          </el-select>
+        </span>
+        
+        <!-- <br /> -->
         <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;">
           <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince)">
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change = "getDistrictByCity(form.memberProvince,form.memberCity)">
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC()">
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;">
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD()">
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
@@ -117,7 +120,7 @@
         <div>医院等级：{{grade}}</div>
         <div>医院性质：{{hospitalNature}}</div>
         <div>医院类型：{{hospitalType}}</div>
-        <div>专科类型：--</div>
+        <div>专科类型：{{professionalType}}</div>
         <div>床位数：{{numberOfBeds}}</div>
       </el-form-item>
       
@@ -138,7 +141,7 @@
       </el-form-item>
 
       <el-form-item label="毕业院校" prop="graduationInstitutions">
-        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province)">
+        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province);clearSchool()">
           <el-option v-for="item in province_options" :label="item.provinceName" :key="item.provinceId" :value="item.provinceId"></el-option>
         </el-select>
         <el-select placeholder="请选择学校" v-model="form.graduationInstitutions">
@@ -192,8 +195,8 @@
 
         <div class="box" style="overflow-y:scroll;">
           <div style="margin: 15px 0;"></div>
-          <el-checkbox-group v-model="form.membertechnical" @change="">
-            <el-checkbox v-for="item in field_2_options" :label="item.id" :key="item.id">{{item.fieldname}}</el-checkbox>
+          <el-checkbox-group v-model="form.membertechnical" @change="shouw">
+            <el-checkbox v-for="item in field_2_options" :label="item.id" :value="item.id" :key="item.id">{{item.fieldname}}</el-checkbox>
           </el-checkbox-group>
         </div>
       </div>
@@ -209,6 +212,7 @@
   export default {
     data() {
       return {
+        professionalType:'',
         checkAll: false,
         checkedCities: ['上海', '北京'],
         cities: ['上海', '北京', '广州', '深圳'],
@@ -238,7 +242,7 @@
           memberidcard:null,
           administrativeposition:null,
           medical_field_1:null,
-          membertechnical:null,
+          membertechnical:[],
           hospital_departments_1:null,
           membersectionoffice:null,
           memberProvince:null,
@@ -324,8 +328,36 @@
       this.getMemberInfoForEdit();
       this.getEducational();
       this.getSociety();
+      
     },
     methods: {
+      clearSchool(){
+        this.form.graduationInstitutions = ''
+      },
+      clearByP(){
+        this.form.memberCity = ''
+      this.form.fkDistrictId = ''
+      this.form.fkHospitalId = ''
+      },
+      clearByC(){
+      this.form.fkDistrictId = ''
+      this.form.fkHospitalId = ''
+      },
+      clearByD(){
+      this.form.fkHospitalId = ''
+      },
+      clear2(){
+        this.form.membersectionoffice = ''
+      },
+      clear(){
+        this.form.memberstation = ''
+      },
+      shouw(){
+        console.log(this.form.membertechnical);
+        console.log(this.field_2_options);
+        
+        
+      },
       listSelect(){
         this.visi = false
       },
@@ -335,6 +367,32 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
       submitForm(formName) {
+        //  if(  this.form.memberRealname  == '' ||
+            //     this.form.memberMail == '' ||
+            //      this.form.memberSex == '' ||
+            //     this.form.memberBirYear == '' ||
+            //     this.form.departmentstle == '' ||
+            //     this.form.registerTime == '' ||
+            //     this.form.workdate == '' ||
+            //     this.form.memberstation == '' ||
+            //      this.form.memberidcard == '' ||
+            //     this.form.membersectionoffice == '' ||
+            //     this.form.administrativeposition == '' ||
+            //     this.form.membertechnical == '' ||
+            //     this.form.memberProvince == '' ||
+            //     this.form.memberCity == '' ||
+            //     this.form.fkDistrictId == '' ||
+            //     // fkHospitalId == '' ||
+            //      this.form.memberhospital == '' ||
+            //      this.form.societyid == '' ||
+            //      this.form.memberEducation == '' ||
+            //     this.form.graduationTime == '' ||
+            //     this.form.graduationInstitutions == '' ||
+            //     this.form.beginTime == '' ||
+            //     this.form.endTime == '' || this.form.membercertificatetype == '' ){
+            //       this.$message.error('请完善所有数据')
+            //       return
+            //     }
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.isload = true;
@@ -393,11 +451,13 @@
                   message: '保存成功'
                 })
               }else{
+                this.isload = false  
                 this.$message.error(res.data.msg);
               }
             })
           }else {
-            console.log('error submit!!');
+            this.isload = false  
+            this.$message.error('请完善数据');
             return false;
           }
         })
@@ -420,6 +480,7 @@
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
             this.form.memberMail = res.data.obj.memberMail;
+            this.form.recommendcode = res.data.obj.recommendcode;
             if(res.data.obj.memberSex == '男'){
               this.form.memberSex = 0;
             }else{
@@ -541,6 +602,7 @@
       },
       //获取职称二级
       getStationTechnicalTitle(parentId){
+        
         this.axios.get(this.common.getApi() + '/sys/api/station/getStationTechnicalTitle',{
           params:{
             params:{
@@ -554,6 +616,7 @@
         }).then((res) => {
           if(res.data.code == '200'){
             this.zc_2_options = res.data.obj;
+            
           }
         })   
       },
@@ -600,6 +663,10 @@
         //}
       },
       getSonFields2(parentId){
+        console.log(this.form.membertechnical);
+        if(this.field_2_options.length == 0){
+          this.form.membertechnical = []
+        }
         
         this.field_2_options = [];
         for(var i = 0; i < parentId.length; i++){
@@ -788,6 +855,7 @@
               this.hospitalNature = res.data.obj.hospitalNature;
               this.hospitalType = res.data.obj.hospitalType;
               this.numberOfBeds = res.data.obj.numberOfBeds;
+              this.professionalType = res.data.obj.professionalType;
             }
           })
         }

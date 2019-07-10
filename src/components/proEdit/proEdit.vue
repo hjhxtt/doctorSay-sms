@@ -18,7 +18,7 @@
       <el-form-item label="项目状态" prop="pro_state">
           <el-select v-model="ruleForm.pro_state" size="">
             <el-option label="正在进行" :value="0"></el-option>
-            <el-option label="已完成" :value="1"></el-option>
+            <el-option label="已结束" :value="1"></el-option>
             <el-option label="等待积分处理" :value="2"></el-option>
             <el-option label="暂停" :value="3"></el-option>
             <el-option label="尚未开始" :value="5"></el-option>
@@ -77,7 +77,7 @@
         <template slot="label">
           <el-checkbox v-model="checked" style="margin-right: 5px;" @change="ischecked"></el-checkbox>被推荐者是否有加分
         </template>
-        <el-input v-model.number="ruleForm.add_jf" type="number" class="inputlength" :disabled="checked == false"></el-input>
+        <el-input v-model.number="ruleForm.add_jf" type="text" class="inputlength" :disabled="checked == false"></el-input>
       </el-form-item>
       <el-form-item label="返回参数hdopid" prop="hdopid">
         <el-input v-model="ruleForm.hdopid" class="inputlength"></el-input>

@@ -8,25 +8,35 @@
       border
       style="width: 100%">
       <el-table-column
-        prop="memberRealname"
-        label="推荐人姓名">
+        prop="memberHandPhone"
+        label="会员手机号">
       </el-table-column>
       <el-table-column
-        prop="memberState"
-        label="推荐人激活状态">
+        prop="memberRealname"
+        label="会员姓名">
       </el-table-column>
       <el-table-column
         prop="registerTime"
-        label="推荐人注册时间">
-      </el-table-column>
-      <el-table-column
-        prop="integral"
-        label="获取奖励">
+        label="会员注册时间">
       </el-table-column>
       <el-table-column
         prop="isblackname"
-        label="医生认证状态">
+        label="会员认证状态">
       </el-table-column>
+      <el-table-column
+        prop="memberIntegral"
+        label="会员当前积分">
+      </el-table-column>
+      <!-- <el-table-column
+        prop="memberState"
+        label="会员激活状态">
+      </el-table-column> -->
+      
+      <el-table-column
+        prop="integral"
+        label="推荐奖励积分">
+      </el-table-column>
+      
     </el-table>
     <el-pagination
       small
@@ -91,7 +101,7 @@
           }else if(this.tableData[i].isblackname == 8){
             this.tableData[i].isblackname = "未联系到本人";
           }else if(this.tableData[i].isblackname == 9){
-            this.tableData[i].isblackname = "兼职";
+            this.tableData[i].isblackname = "不良和注销";
           }else if(this.tableData[i].isblackname == 10){
             this.tableData[i].isblackname = "测试";
           }

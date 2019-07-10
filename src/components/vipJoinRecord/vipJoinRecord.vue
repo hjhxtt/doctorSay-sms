@@ -33,6 +33,11 @@
         label="会员完成状态">
       </el-table-column>
       <el-table-column
+        prop="projectIntegral"
+        width="100"
+        label="获得积分">
+      </el-table-column>
+      <el-table-column
         prop="paraS"
         label="使用参数">
       </el-table-column>

@@ -112,7 +112,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item label="职称" prop="memberstation">
-        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1)" style="width: 98px;" >
+        <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1);clear()" style="width: 98px;" >
           <el-option v-for="item in zc_1_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>
         <el-select v-model="form.memberstation" style="width: 98px;" >
@@ -148,13 +148,13 @@
       </el-form-item>
 
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" >
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" >
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;"  @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC()">
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" >
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD()">
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
@@ -190,7 +190,7 @@
       </el-form-item>
 
       <el-form-item label="毕业院校" prop="graduationInstitutions">
-        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province)" >
+        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province);clearSchool()" >
           <el-option v-for="item in province_options" :label="item.provinceName" :key="item.provinceId" :value="item.provinceId"></el-option>
         </el-select>
         <el-select placeholder="请选择学校" v-model="form.graduationInstitutions" >
@@ -225,7 +225,7 @@
         </el-time-select>
       </el-form-item>
       <el-form-item>
-        <!--<el-button type="primary" @click="submitForm('form')" :loading="isload">保存</el-button>-->
+        <el-button type="primary" @click="submitForm2('form')" :loading="isload">保存</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -351,6 +351,84 @@
 //    this.goQcMemberAudit();
     },
     methods: {
+      clearSchool(){
+        this.form.graduationInstitutions = ''
+      },
+      clearByP(){
+        this.form.memberCity = ''
+      this.form.fkDistrictId = ''
+      this.form.fkHospitalId = ''
+      },
+      clearByC(){
+      this.form.fkDistrictId = ''
+      this.form.fkHospitalId = ''
+      },
+      clearByD(){
+      this.form.fkHospitalId = ''
+      },
+      clear2(){
+        this.form.membersectionoffice = ''
+      },
+      clear(){
+        this.form.memberstation = ''
+      },
+      submitForm2(formName) {
+            this.isload = true;
+            var fkHospitalId = null;
+            if(this.form.inputhospital == ""){
+              fkHospitalId = Number(this.form.fkHospitalId);
+              this.form.memberhospital = "";
+            }else{
+              this.form.memberhospital = this.form.inputhospital;
+              this.form.fkHospitalId = "0";
+              fkHospitalId = null;
+            }
+            var memberSex = null;
+            if(this.form.memberSex == 0){
+              memberSex = "男"
+            }else{
+              memberSex = "女"
+            }
+            this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
+              params:{
+                id: Number(sessionStorage.getItem("userid")),
+                memberRealname: this.form.memberRealname,
+                memberMail: this.form.memberMail,
+                memberSex: memberSex,
+                memberBirYear: Number(this.form.memberBirYear),
+                departmentstle: this.form.departmentstle,
+                registerTime: this.form.registerTime,
+                workdate: Number(this.form.workdate),
+                memberstation: Number(this.form.memberstation),
+                memberidcard: this.form.memberidcard,
+                membersectionoffice: Number(this.form.membersectionoffice),
+                administrativeposition: Number(this.form.administrativeposition),
+                membertechnical: this.form.membertechnical.join(','),
+                memberProvince: Number(this.form.memberProvince),
+                memberCity: Number(this.form.memberCity),
+                fkDistrictId: Number(this.form.fkDistrictId),
+                fkHospitalId: fkHospitalId,
+                memberhospital: this.form.memberhospital,
+                societyid: this.form.societyid.join(','),
+                memberEducation: Number(this.form.memberEducation),
+                graduationTime: this.form.graduationTime,
+                graduationInstitutions: this.form.graduationInstitutions,
+                beginTime: Number(this.form.beginTime.slice(0,2)),
+                endTime: Number(this.form.endTime.slice(0,2)),
+                membercertificatetype:this.form.membercertificatetype//职业证
+              },
+            }).then((res) => {
+              this.isload = false                
+              if(res.data.success){
+                this.$message({
+                  type: 'success',
+                  message: '保存成功'
+                })
+              }else{
+                this.$message.error(res.data.msg);
+              }
+            })
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {

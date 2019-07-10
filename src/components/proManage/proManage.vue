@@ -9,8 +9,8 @@
         <el-form label-width="120px" ref="editform" :model="editform" style="margin-top: 2%;" :rules="rules">
           <el-form-item label="项目类型： " prop="type">
             <el-select v-model="editform.type">
-              <el-option label="全部" value="0"></el-option>
-              <el-option label="已参与" value="1"></el-option>
+              <el-option label="抽样全导出" value="0"></el-option>
+              <el-option label="参加者导出" value="1"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
@@ -24,7 +24,7 @@
         </el-form> -->
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button @click="closeCy()">取 消</el-button>
         <el-button type="primary" @click="submitForm('editform')">确 定</el-button>
       </span>
     </el-dialog>
@@ -39,7 +39,7 @@
         <el-form-item label="项目状态">
           <el-select v-model="formInline.pro_state" size="">
             <el-option label="正在进行" value="0"></el-option>
-            <el-option label="已完成" value="1"></el-option>
+            <el-option label="已结束" value="1"></el-option>
             <el-option label="等待积分处理" value="2"></el-option>
             <el-option label="暂停" value="3"></el-option>
             <el-option label="尚未开始" value="5"></el-option>
@@ -51,7 +51,11 @@
       <el-button type="primary" size="mini" @click="toAdd">增加</el-button>
       <el-button type="primary" size="mini" @click="resetForm">重置</el-button>
     </div>
+    <div class="title">
+      <i class="el-icon-search"></i><span>项目搜索结果</span><span v-if="pageTotal" style="color:red;font-size:14px;">共{{pageTotal}}条数据</span><span v-else style="color:red;font-size:14px;">共0条数据</span>
+    </div>
     <div class="table-wrapper">
+
       <el-table
         :data="tableData3"
         v-loading="loading"
@@ -61,31 +65,38 @@
         size="mini">
         <el-table-column
           prop="id"
+          width="70"
           label="项目ID">
         </el-table-column>
         <el-table-column
           prop="projectId"
-          width="120"
+          width="90"
           label="项目编号">
         </el-table-column>
         <el-table-column
           prop="projectName"
           label="项目标题"
-          width="200">
+          >
+        </el-table-column>
+        <el-table-column
+          prop="projectSampleTotal"
+          width="50"
+          label="目标样本量">
         </el-table-column>
         <el-table-column
           prop="projectState"
+          width="70"
           label="项目状态">
         </el-table-column>
         <el-table-column
           prop="projectPerson"
-          width="90"
+          width="70"
           label="记录人">
         </el-table-column>
         <el-table-column
           prop="projectIntegral"
-          width="80"
-          label="完成奖励">
+          width="50"
+          label="项目奖励">
         </el-table-column>
         <el-table-column
           prop="projectPutTime"
@@ -98,31 +109,37 @@
           width="90">
         </el-table-column>
         <el-table-column
+          prop="sampleNumber"
+          width="50"
+          label="抽样人数">
+        </el-table-column>
+        <el-table-column
           prop="projectJoinNum"
-          width="80"
+          width="50"
           label="已参与数">
         </el-table-column>
         <el-table-column
           prop="finishNum"
-          width="60"
+          width="50"
           label="完成量">
         </el-table-column>
         <el-table-column
-          prop="projectSampleTotal"
-          width="60"
-          label="样本数">
+          prop="projectSendTotalScore"
+          width="80"
+          label="项目总发放积分">
         </el-table-column>
+        
         <el-table-column
           label="操作"
-          width="250"
+          width="190"
           fixed="right">
           <template slot-scope="scope">
             <el-button @click="" type="text" size="small" @click="toEdit(scope.row)">编辑</el-button>
-            <el-button @click="" type="text" size="small" @click="toStat(scope.row)">项目进度</el-button>
-            <el-button @click="" type="text" size="small" @click="toParam(scope.row)">项目参数</el-button>
-            <el-button @click="" type="text" size="small" @click="toSample(scope.row)">项目抽样</el-button>
-            <el-button @click="" type="text" size="small" @click="toSampleRecord(scope.row)">项目抽样记录</el-button>
-            <el-button @click="" type="text" size="small" @click="toIntegration(scope.row)">项目积分</el-button>
+            <el-button @click="" type="text" size="small" @click="toStat(scope.row)">进度</el-button>
+            <el-button @click="" type="text" size="small" @click="toParam(scope.row)">参数</el-button>
+            <el-button @click="" type="text" size="small" @click="toSample(scope.row)">抽样</el-button>
+            <el-button @click="" type="text" size="small" @click="toSampleRecord(scope.row)">抽样记录</el-button>
+            <el-button @click="" type="text" size="small" @click="toIntegration(scope.row)">积分添加</el-button>
             <el-button @click="" type="text" size="small" @click="showdialog(scope.row)">导出</el-button>
           </template>
         </el-table-column>
@@ -143,6 +160,7 @@
   name: 'slider',
   data(){
     return {
+      total:null,
       loading:true,
       formInline: {
         pro_id: null,
@@ -166,27 +184,36 @@
     }
   },
   mounted(){
-    this.getList(this.pageIndex,this.pageSize,this.formInline.pro_id,this.formInline.pro_title,this.formInline.pro_state);
-    this.getCar()
+
+    if ( Boolean(sessionStorage.getItem('formInline'))) {
+        this.formInline = JSON.parse(sessionStorage.getItem('formInline'))
+        debugger
+        this.getList(this.pageIndex,this.pageSize,this.formInline.pro_id,this.formInline.pro_title,this.formInline.pro_state);
+      }else{
+        this.getList(this.pageIndex,this.pageSize,this.formInline.pro_id,this.formInline.pro_title,this.formInline.pro_state);
+      }
+    
+  },
+  beforeDestroy() {
+    sessionStorage.setItem('formInline',JSON.stringify(this.formInline))
   },
   methods:{
-    getCar(){
-      this.axios({
-      method: "GET",
-      url: 'https://testapi.che300.com/service/mortageQuery' ,
-      params:{
-      token:'00932aa74838efdb693018dfdc0814bd',
-      carNo:'川AG7V34',
-      vin:'LJDMAA225J0022594',
-      carType:'02',
-      carOwner:'杨梦云',
-      tel:'17621953379'
-      }
-      }).then((res) => {
-
-      console.log(res);
-      })
+    openLoading() {
+        const loading = this.$loading({           // 声明一个loading对象
+          lock: true,                             // 是否锁屏
+          text: '',                     // 加载动画的文字
+          spinner: 'el-icon-loading',             // 引入的loading图标
+          background: 'rgba(0, 0, 0, 0.3)',       // 背景颜色
+          target: '.sub-main',                    // 需要遮罩的区域
+          body: true,                              
+          customClass: 'mask'                     // 遮罩层新增类名
+        })
+        return loading;
       },
+    closeCy(){
+      this.editform.type = ''
+      this.dialogVisible = false
+    },
     resetForm(){
       this.formInline.pro_id = null;
       this.formInline.pro_title = null;
@@ -206,8 +233,14 @@
       this.$router.push({ path: 'proParameter'})
     },
     toSample(row){
-      sessionStorage.setItem('id',row.id);
-      this.$router.push({ path: 'proSample'})
+      console.log(row);
+      if(row.projectState === '正在进行'){
+        sessionStorage.setItem('id',row.id);
+        this.$router.push({ path: 'proSample'})
+      }else{
+        this.$message.error('请确认项目状态是否正在进行')
+      }
+      
     },
     toSampleRecord(row){
       sessionStorage.setItem('id',row.id);
@@ -231,7 +264,7 @@
           pageIndex: pageIndex,
           pageSize: pageSize,
           params:{
-            id: id,
+            projectId: id,
             projectName: projectName,
             projectState: projectState
           }
@@ -242,6 +275,7 @@
         }
       }).then((res) => {
         this.tableData3 = res.data.obj.list;
+        this.total = res.data.obj.list.length
         for(var i = 0;i < this.tableData3.length;i++){
           if(this.tableData3[i].projectState == 0){
             this.tableData3[i].projectState = '正在进行'
@@ -273,8 +307,11 @@
       this.editform.id = row.id;
     },
     submitForm(formName){
+      
+      var that = this
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.openLoading()
           this.axios({
             url:this.common.getApi() + '/sys/api/project/downloadSample',
             method:'get',
@@ -286,15 +323,28 @@
           }).then((res) => {
             let data = res.data
             const blob = data
-            const fileName = '项目导出.csv'
-            const elink = document.createElement('a')
-            elink.download = fileName
-            elink.style.display = 'none'
-            elink.href = URL.createObjectURL(blob)
-            document.body.appendChild(elink)
-            elink.click()
+            console.log();
+              var fileName = ''
+            if(that.editform.type === '0'){
+               fileName = this.editform.id+'-抽样全导出.csv'
+            }else{
+             fileName = this.editform.id+'-参加者导出.csv'
+            }
+
+            
+
+            const elink = document.createElement('a')//创建一个元素
+            elink.download = fileName //设置文件下载名
+            elink.style.display = 'none' //隐藏元素
+            elink.href = URL.createObjectURL(blob)//元素添加href
+            document.body.appendChild(elink)//元素放入body中
+            elink.click()//元素点击实现
             URL.revokeObjectURL(elink.href) // 释放URL 对象
             document.body.removeChild(elink)
+            this.openLoading().close()
+            this.editform.type = ''
+            this.dialogVisible = false
+            this.$message.success('导出成功')
           })
         }
       })
@@ -349,5 +399,26 @@
 }
   .proManage-wrapper .el-button--small{
     padding: 5px 5px;
+  }
+  .proManage-wrapper .title{
+    width: 100%;
+    padding: 10px 15px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 13px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E9EEF3;
+  }
+
+  .proManage-wrapper .title span{
+    font-size: 17px;
+    font-weight: bold;
+    margin-right: 20px;
+  }
+
+  .proManage-wrapper .title i{
+    font-size: 17px;
+    margin-right: 5px;
   }
 </style>

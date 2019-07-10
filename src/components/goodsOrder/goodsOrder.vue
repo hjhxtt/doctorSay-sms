@@ -80,17 +80,17 @@
       </el-table-column>
       <el-table-column
         prop="id"
-        width="80"
+        width="60"
         label="订单ID">
       </el-table-column>
       <el-table-column
         prop="userid"
-        width="80"
+        width="60"
         label="会员ID">
       </el-table-column>
       <el-table-column
         prop="memberRealname"
-        width="90"
+        width="50"
         label="会员账号">
       </el-table-column>
       <el-table-column
@@ -100,7 +100,6 @@
       </el-table-column>
       <el-table-column
         prop="adress"
-        width="220"
         label="兑换联系信息">
       </el-table-column>
       <el-table-column
@@ -109,13 +108,18 @@
       </el-table-column>
       <el-table-column
         prop="giftprize"
-        width="110"
-        label="价格（积分）">
+        width="60"
+        label="价格(积分)">
       </el-table-column>
       <el-table-column
         prop="converttime"
         width="100"
         label="兑换时间">
+      </el-table-column>
+      <el-table-column
+        prop=""
+        width="100"
+        label="审核备注">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -148,7 +152,7 @@
               <el-option value='3' label='无效订单'></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="问题说明：" >
+          <el-form-item label="审核备注：" >
             <el-input type="textarea" v-model="editform.remark" style="width: 80%;"></el-input>
           </el-form-item>
         </el-form>
@@ -367,6 +371,7 @@
                   message: '修改成功'
                 })
                 this.editdialogVisible = false;
+                
                 this.getConvertGifsList(this.pageIndex,this.pageSize);
               }else{
                 this.$message.error(res.data.msg)
@@ -377,6 +382,8 @@
             return false;
           }
         });
+        this.editdialogVisible = false;
+        this.editform.auditType = ''
       },
       del(row){
 //      this.axios.get(this.common.getApi() + '/sys/api/rule/delExchangeRule',{
@@ -403,6 +410,7 @@
       },
       showdialog(row){
         this.editform.id = row.id;
+        
         this.editdialogVisible = true;
       },
       getGiftCategoryList(){
@@ -439,5 +447,8 @@
   .goodsOrder-wrapper .el-pagination{
     text-align: center;
     margin-top: 20px;
+  }
+  .el-table td, .el-table th{
+    padding: 0;
   }
 </style>

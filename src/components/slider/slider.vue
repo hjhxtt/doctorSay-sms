@@ -165,8 +165,11 @@ export default {
              
               this.menuList = newList
             }else{
+              debugger
               this.$message.error(res.data.msg);
-              $this.$router.push('/login')
+              localStorage.removeItem('isLogin')
+              this.$router.push('/login')
+              this.$store.state.openTab=[]
             }
             
         })

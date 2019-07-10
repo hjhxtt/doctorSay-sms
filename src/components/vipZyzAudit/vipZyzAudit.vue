@@ -1,15 +1,25 @@
 <template>
   <div class="vipZyzAudit-wrapper">
+    <div class="title">
+      <i class="el-icon-search"></i><span>执业证审核</span>
+    </div>
     <div class="query-wrapper">
       <el-form label-width="120px" :inline="true" size="mini">
-        <el-form-item label="会员流水号：">
+        <!-- <el-form-item label="会员流水号：">
           <el-input style="width: 200px;" v-model="memberId"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="会员账号：">
           <el-input style="width: 200px;" v-model="memberMobile"></el-input>
         </el-form-item>
         <el-form-item label="会员姓名：">
           <el-input style="width: 200px;" v-model="memberName"></el-input>
+        </el-form-item>
+        <el-form-item label="审核状态:">
+          <el-select style="width: 200px;" v-model="state">
+            <el-option label="待审核" value="0"></el-option>
+            <el-option label="审核未通过" value="1"></el-option>
+            <el-option label="审核已通过" value="3"></el-option>
+          </el-select>
         </el-form-item>
         <br />
         <el-form-item style="padding-left: 30px;">          
@@ -19,6 +29,9 @@
           <el-button type="primary" @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
+    </div>
+    <div class="title">
+     <i class="el-icon-search"></i><span>会员搜索结果</span><span v-if="pageTotal" style="color:red;font-size:14px;">共{{pageTotal}}条数据</span><span v-else style="color:red;font-size:14px;">共0条数据</span>
     </div>
     <el-table
       :data="tableData"
@@ -76,6 +89,7 @@
   export default {
     data() {
       return {
+        state:'',
         loading:true,
         picUrl:'',
         tableData: [],
@@ -194,6 +208,27 @@
 </script>
 
 <style>
+.vipZyzAudit-wrapper .title{
+    width: 100%;
+    padding: 10px 15px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 13px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E9EEF3;
+  }
+  
+  .vipZyzAudit-wrapper .title span{
+    font-size: 17px;
+    font-weight: bold;
+    margin-right: 20px;
+  }
+  
+  .vipZyzAudit-wrapper .title i{
+    font-size: 17px;
+    margin-right: 5px;
+  } 
   .vipZyzAudit-wrapper .query-wrapper{
     min-height: 50px;
     width: 100%;

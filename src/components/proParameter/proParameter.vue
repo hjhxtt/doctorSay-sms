@@ -35,7 +35,7 @@
         <template slot="label">
           <el-select  v-model="form.choose_param">
             <el-option label="删除未使用的参数" value="0"></el-option>
-            <el-option label="删除全部参数" value="2"></el-option>
+            <el-option label="删除全部参数" value="1"></el-option>
           </el-select>
         </template>
         <el-button type="primary" @click="deleteParam">删除参数文本</el-button>
@@ -76,6 +76,18 @@
       this.getProject();
     },
     methods: {
+      openLoading() {
+        const loading = this.$loading({           // 声明一个loading对象
+          lock: true,                             // 是否锁屏
+          text: '',                     // 加载动画的文字
+          spinner: 'el-icon-loading',             // 引入的loading图标
+          background: 'rgba(0, 0, 0, 0.3)',       // 背景颜色
+          target: '.sub-main',                    // 需要遮罩的区域
+          body: true,                              
+          customClass: 'mask'                     // 遮罩层新增类名
+        })
+        return loading;
+      },
       deleteTel(){
 
           if(this.telArr==''){
@@ -122,6 +134,11 @@
         console.log(this.fileParam);
       },
       submitUpload(){
+        if(!Boolean(this.fileParam)){
+          this.$message.error('请选择文件')
+          return false
+        }
+        this.openLoading()
         console.log(this.fileParam);
         console.log(sessionStorage.getItem('id'));
         this.uploadForm.append('file', this.fileParam[0].raw);
@@ -134,16 +151,43 @@
           }
         }).then((res) => {
           console.log(res)
-          if(res.data.success){
+          if(Boolean(res.data.success)){
+
             this.$message({
               message: '上传成功',
               type: 'success'
             });
+            this.uploadForm=''
+            this.openLoading().close()
           }else{
-            this.$message.error(res.data.msg);
-            this.fileList = [];
-            this.fileParam = '';
-            this.uploadForm = new FormData()
+
+            if(Boolean(res.data.msg)){
+              this.$message.error(res.data.msg);
+            }else{
+              this.$message.error('文件格式有误，请查看错误日志');
+              this.fileList = [];
+              this.fileParam = '';
+              this.uploadForm = new FormData()
+              // var aaaa = "data:text/csv;charset=utf-8,\ufeff" + res.data;
+              // var link = document.createElement("a");
+              // link.setAttribute("href", aaaa);
+              // link.setAttribute("download","错误位置.csv");
+              // link.click();
+
+              let a = document.createElement('a');
+              let content="\ufeff"+res.data;
+              let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+              let filename = '错误日志.csv';
+              a.href = url;
+              a.download = filename;
+              a.click();
+              window.URL.revokeObjectURL(url);
+            }
+
+            
+            
+            this.uploadForm=''
+            this.openLoading().close()
           }
         })
       },
@@ -152,6 +196,7 @@
           this.$message.error('请选择删除对象');
           return
         }
+        this.openLoading()
         this.axios.get(this.common.getApi() + '/sys/api/projectPara/deletePara',{
           params:{
             params:{
@@ -166,6 +211,7 @@
         }).then((res) => {
           console.log(res)
           if(res.data.success){
+            this.openLoading().close()
             this.$message({
               message: '删除成功',
               type: 'success'
@@ -177,7 +223,36 @@
       },
       download(){
         //todo
-        location.href = this.common.getApi() + "/sys/api/projectPara/downloadParam/?id="+this.form.pro_id;
+        this.openLoading()
+        this.axios({
+            url:this.common.getApi() + '/sys/api/projectPara/downloadParam',
+            method:'get',
+            params: {
+              id: this.form.pro_id
+            },
+            responseType: 'blob',
+          }).then((res) => {
+            
+            let data = res.data
+            const blob = data
+            console.log();
+            var fileName = this.form.pro_id+'-参数.csv'
+            const elink = document.createElement('a')//创建一个元素
+            elink.download = fileName //设置文件下载名
+            elink.style.display = 'none' //隐藏元素
+            elink.href = URL.createObjectURL(blob)//元素添加href
+            document.body.appendChild(elink)//元素放入body中
+            elink.click()//元素点击实现
+            URL.revokeObjectURL(elink.href) // 释放URL 对象
+            document.body.removeChild(elink)
+            this.openLoading().close()
+            this.$message.success('下载成功')
+          })
+
+
+        // location.href = this.common.getApi() + "/sys/api/projectPara/downloadParam/?id="+this.form.pro_id;
+        // debugger
+
       },
       getProject(){
         this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
@@ -209,11 +284,25 @@
   .proParameter-wrapper .inputlength{
     width: 200px;
   }
-
+.el-loading-spinner i {
+    color: #009999;
+    font-weight:700;
+}
+.el-loading-spinner .el-loading-text {
+    color: #009999;
+    font-weight:700;
+}
   .proParameter-wrapper .upload-demo{
     width: 30%;
   }
-  .el-textarea__inner{
+  .el-loading-spinner {
+    top: 25%;
+    margin-top: -21px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
+  .proParameter-wrapper .el-textarea__inner{
     height: 150px !important;
     width: 380px;
   }

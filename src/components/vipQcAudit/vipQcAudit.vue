@@ -48,6 +48,12 @@
         <el-form-item label="真实姓名：">
           <el-input style="width: 200px;" v-model="realName"></el-input>
         </el-form-item>
+        <el-form-item label="激活状态:">
+          <el-select style="width: 200px;" v-model="state">
+            <el-option label="未激活" value="0"></el-option>
+            <el-option label="已激活" value="1"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="拨科电数 ：" title="拨打科室电话次数">
           <el-select style="width: 90px;" v-model="roomtype">
             <el-option label=">=" value=0></el-option>
@@ -151,6 +157,11 @@
       label="地区">
     </el-table-column>
     <el-table-column
+      prop="memberState"
+      width="70"
+      label="激活状态">
+    </el-table-column>
+    <el-table-column
       prop="teltime"
       width="120"
       label="拨打电话时段">
@@ -198,6 +209,7 @@
   export default {
     data() {
       return {
+        state:null,
         loading:true,
         tableData: [],
         dialogVisible: false,

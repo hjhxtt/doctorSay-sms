@@ -14,6 +14,7 @@
               </el-form-item>
             </el-form>
         </div>
+        <!-- <el-button @click="getCar">cha</el-button> -->
     </div>
 </template>
 <script>
@@ -51,7 +52,27 @@
         }
       };
     },
+    mounted(){
+      sessionStorage.clear()
+    },
     methods: {
+      getCar(){
+      this.axios({
+      method: "GET",
+      url: 'https://testapi.che300.com/service/mortageQuery' ,
+      params:{
+      token:'00932aa74838efdb693018dfdc0814bd',
+      carNo:'沪LZ7620',
+      vin:'LSJW2679XFS091611',
+      carType:'02',
+      carOwner:'杨梦云',
+      tel:'17621953379'
+      }
+      }).then((res) => {
+
+      console.log(res);
+      })
+      },
       login(){
             if(this.userInfo.userName=='' || this.userInfo.password==''){
               this.$message.error('请输入用户名和密码')
@@ -69,6 +90,7 @@
                 
                 this.$message.success(res.data.msg);
                 localStorage.setItem('isLogin',true)
+                localStorage.setItem('userInfo',JSON.stringify(params))
                 if(Boolean(this.$route.params.redirect)){//有传路由则跳转到之前的路由，否者跳转主页
                     this.$router.push(this.$route.params.redirect)
                 }else{

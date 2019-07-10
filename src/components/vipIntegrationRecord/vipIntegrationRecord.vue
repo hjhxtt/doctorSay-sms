@@ -4,21 +4,22 @@
       <i class="el-icon-search"></i><span>会员积分记录</span>
       <p style="float:right;" > <span style="font-size:14px;">用户id：{{id}}</span><span style="font-size:14px;margin-right:0px;">用户名：{{name}}</span></p>
     </div>
-    <div style="margin-bottom: 15px;padding-left:20px ;">总计{{total_num}}分</div>
+    <div style="margin-bottom: 15px;padding-left:20px ;">总获得积分：{{total}},总兑换积分：{{exchangeTotal}},当前积分：{{now}}</div>
     <el-table
       :data="tableData"
       border
       style="width: 100%">
       <el-table-column
-        prop="integralrecordid"
-        width="150"
-        label="记录编号">
-      </el-table-column>
-      <el-table-column
         prop="integral"
         width="150"
-        label="分数">
+        label="积分">
       </el-table-column>
+      <el-table-column
+        prop="projectName"
+        width="150"
+        label="项目">
+      </el-table-column>
+      
       <el-table-column
         prop="integralrecordmsg"
         label="积分描述">
@@ -26,7 +27,7 @@
       <el-table-column
         prop="integralrecordtime"
         width="200"
-        label="时间">
+        label="日期">
       </el-table-column>
     </el-table>
     <el-pagination
@@ -48,9 +49,11 @@
       pageIndex: 1,
       pageSize:5,
       tableData:[],
-      total_num:null,
       id:'',
       name:'',
+      total:'',
+      exchangeTotal:'',
+      now:'',
     }
   },
   mounted(){
@@ -58,8 +61,26 @@
     this.getMemberIngretalRecordCount();
     this.id = sessionStorage.getItem('userid')
     this.name = sessionStorage.getItem('userName')
+    this.getMemberTotal()
   },
   methods:{
+    getMemberTotal(){
+      this.axios.get(this.common.getApi() + '/sys/api/member/getMemberTotal',{
+        params:{
+            id: Number(sessionStorage.getItem('userid'))
+        }
+      },{
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then((res) => {
+        
+          this.total = res.data.obj.total
+          this.exchangeTotal = Math.abs(res.data.obj.exchangeTotal)
+          this.now = this.total - this.exchangeTotal
+
+      })
+    },
     getMemberIngretalRecord(pageIndex,pageSize){
       this.axios.get(this.common.getApi() + '/sys/api/member/getMemberIngretalRecord',{
         params:{

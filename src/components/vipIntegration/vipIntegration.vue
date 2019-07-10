@@ -24,16 +24,16 @@
       </el-form-item>
     </el-form>
     <div class="intr-txt">
-      <p>上传参数文本说明：上传的文本需是.cs格式的文件，上传的参数必须统一为会员数字ID或者会员手机号</p>
+      <p>上传参数文本说明：上传的文本需是.csv格式的文件，上传的参数必须统一为会员数字ID或者会员手机号</p>
       <p>1.每个参数文本可包含N条参数；</p>
-      <p>2.每条参数应包含4种数据，会员ID（需要统一数字ID或者会员手机号）|分值|类型|积分明细；</p>
-      <p>3.积分明细中，如果出现标点符号，必须是中文状态下的标点符合，否则会出错。</p>
+      <p>2.每条参数应包含4种数据，会员ID（需要统一数字ID或者会员手机号）|类型|分值|积分明细；</p>
+      <p>3.积分明细中，如果出现标点符号，必须是中文状态下的标点符号，否则会出错。</p>
       <p>4.参数文本实例：<span style="color: red;font-weight: bold;">(注意：如果写的是负分，那么就是扣除积分)</span></p>
       <div style="margin-left: 40px;">
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>10<span style="color: red;">|</span>1<span style="color: red;">|</span>参加商业调查系统奖励10积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>30<span style="color: red;">|</span>1<span style="color: red;">|</span>8月份推荐10名医生系统奖励30积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>10<span style="color: red;">|</span>1<span style="color: red;">|</span>参与活动系统奖励10积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>20<span style="color: red;">|</span>1<span style="color: red;">|</span>参与论坛系统奖励20积分<span style="color: red;">,</span></p>
+        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>10<span style="color: red;">|</span>参加商业调查系统奖励10积分<span style="color: red;">,</span></p>
+        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>30<span style="color: red;">|</span>8月份推荐10名医生系统奖励30积分<span style="color: red;">,</span></p>
+        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>10<span style="color: red;">|</span>参与活动系统奖励10积分<span style="color: red;">,</span></p>
+        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>20<span style="color: red;">|</span>参与论坛系统奖励20积分<span style="color: red;">,</span></p>
       </div>
       <p>请注意以上红色符号！</p>
     </div>

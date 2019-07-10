@@ -240,12 +240,12 @@
     </el-table-column>
     <el-table-column
       prop="memberRealname"
-      width="80"
+      width="70"
       label="会员姓名">
     </el-table-column>
     <el-table-column
       prop="memberSex"
-      width="50"
+      width="30"
       label="性别">
     </el-table-column>
     <el-table-column
@@ -265,7 +265,7 @@
     </el-table-column>
     <el-table-column
       prop="city"
-       width="70"
+       width="60"
       label="区域">
     </el-table-column>
     <el-table-column
@@ -274,7 +274,7 @@
     </el-table-column>
     <el-table-column
       prop="memberIntegral"
-      width="80"
+      width="50"
       label="会员积分">
     </el-table-column>
     <!--<el-table-column
@@ -293,7 +293,7 @@
     </el-table-column>
     <el-table-column
       fixed="right"
-      width="80"
+      width="50"
       label="参与记录">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toJoinRecord(scope.row)">查看</el-button>
@@ -301,7 +301,7 @@
     </el-table-column>
     <el-table-column
       fixed="right"
-      width="80"
+      width="50"
       label="推荐记录">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toRecommendRecord(scope.row)">查看</el-button>
@@ -310,7 +310,7 @@
     <el-table-column
       fixed="right"
       label="操作"
-      width="200">
+      width="170">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="toEdit(scope.row)">编辑</el-button>
         <el-button type="text" size="small" style="margin-left: 0;" @click="showdialog(scope.row)">设置审核状态</el-button>
@@ -333,9 +333,9 @@
       center>
       <div>
         
-        <el-form label-width="120px" ref="editform" :model="editform" style="margin-top: 2%;" :rules="rules">
+        <el-form label-width="120px" ref="editform"  :model="editform" style="margin-top: 2%;" :rules="rules">
           <el-form-item label="会员id： ">
-            <el-input disabled :value="editform.id" style="width: 80%;"></el-input>
+            <el-input  :value="editform.id" style="width: 80%;"></el-input>
           </el-form-item>
           <el-form-item label="会员姓名： " >
             <el-input disabled :value="editform.name" style="width: 80%;"></el-input>
@@ -350,9 +350,12 @@
               <el-option value='6' label='信息填写错误'></el-option>
               <el-option value='7' label='科室电话错误'></el-option>
               <el-option value='8' label='未联系到本人'></el-option>
-              <el-option value='9' label='兼职'></el-option>
+              <el-option value='9' label='不良和注销'></el-option>
               <el-option value='10' label='测试'></el-option>
             </el-select>
+          </el-form-item>
+          <el-form-item label="备注： " >
+            <el-input  v-model="editform.remark" style="width: 80%;"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -438,7 +441,8 @@
         editform:{
           isblackname:null,
           id:null,
-          name:null
+          name:null,
+          remark:'',
         },
       };
     },
@@ -516,10 +520,19 @@
       submitForm(formName){
         this.$refs[formName].validate((valid) => {
           if (valid) {
+
+            if(this.editform.isblackname != '0' && this.editform.isblackname != '2'){
+              if(this.editform.remark == ''){
+                this.$message.error('请填写备注')
+                return false
+              }
+            }
+
             this.axios.post(this.common.getApi() + '/sys/api/member/setAuditState',{
               params:{
                 id: Number(this.editform.id),
                 isblackname: Number(this.editform.isblackname),
+                remark:this.editform.remark
               }
             }).then((res) => {
               if(res.data.success){
@@ -529,6 +542,7 @@
                 })
                 this.editdialogVisible = false;
                 this.getMemberList(this.pageIndex,this.pageSize);
+                this.editform.remark = ''
               }else{
                 this.$message.error(res.data.msg)
               }
@@ -726,6 +740,11 @@
         this.getMemberList(currentPage,this.pageSize);
       },
       getMemberList(pageIndex,pageSize){
+        if(this.form.sex == 1){
+          this.form.sex = '女'
+        }else if(this.form.sex == 0){
+          this.form.sex = '男'
+        }
         this.loading = true
         console.log(pageIndex)
         this.axios.post(this.common.getApi() + '/sys/api/member/getMemberList',{

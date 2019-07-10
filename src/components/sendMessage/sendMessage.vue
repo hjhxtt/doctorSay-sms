@@ -29,11 +29,22 @@
         </el-col>
 
       </el-form-item>
+     
       <el-form-item>
         <el-button type="primary" @click="submitForm" >发送</el-button>
         <el-button type="primary" @click="$router.push('/sampleRecord')" >取消</el-button>
+         <el-button type="primary" @click="reset" >重置</el-button>
       </el-form-item>
     </el-form>
+     <div style="font-size:14px;margin-left:120px;line-height:26px;color:red;">
+    %1%--------项目数字编号<br>
+    %2%--------会员手机号<br>
+    %3%--------项目编号<br>
+    %4%--------项目名称<br>
+    %5%--------项目时长<br>
+    %6%--------会员姓名<br>
+    %7%--------会员密码  <br>
+      </div>
   </div>
 </template>
 
@@ -56,6 +67,27 @@
 
     },
     methods: {
+      openLoading() {
+        const loading = this.$loading({           // 声明一个loading对象
+          lock: true,                             // 是否锁屏
+          text: '',                     // 加载动画的文字
+          spinner: 'el-icon-loading',             // 引入的loading图标
+          background: 'rgba(0, 0, 0, 0.3)',       // 背景颜色
+          target: '.sub-main',                    // 需要遮罩的区域
+          body: true,                              
+          customClass: 'mask'                     // 遮罩层新增类名
+        })
+        setTimeout(function () {                  // 设定定时器，超时5S后自动关闭遮罩层，避免请求失败时，遮罩层一直存在的问题
+          loading.close();                        // 关闭遮罩层
+        },10000)
+        return loading;
+      },
+      reset(){
+        this.message=''
+        this.testTel=''
+        this.sendTime=''
+        this.taskName=''
+      },
       submitForm(formName) {
 
       function checkTime(i){
@@ -105,6 +137,7 @@
           taskName : this.taskName
         }
         console.log(para)
+        this.openLoading()
          this.axios.post(this.common.getApi() + '/sys/api/projectSample/sendBatchSmsMessage',{
                 params:para
               }).then((res) => {
@@ -113,14 +146,11 @@
                     type: 'success',
                     message: '发送成功'
                   })
-                  this.message=''
-                  this.testTel=''
-                  this.sendTime=''
-                  this.taskName=''
                 }else{
                   this.$message.error(res.data.msg)
                   console.log(res.data)
                 }
+                this.openLoading().close()
               })
       }
     }
@@ -144,4 +174,19 @@
   .pro-wrapper .quill-editor .ql-container{
     height: 200px;
   }
+   .el-loading-spinner i {
+    color: #009999;
+    font-weight:700;
+}
+.el-loading-spinner .el-loading-text {
+    color: #009999;
+    font-weight:700;
+}
+   .el-loading-spinner {
+    top: 25%;
+    margin-top: -21px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
 </style>

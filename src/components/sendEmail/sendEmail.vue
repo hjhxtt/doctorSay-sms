@@ -31,6 +31,21 @@
 
     },
     methods: {
+      openLoading() {
+        const loading = this.$loading({           // 声明一个loading对象
+          lock: true,                             // 是否锁屏
+          text: '',                     // 加载动画的文字
+          spinner: 'el-icon-loading',             // 引入的loading图标
+          background: 'rgba(0, 0, 0, 0.3)',       // 背景颜色
+          target: '.sub-main',                    // 需要遮罩的区域
+          body: true,                              
+          customClass: 'mask'                     // 遮罩层新增类名
+        })
+        setTimeout(function () {                  // 设定定时器，超时5S后自动关闭遮罩层，避免请求失败时，遮罩层一直存在的问题
+          loading.close();                        // 关闭遮罩层
+        },10000)
+        return loading;
+      },
       submitForm(formName) {
 
         if(this.email=='' || this.title == '' || this.taskName == '' ){
@@ -54,7 +69,7 @@
         // }
         // console.log(para)
 
-
+        this.openLoading()
         this.axios.post(this.common.getApi() + '/sys/api/projectSample/sendBatchEmail',{
                 params:{
                   id : Number(sessionStorage.getItem('nweid')),
@@ -67,12 +82,13 @@
                 if(res.data.success){
                   this.$message({
                     type: 'success',
-                    message: '添加成功'
+                    message: '邮件发送成功'
                   })
                 }else{
                   this.$message.error(res.data.msg)
                   console.log(res.data)
                 }
+                this.openLoading().close()
               }).catch(function(err){
                 console.log(err);
               })
@@ -99,4 +115,19 @@
   .pro-wrapper .quill-editor .ql-container{
     height: 200px;
   }
+   .el-loading-spinner i {
+    color: #009999;
+    font-weight:700;
+}
+.el-loading-spinner .el-loading-text {
+    color: #009999;
+    font-weight:700;
+}
+   .el-loading-spinner {
+    top: 25%;
+    margin-top: -21px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+}
 </style>
