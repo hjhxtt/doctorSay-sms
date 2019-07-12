@@ -5,25 +5,26 @@
     </div>
     <div class="query-wrapper">
       <el-form label-width="120px" :inline="true" size="mini">
-        <!-- <el-form-item label="会员流水号：">
-          <el-input style="width: 200px;" v-model="memberId"></el-input>
-        </el-form-item> -->
-        <el-form-item label="会员账号：">
+        <el-form-item label="会员手机号：">
           <el-input style="width: 200px;" v-model="memberMobile"></el-input>
         </el-form-item>
+        <el-form-item label="会员ID：">
+          <el-input style="width: 200px;" v-model="memberId"></el-input>
+        </el-form-item>
+        
         <el-form-item label="会员姓名：">
           <el-input style="width: 200px;" v-model="memberName"></el-input>
         </el-form-item>
         <el-form-item label="审核状态:">
           <el-select style="width: 200px;" v-model="state">
-            <el-option label="待审核" value="0"></el-option>
-            <el-option label="审核未通过" value="1"></el-option>
-            <el-option label="审核已通过" value="3"></el-option>
+            <el-option label="未审核" value="0"></el-option>
+            <el-option label="审核未通过" value="5,6"></el-option>
+            <el-option label="审核已通过" value="2"></el-option>
           </el-select>
         </el-form-item>
         <br />
         <el-form-item style="padding-left: 30px;">          
-          <el-button size="mini" type="primary" @click="getCertificateMemberList(1,6)">立即查询</el-button>        
+          <el-button size="mini" type="primary" @click="getCertificateMemberList(1,30)">立即查询</el-button>        
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="resetForm">重置</el-button>
@@ -127,6 +128,7 @@
         this.memberName = null;
       },
       getCertificateMemberList(pageIndex,pageSize){
+
         this.loading = true
         this.axios.get(this.common.getApi() + '/sys/api/audit/getCertificateMemberList',{
           params:{
@@ -136,6 +138,7 @@
               memberId: this.memberId,
               memberMobile: this.memberMobile,
               memberName: this.memberName,
+              blackName:this.state
             }            
           }
         },{

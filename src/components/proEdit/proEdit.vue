@@ -82,6 +82,9 @@
       <el-form-item label="返回参数hdopid" prop="hdopid">
         <el-input v-model="ruleForm.hdopid" class="inputlength"></el-input>
       </el-form-item>
+      <el-form-item label="返回参数s" prop="s">
+        <el-input v-model="ruleForm.s" class="inputlength"></el-input>
+      </el-form-item>
       <el-form-item label="问卷时长" prop="time">
         <el-input v-model.number="ruleForm.time" class="inputlength"></el-input>
       </el-form-item>
@@ -125,7 +128,8 @@
           time: '',//问卷时长
           add_jf:'',//加分
           welcome_txt:'',
-          pro_state:''
+          pro_state:'',
+          s:''
         },
         typeSelect: [],
         checked:false,//
@@ -249,6 +253,7 @@
           this.ruleForm.hdopid = res.data.obj.hdopid;
           this.ruleForm.time = res.data.obj.surveylenth;
           this.ruleForm.welcome_txt = res.data.obj.welcomecontent;
+          this.ruleForm.s = res.data.obj.s;
 
         })
       },
@@ -279,7 +284,8 @@
             recompointnum: Number(this.ruleForm.add_jf),
             hdopid: this.ruleForm.hdopid,
             surveylenth: Number(this.ruleForm.time),
-            welcomecontent: this.ruleForm.welcome_txt
+            welcomecontent: this.ruleForm.welcome_txt,
+            s: this.ruleForm.s
           }
         }).then((res) => {
           this.isload = false;

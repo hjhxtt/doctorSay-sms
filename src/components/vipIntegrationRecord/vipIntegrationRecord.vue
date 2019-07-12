@@ -10,8 +10,13 @@
       border
       style="width: 100%">
       <el-table-column
+        prop="integralrecordid"
+        width="80"
+        label="编号">
+      </el-table-column>
+      <el-table-column
         prop="integral"
-        width="150"
+        width="80"
         label="积分">
       </el-table-column>
       <el-table-column

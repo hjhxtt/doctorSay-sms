@@ -62,8 +62,8 @@
       </el-form-item>
     </el-form>
     <el-form label-width="120px" size="mini" :inline-message='true'>
-      <el-form-item label="推荐码" prop="memberHandphone" >
-        <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>{{form.smscode}}
+      <el-form-item label="推荐人" prop="memberHandphone" >
+        <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>我的推荐码：{{form.smscode}}
       </el-form-item>
       <el-form-item label="手机号码" prop="memberHandphone" >
         <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>我们将只会使用该手机号码，已短信的形式通知您参加调查
@@ -80,16 +80,7 @@
           <el-radio :label="1">女</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="出生年份" prop="memberBirYear">
-        <el-date-picker
-          style="width: 200px;"
-          v-model="form.memberBirYear"
-          type="year"
-          placeholder="选择年份"
-          value-format="yyyy"
-          >
-        </el-date-picker>
-      </el-form-item>
+      
       <el-form-item label="科室电话" prop="departmentstle">
         <el-input v-model="form.departmentstle" style="width: 200px;margin-right: 10px;" ></el-input>
       </el-form-item>
@@ -101,16 +92,7 @@
           >
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="从医年份" prop="workdate">
-        <el-date-picker
-          style="width: 200px;"
-          v-model="form.workdate"
-          type="year"
-          placeholder="选择年份"
-          value-format="yyyy"
-          >
-        </el-date-picker>
-      </el-form-item>
+      
       <el-form-item label="职称" prop="memberstation">
         <el-select v-model="form.zc_1" @change = "getStationTechnicalTitle(form.zc_1);clear()" style="width: 98px;" >
           <el-option v-for="item in zc_1_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
@@ -173,31 +155,11 @@
         <div>床位数：{{numberOfBeds}}</div>
       </el-form-item>
 
-      <el-form-item label="加入的学会" prop="societyid">
-        <el-select v-model="form.societyid" multiple placeholder="请填写您参加过的学会" class="meetingInput" style="width: 400px;" >
-          <el-option v-for="item in meeting_options" :label="item.societyname" :key="item.id" :value="item.id"></el-option>
-        </el-select>
-      </el-form-item>
+      
 
-      <el-form-item label="最高学历" prop="memberEducation">
-        <el-select v-model="form.memberEducation" style="width: 200px;" >
-          <el-option v-for="item in education_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
-        </el-select>
-      </el-form-item>
+      
 
-      <el-form-item label="毕业时间"  prop="graduationTime" >
-        <el-date-picker v-model="form.graduationTime" type="year" placeholder="选择日期" value-format="yyyy" style="width: 200px;" ></el-date-picker>
-      </el-form-item>
-
-      <el-form-item label="毕业院校" prop="graduationInstitutions">
-        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province);clearSchool()" >
-          <el-option v-for="item in province_options" :label="item.provinceName" :key="item.provinceId" :value="item.provinceId"></el-option>
-        </el-select>
-        <el-select placeholder="请选择学校" v-model="form.graduationInstitutions" >
-          <el-option v-for="item in school_options" :label="item.graduatename" :key="item.graduateid" :value="item.graduateid"></el-option>
-        </el-select>
-      </el-form-item>
-
+      
       <el-form-item label="接听电话时间" prop="end_time" >
         <el-time-select
           placeholder="请选择起始时间"
@@ -224,6 +186,54 @@
           }">
         </el-time-select>
       </el-form-item>
+      <el-form-item label="从医年份" prop="workdate">
+        <el-date-picker
+          style="width: 200px;"
+          v-model="form.workdate"
+          type="year"
+          placeholder="选择年份"
+          value-format="yyyy"
+          >
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="出生年份" prop="memberBirYear">
+        <el-date-picker
+          style="width: 200px;"
+          v-model="form.memberBirYear"
+          type="year"
+          placeholder="选择年份"
+          value-format="yyyy"
+          >
+        </el-date-picker>
+      </el-form-item>
+      <el-form-item label="加入的学会" prop="societyid">
+        <el-select v-model="form.societyid" multiple placeholder="请填写您参加过的学会" class="meetingInput" style="width: 400px;" >
+          <el-option v-for="item in meeting_options" :label="item.societyname" :key="item.id" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="最高学历" prop="memberEducation">
+        <el-select v-model="form.memberEducation" style="width: 200px;" >
+          <el-option v-for="item in education_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="毕业时间"  prop="graduationTime" >
+        <el-date-picker v-model="form.graduationTime" type="year" placeholder="选择日期" value-format="yyyy" style="width: 200px;" ></el-date-picker>
+      </el-form-item>
+
+      <el-form-item label="毕业院校" prop="graduationInstitutions">
+        <el-select placeholder="请选择省份" v-model="form.province" @change="getGraduateList(form.province);clearSchool()" >
+          <el-option v-for="item in province_options" :label="item.provinceName" :key="item.provinceId" :value="item.provinceId"></el-option>
+        </el-select>
+        <el-select placeholder="请选择学校" v-model="form.graduationInstitutions" >
+          <el-option v-for="item in school_options" :label="item.graduatename" :key="item.graduateid" :value="item.graduateid"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="执业证1">
+        <img style="max-width:400px;max-height:400px;" :src="form.filename" alt="">
+      </el-form-item>  
+      <el-form-item label="执业证2">
+        <img style="max-width:400px;max-height:400px;" :src="form.secondfilename" alt="">
+      </el-form-item>  
       <el-form-item>
         <el-button type="primary" @click="submitForm2('form')" :loading="isload">保存</el-button>
       </el-form-item>

@@ -304,7 +304,7 @@
             })
             //todo
             this.peopleNum = this.can_sample
-            this.can_sample = ''
+            // this.can_sample = ''
           }else{
             this.$message.error(res.data.msg);
           }

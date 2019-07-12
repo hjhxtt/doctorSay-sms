@@ -55,11 +55,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="拨科电数 ：" title="拨打科室电话次数">
-          <el-select style="width: 90px;" v-model="roomtype">
+          <el-select style="width: 90px;" v-model="phoneStatus">
             <el-option label=">=" value=0></el-option>
             <el-option label="<=" value=1></el-option>
           </el-select>
-          <el-input style="width: 120px;" v-model="roomenum"></el-input>
+          <el-input style="width: 120px;" v-model="msgCount"></el-input>
+        </el-form-item>
+        <el-form-item label="短信次数 ：" title="发送短信次数">
+          <el-select style="width: 90px;" v-model="msgtype">
+            <el-option label=">=" value=0></el-option>
+            <el-option label="<=" value=1></el-option>
+          </el-select>
+          <el-input style="width: 120px;" v-model="msgNum"></el-input>
         </el-form-item>
         <el-form-item label="拨手机数  ：" title="拨打手机电话次数">
           <el-select style="width: 90px;" v-model="mobiletype">
@@ -157,11 +164,6 @@
       label="地区">
     </el-table-column>
     <el-table-column
-      prop="memberState"
-      width="70"
-      label="激活状态">
-    </el-table-column>
-    <el-table-column
       prop="teltime"
       width="120"
       label="拨打电话时段">
@@ -188,11 +190,18 @@
       label="职称">
     </el-table-column>
     <el-table-column
+      prop="memberState"
+      width="70"
+      label="激活状态">
+    </el-table-column>
+    <el-table-column
       fixed="right"
       label="操作"
       width="150">
       <template slot-scope="scope">
         <el-button type="text" size="small" @click="audit(scope.row)">点击审核</el-button>
+        
+        <el-button v-show="scope.row.memberState == '未激活'" type="text" size="small" @click="showSendCode(scope.row)">发送激活码</el-button>
       </template>
     </el-table-column>    
   </el-table>    
@@ -202,6 +211,24 @@
       :page-size="pageSize"
       @current-change="go">
     </el-pagination>  
+      <el-dialog
+        title="发送激活码"
+        :visible.sync="dialogAddVisible"
+        width="500px"
+        center>
+        <div>
+            <span>激活码</span><el-input disabled type="text" v-model="code" style="width:150px;margin:0 50px;margin-bottom:30px;"></el-input>
+            <el-button  @click="getCode()">刷新激活码</el-button>
+            <el-button  style="margin-left:90px;" @click="sendCode()">发送激活码</el-button>
+            <!-- <a href=" ">
+             <img id="test" style="cursor:pointer;width: 100px;height: 36px;margin: 5px 0 0 5px;border-radius: 3px;" title="点击刷新验证码" src="http://47.102.194.98:8080/doctor_sys_api/sys/api/audit/getVerifiCode"/>
+          </a> -->
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogAddVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveCode()">保存</el-button>
+        </span>
+      </el-dialog>
   </div>
 </template>
 
@@ -209,6 +236,9 @@
   export default {
     data() {
       return {
+        code:'',
+        phoneStatus:null,
+        msgCount:null,
         state:null,
         loading:true,
         tableData: [],
@@ -231,7 +261,9 @@
         mobilenum:null,
         pageIndex:1,
         pageSize:6,
-        pageTotal:null,        
+        pageTotal:null,
+        dialogAddVisible:false ,
+        showData:null
       };
     },
     mounted(){
@@ -289,6 +321,48 @@
         sessionStorage.setItem('registTimeEnd',JSON.stringify(this.registTimeEnd))
     },
     methods: {
+      saveCode(){
+        this.axios.post(this.common.getApi() + '/sys/api/audit/saveVerifiCode',{
+          memberId:this.showData.id,
+          memberHandPhone:this.showData.memberHandPhone,
+           vireCode:this.code
+        }).then((res) => {
+          if(res.data.success){
+            this.$message({
+              message:'保存成功',
+              type:'success'
+            })
+           this.dialogAddVisible = false
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
+      getCode(){
+         
+         var code = Math.random().toString(36).substr(2,4);
+         this.code = code
+      },
+      showSendCode(data){
+        this.dialogAddVisible = true
+        this.showData = data
+        this.getCode()
+      },
+      sendCode(){
+        this.axios.post(this.common.getApi() + '/sys/api/audit/sendVerifiCode',{
+          memberHandPhone:this.showData.memberHandPhone,
+           vireCode:this.code
+        }).then((res) => {
+          if(res.data.success){
+            this.$message({
+              message:'发送成功',
+              type:'success'
+            })
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
       time(){
         console.log(this.registerTime);
         
@@ -361,6 +435,11 @@
               registTimeEnd: this.registTimeEnd,
               beginTime: beginTime,
               endTime: endTime,
+              memberState:this.state,
+              // msgNum:{
+              //   type:this.phoneStatus,
+              //   number:this.msgCount
+              // }
             }
           }
         },{
@@ -377,6 +456,14 @@
             this.tableData[i].filename = this.tableData[i].filename?'已上传': '未上传';
             this.tableData[i].phoneNum = this.tableData[i].phoneNum?this.tableData[i].phoneNum:0;
             this.tableData[i].mobileNum = this.tableData[i].mobileNum?this.tableData[i].mobileNum:0;
+
+
+            if(this.tableData[i].memberState == 1){
+              this.tableData[i].memberState = '已激活'
+            }else if(this.tableData[i].memberState == 0){
+              this.tableData[i].memberState = '未激活'
+            }
+
           }
           this.loading = false
         })

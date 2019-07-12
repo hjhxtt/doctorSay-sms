@@ -62,8 +62,8 @@
       url: 'https://testapi.che300.com/service/mortageQuery' ,
       params:{
       token:'00932aa74838efdb693018dfdc0814bd',
-      carNo:'沪LZ7620',
-      vin:'LSJW2679XFS091611',
+      carNo:'川WZG628',
+      vin:'LZZ1BDEB8GE592602',
       carType:'02',
       carOwner:'杨梦云',
       tel:'17621953379'

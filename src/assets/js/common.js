@@ -3,8 +3,8 @@ export default{
 //  var api = "http://uw64ry.natappfree.cc/doctor_sys_api"
     //var api = "http://nba6sy.natappfree.cc/doctor_sys_api"
     //var api = "http://192.168.1.244:80/doctor_sys_api"
-    var api = "http://47.102.194.98:8080/doctor_sys_api"
-    //var api = "doctor_sys_api"
+    //var api = "http://47.102.194.98:8080/doctor_sys_api"
+    var api = "doctor_sys_api"
     return api;
   },
   
