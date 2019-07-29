@@ -28,9 +28,32 @@
       };
     },
     mounted(){
-
+      this.getProject()
     },
     methods: {
+      getProject(){
+        this.axios.get(this.common.getApi() + '/sys/api/project/getProject',{
+          params: {
+            params:{
+              id: Number(sessionStorage.getItem("id"))
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.success){
+           this.title = res.data.obj.mailtitle
+            this.email = res.data.obj.projectMailMessage
+            
+
+            
+          }else{
+            this.$message.error(res.data.msg);
+          }
+        })
+      },
       openLoading() {
         const loading = this.$loading({           // 声明一个loading对象
           lock: true,                             // 是否锁屏
@@ -59,15 +82,6 @@
 
 
 
-
-        // let para = {
-        //   id : Number(sessionStorage.getItem('id')),
-        //   title : this.title,
-        //   content : this.email,
-        //   taskName : this.taskName,
-        //   emailType : true
-        // }
-        // console.log(para)
 
         this.openLoading()
         this.axios.post(this.common.getApi() + '/sys/api/projectSample/sendBatchEmail',{

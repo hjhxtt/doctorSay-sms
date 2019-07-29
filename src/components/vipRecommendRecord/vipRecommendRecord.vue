@@ -55,7 +55,7 @@
     return {
       pageTotal:0,
       pageIndex: 1,
-      pageSize:12,
+      pageSize:20,
       tableData:[],
     }
   },
@@ -78,6 +78,7 @@
         }
       }).then((res) => {
         this.tableData = res.data.obj.list;
+        debugger
         for(var i = 0; i < this.tableData.length; i++){
           if(this.tableData[i].memberState == 0){
             this.tableData[i].memberState = '未激活'
@@ -106,6 +107,7 @@
             this.tableData[i].isblackname = "测试";
           }
         }
+
         this.pageTotal = res.data.obj.pager.total;
         console.log(this.pageTotal);
       })

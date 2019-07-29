@@ -6,7 +6,7 @@
     <div class="query-wrapper">
       <el-form label-width="120px" :inline="true" size="mini">
         <el-form-item label="会员手机号：">
-          <el-input style="width: 200px;" v-model="memberMobile"></el-input>
+          <el-input style="width: 200px;" v-model="memberMobile" debounce="2000"></el-input>
         </el-form-item>
         <el-form-item label="会员ID：">
           <el-input style="width: 200px;" v-model="memberId"></el-input>
@@ -49,6 +49,11 @@
         prop="memberRealname"
         label="会员姓名">
       </el-table-column>
+      <el-table-column
+        prop="memberHandPhone"
+        label="会员手机号">
+      </el-table-column>
+      
       <el-table-column
         prop="recommendcode"
         label="推荐码">
@@ -100,7 +105,7 @@
         memberName:null,
         memberMobile:null,
         memberId:null,
-        state:null,
+        state:'0',
         baseurl: baseurl,
         showPic:false
       }
@@ -138,8 +143,8 @@
               memberId: this.memberId,
               memberMobile: this.memberMobile,
               memberName: this.memberName,
-              blackName:this.state
-            }            
+              blackname:this.state
+            } 
           }
         },{
           headers: {

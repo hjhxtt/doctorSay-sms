@@ -55,11 +55,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="拨科电数 ：" title="拨打科室电话次数">
-          <el-select style="width: 90px;" v-model="phoneStatus">
+          <el-select style="width: 90px;" v-model="roomtype">
             <el-option label=">=" value=0></el-option>
             <el-option label="<=" value=1></el-option>
           </el-select>
-          <el-input style="width: 120px;" v-model="msgCount"></el-input>
+          <el-input style="width: 120px;" v-model="roomenum"></el-input>
         </el-form-item>
         <el-form-item label="短信次数 ：" title="发送短信次数">
           <el-select style="width: 90px;" v-model="msgtype">
@@ -131,10 +131,13 @@
           <el-button type="success" plain>待释放人数：0</el-button>
         </el-form-item>        -->
         <el-form-item >
-          <el-button type="primary" @click="getQcMemberList(1,6)">搜索</el-button>
+          <el-button type="primary" @click="getQcMemberList(pageIndex,pageSize)">搜索</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="resetForm()">重置</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="unLock(0)">待释放人数：{{peopleNum}}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -236,10 +239,11 @@
   export default {
     data() {
       return {
+        peopleNum:0,
         code:'',
         phoneStatus:null,
         msgCount:null,
-        state:null,
+        state:"1",
         loading:true,
         tableData: [],
         dialogVisible: false,
@@ -260,10 +264,12 @@
         mobiletype:null,
         mobilenum:null,
         pageIndex:1,
-        pageSize:6,
+        pageSize:20,
         pageTotal:null,
         dialogAddVisible:false ,
-        showData:null
+        showData:null,
+        msgtype:null,
+        msgNum:null
       };
     },
     mounted(){
@@ -306,6 +312,7 @@
 
 
       this.getQcMemberList(this.pageIndex,this.pageSize)
+      this.unLock(1)
     },
     beforeDestroy() {
         sessionStorage.setItem('userId',JSON.stringify(this.userId))
@@ -321,22 +328,56 @@
         sessionStorage.setItem('registTimeEnd',JSON.stringify(this.registTimeEnd))
     },
     methods: {
+      unLock(num){
+        var para = new URLSearchParams()
+         para.append('lockState',num)
+         this.axios({
+            method: 'post',
+            url: this.common.getApi() + '/sys/api/audit/getLockCountOrUnLock',
+            data: para
+          }).then(res=>{
+
+            if(res.data.success){
+              if(num === 0){
+                this.$message({
+                  message:'释放成功',
+                  type:'success'
+                })
+                this.unLock(1)
+              }
+              if(num === 1){
+                  this.peopleNum = res.data.obj;
+                  
+                }
+            }else{
+              this.$message.error(res.data.msg);
+            }
+          })
+      },
       saveCode(){
-        this.axios.post(this.common.getApi() + '/sys/api/audit/saveVerifiCode',{
-          memberId:this.showData.id,
-          memberHandPhone:this.showData.memberHandPhone,
-           vireCode:this.code
-        }).then((res) => {
-          if(res.data.success){
-            this.$message({
-              message:'保存成功',
-              type:'success'
-            })
-           this.dialogAddVisible = false
-          }else{
-            this.$message.error(res.data.msg);
-          }
-        })
+        var para = new URLSearchParams()
+         para.append('memberId',this.showData.id)
+         para.append('memberHandPhone',this.showData.memberHandPhone)
+         para.append('vireCode',this.code)
+         this.axios({
+            method: 'post',
+            url: this.common.getApi() + '/sys/api/audit/saveVerifiCode',
+            data: para
+          }).then(res=>{
+
+            if(res.data.success){
+              this.$message({
+                message:'保存成功',
+                type:'success'
+              })
+            this.dialogAddVisible = false
+            }else{
+              this.$message.error(res.data.msg);
+            }
+            
+            
+          })
+       
       },
       getCode(){
          
@@ -349,10 +390,8 @@
         this.getCode()
       },
       sendCode(){
-        this.axios.post(this.common.getApi() + '/sys/api/audit/sendVerifiCode',{
-          memberHandPhone:this.showData.memberHandPhone,
-           vireCode:this.code
-        }).then((res) => {
+        
+        this.axios.post(this.common.getApi() + '/sys/api/audit/sendVerifiCode?memberHandPhone='+this.showData.memberHandPhone+'&vireCode='+this.code).then((res) => {
           if(res.data.success){
             this.$message({
               message:'发送成功',
@@ -381,6 +420,11 @@
         this.registerTime = null; 
         this.registTimeBegin = null
         this.registTimeEnd = null
+        this.msgtype = null
+        this.msgNum = null
+         this.state = null   
+        
+
       },
       handleClose(done) {
         this.$confirm('确认关闭？')
@@ -403,7 +447,9 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
-            sessionStorage.setItem('qcinfo',JSON.stringify(res.data.obj));
+            if(Boolean(res.data.obj)){
+              sessionStorage.setItem('qcinfo',JSON.stringify(res.data.obj));
+            }
             this.$router.push({ path: 'vipTelVerify'})            
           }else{
             this.$message.error(res.data.msg);
@@ -417,9 +463,15 @@
         let realName = this.realName?this.realName:null;
         let studioPhone = this.roomtype && this.roomenum?{type: this.roomtype ,number: this.roomenum }:null;
         let mobilePhone = this.mobiletype && this.mobilenum?{type: this.mobiletype ,number: this.mobilenum }:null;
+      
+        let msgNum = this.msgtype && this.msgNum?{type: this.msgtype ,number: this.msgNum }:null;
         let isCertificate = this.isCertificate?this.isCertificate:null; 
         let beginTime = this.beginTime?Number(this.beginTime.slice(0,2)):null;
         let endTime = this.endTime?Number(this.endTime.slice(0,2)):null;
+
+      
+
+
         this.axios.get(this.common.getApi() + '/sys/api/audit/getQcMemberList',{
           params:{
             pageIndex: pageIndex,
@@ -436,10 +488,7 @@
               beginTime: beginTime,
               endTime: endTime,
               memberState:this.state,
-              // msgNum:{
-              //   type:this.phoneStatus,
-              //   number:this.msgCount
-              // }
+              msgNum:msgNum
             }
           }
         },{
@@ -453,7 +502,7 @@
           for(var i = 0; i < this.tableData.length; i++){
             this.teltime = this.tableData[i].beginTime + "时 至" + this.tableData[i].endTime + "时";
             this.tableData[i].teltime = this.teltime;
-            this.tableData[i].filename = this.tableData[i].filename?'已上传': '未上传';
+            this.tableData[i].filename = Boolean(this.tableData[i].filename)?'已上传': '未上传';
             this.tableData[i].phoneNum = this.tableData[i].phoneNum?this.tableData[i].phoneNum:0;
             this.tableData[i].mobileNum = this.tableData[i].mobileNum?this.tableData[i].mobileNum:0;
 
@@ -467,28 +516,7 @@
           }
           this.loading = false
         })
-      },
-      goQcMemberAudit(){
-        var id = sessionStorage.getItem("id");
-        this.axios.get(this.common.getApi() + '/sys/api/audit/goQcMemberAudit',{
-          params:{
-            params:{
-              id: Number(id)
-            }
-          }
-        },{
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then((res) => {
-          if(res.data.code == '200'){
-            console.log(res.data.obj);
-            sessionStorage.setItem('qcinfo',JSON.stringify(res.data.obj));
-          }else{
-            this.$message.error(res.data.msg);
-          }
-        })           
-      },      
+      },   
       go(currentPage){
         
         this.getQcMemberList(currentPage,this.pageSize);

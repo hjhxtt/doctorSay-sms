@@ -52,7 +52,7 @@
     return {
       pageTotal:0,
       pageIndex: 1,
-      pageSize:5,
+      pageSize:20,
       tableData:[],
       id:'',
       name:'',
@@ -63,7 +63,7 @@
   },
   mounted(){
     this.getMemberIngretalRecord(this.pageIndex,this.pageSize);
-    this.getMemberIngretalRecordCount();
+    // this.getMemberIngretalRecordCount();
     this.id = sessionStorage.getItem('userid')
     this.name = sessionStorage.getItem('userName')
     this.getMemberTotal()
@@ -79,10 +79,21 @@
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then((res) => {
-        
-          this.total = res.data.obj.total
-          this.exchangeTotal = Math.abs(res.data.obj.exchangeTotal)
+        debugger
+          if(Boolean(res.data.obj.total)){
+              
+              this.total = res.data.obj.total
+          }else{
+              this.total = 0
+          }     
+          if(Boolean(Math.abs(res.data.obj.exchangeTotal))){
+            this.exchangeTotal = Math.abs(res.data.obj.exchangeTotal)
+          }else{
+            this.exchangeTotal = 0
+          }
+          
           this.now = this.total - this.exchangeTotal
+          
 
       })
     },
@@ -117,23 +128,23 @@
     go(currentPage){
       this.getMemberIngretalRecord(currentPage,this.pageSize);
     },
-    getMemberIngretalRecordCount(){
-      this.axios.get(this.common.getApi() + '/sys/api/member/getMemberIngretalRecordCount',{
-        params:{
-          params:{
-            id: Number(sessionStorage.getItem('userid'))
-          }
-        }
-      },{
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }).then((res) => {
-        console.log(res);
+    // getMemberIngretalRecordCount(){
+    //   this.axios.get(this.common.getApi() + '/sys/api/member/getMemberIngretalRecordCount',{
+    //     params:{
+    //       params:{
+    //         id: Number(sessionStorage.getItem('userid'))
+    //       }
+    //     }
+    //   },{
+    //     headers: {
+    //       'Content-Type': 'application/x-www-form-urlencoded'
+    //     }
+    //   }).then((res) => {
+    //     console.log(res);
         
-        this.total_num = res.data.obj == null? 0 : res.data.obj;
-      })
-    }
+    //     this.total_num = res.data.obj == null? 0 : res.data.obj;
+    //   })
+    // }
   }
 }
 </script>

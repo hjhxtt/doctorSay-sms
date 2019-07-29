@@ -130,6 +130,12 @@
             case 20:
               childList.push('角色管理')
               break;
+            case 21:
+              childList.push('活跃度管理')
+              break;
+            case 22:
+              childList.push('医院管理')
+              break;
                     }
                   })
                   this.memberType=childList
@@ -218,6 +224,14 @@
               parentList.push(18)
               childList.push(20)
               break;
+            case '活跃度管理':
+              parentList.push(18)
+              childList.push(21)
+              break;
+            case '医院管理':
+              parentList.push(18)
+              childList.push(22)
+              break;
           }
         })
         
@@ -245,7 +259,7 @@
             
                 if(res.data.success){
                   this.$message.success(res.data.msg)
-                  this.$router.push('/manRole')
+                  // this.$router.push('/manRole')
                   return false
                 }else{
                   this.$message.error(res.data.msg)

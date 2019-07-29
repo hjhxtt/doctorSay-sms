@@ -329,6 +329,18 @@ export default {
                             childtitle:'角色管理'
                           })
                           break;
+                        case 21:
+                          childList[4].children.push({
+                            index:'/activity',
+                            childtitle:'活跃度管理'
+                          })
+                          break;
+                        case 22:
+                          childList[4].children.push({
+                            index:'/hospital',
+                            childtitle:'医院管理'
+                          })
+                          break;
                     }
                   })
                   this.menuList=childList

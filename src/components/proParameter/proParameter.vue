@@ -30,25 +30,21 @@
       <el-form-item>
         <el-button type="primary" @click="download">下载参数文本</el-button>
       </el-form-item>
-      <el-form-item style="margin-left:170px;">
+      <el-form-item  label="删除参数文本">
         
-        <template slot="label">
           <el-select  v-model="form.choose_param">
             <el-option label="删除未使用的参数" value="0"></el-option>
             <el-option label="删除全部参数" value="1"></el-option>
           </el-select>
-        </template>
         <el-button type="primary" @click="deleteParam">删除参数文本</el-button>
       </el-form-item>
-      <el-form-item style="margin-left:170px;">
-        <template slot="label">
+      <el-form-item label="删除参与记录">
           <el-input
             type="textarea"
             :autosize="{ minRows: 2, maxRows: 4}"
             placeholder="请输入要删除的手机号以英文逗号分隔"
             v-model="telArr">
           </el-input>
-        </template>
       </el-form-item >
       <el-button style="margin-left:170px;" type="primary" @click="deleteTel()">删除参与记录</el-button>
     </el-form>

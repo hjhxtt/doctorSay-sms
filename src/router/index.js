@@ -37,6 +37,8 @@ import login from '@/components/login/login'
 import manAccount from '@/components/manAccount/manAccount'
 import manRole from '@/components/manRole/manRole'
 import allList from '@/components/allList/allList'
+import activity from '@/components/activity/activity'
+import hospital from '@/components/hospital/hospital'
 
 
 Vue.use(Router)
@@ -224,6 +226,17 @@ const router = new Router({
           name: '权限列表',
           component: allList,
         },
+        {
+          path: 'activity',
+          name: '活跃度管理',
+          component: activity,
+        }, {
+          path: 'hospital',
+          name: '医院管理',
+          component: hospital,
+        },
+        
+        
 
 
       ]

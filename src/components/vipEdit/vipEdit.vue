@@ -10,7 +10,7 @@
       <el-form-item label="真实姓名" prop="memberRealname" >
         <el-input v-model="form.memberRealname" style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
-      <el-form-item label="电子邮箱" prop="memberMail">
+      <el-form-item label="电子邮箱">
         <el-input v-model="form.memberMail" style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
       <el-form-item label="您的性别" prop="memberSex" required>
@@ -20,13 +20,14 @@
         </el-radio-group>
       </el-form-item>
       
-      <el-form-item label="科室电话" prop="departmentstle">
+      <el-form-item label="科室电话">
         <el-input v-model="form.departmentstle" style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
       <el-form-item label="注册时间" prop="registerTime">
         <el-date-picker
           v-model="form.registerTime"
           type="datetime"
+          value-format="yyyy-MM-dd"
           placeholder="选择日期时间">
         </el-date-picker>        
       </el-form-item>
@@ -63,6 +64,31 @@
           <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="所在医院" prop="fkHospitalId">
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
+          <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
+        </el-select>
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC()">
+          <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
+        </el-select>
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD()">
+          <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+        <br>
+        <el-input style="width: 400px;margin-top: 10px;" v-if="form.memberProvince === 0" v-model="form.memberhospital"></el-input>
+        <el-select placeholder="请选择" v-else style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" @change="getHospitalById(form.fkHospitalId)">
+          <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+        
+      </el-form-item>
+      <el-form-item label="医院信息:" v-if = "form.fkHospitalId != -1">
+        <div>医院级别：{{level}}</div>
+        <div>医院等级：{{grade}}</div>
+        <div>医院性质：{{hospitalNature}}</div>
+        <div>医院类型：{{hospitalType}}</div>
+        <div>专科类型：{{professionalType}}</div>
+        <div>床位数：{{numberOfBeds}}</div>
+      </el-form-item>
       
       <!-- <el-form-item label="从医领域" prop="medical_field_2" style="width:518px;"> 
         <el-button @click="visi=true">选择</el-button>
@@ -80,33 +106,7 @@
           <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
-
-      <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
-          <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
-        </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC()">
-          <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
-        </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD()">
-          <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
-        </el-select>
-        <br>
-        <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" @change="getHospitalById(form.fkHospitalId)">
-          <el-option value="0" label="其他"></el-option>
-          <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
-        </el-select>
-        <br />
-        <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == 0" v-model="form.inputhospital"></el-input>
-      </el-form-item>
-      <el-form-item label="医院信息:" v-if = "form.fkHospitalId != -1">
-        <div>医院级别：{{level}}</div>
-        <div>医院等级：{{grade}}</div>
-        <div>医院性质：{{hospitalNature}}</div>
-        <div>医院类型：{{hospitalType}}</div>
-        <div>专科类型：{{professionalType}}</div>
-        <div>床位数：{{numberOfBeds}}</div>
-      </el-form-item>
+      
       <el-form-item label="接听电话时间" prop="end_time" >
         <el-time-select
           placeholder="请选择起始时间"
@@ -131,7 +131,7 @@
           }">
         </el-time-select>
       </el-form-item > 
-      <el-form-item label="从医年份" prop="workdate">
+      <el-form-item label="从医年份">
         <el-date-picker
           style="width: 200px;"
           v-model="form.workdate"
@@ -140,7 +140,7 @@
           value-format="yyyy">
         </el-date-picker>        
       </el-form-item>
-      <el-form-item label="出生年份" prop="memberBirYear">
+      <el-form-item label="出生年份">
         <el-date-picker
           style="width: 200px;"
           v-model="form.memberBirYear"
@@ -159,7 +159,7 @@
           <el-option v-for="item in education_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
-       <el-form-item label="毕业时间" required prop="graduationTime">
+       <el-form-item label="毕业时间">
         <el-date-picker v-model="form.graduationTime" type="year" placeholder="选择日期" value-format="yyyy" style="width: 200px;"></el-date-picker>
       </el-form-item>
 
@@ -272,20 +272,17 @@
           memberRealname:[
             { required: true, message: '请填写真实姓名', trigger: 'blur' }
           ],
-          memberMail:[
-            { required: true, message: '请填写邮箱', trigger: 'blur' }
-          ],
           memberSex:[
             { required: true, message: '请选择性别', trigger: 'change' }
           ],
-          memberBirYear:[
-            { required: true, message: '请选择出生年份', trigger: 'change' }
+          fkHospitalId:[
+            { required: true, message: '请选择所在医院', trigger: 'change' }
           ],
           departmentstle:[
             { required: true, message: '请填写科室电话', trigger: 'blur' }
           ],
-          workdate:[
-            { required: true, message: '请选择从医年份', trigger: 'change' }
+          membersectionoffice:[
+            { required: true, message: '请选择工作科室', trigger: 'change' }
           ],
           memberidcard:[
             { required: true, message: '请填写证件号', trigger: 'blur' }
@@ -298,6 +295,9 @@
           ],
           membertechnical:[
             { required: true, message: '请选择从医领域', trigger: 'change' }
+          ],
+          registerTime:[
+            { required: true, message: '请选择注册时间', trigger: 'change' }
           ],
         },
         zc_1_options:[],
@@ -371,52 +371,35 @@
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length;
       },
       submitForm(formName) {
-        //  if(  this.form.memberRealname  == '' ||
-            //     this.form.memberMail == '' ||
-            //      this.form.memberSex == '' ||
-            //     this.form.memberBirYear == '' ||
-            //     this.form.departmentstle == '' ||
-            //     this.form.registerTime == '' ||
-            //     this.form.workdate == '' ||
-            //     this.form.memberstation == '' ||
-            //      this.form.memberidcard == '' ||
-            //     this.form.membersectionoffice == '' ||
-            //     this.form.administrativeposition == '' ||
-            //     this.form.membertechnical == '' ||
-            //     this.form.memberProvince == '' ||
-            //     this.form.memberCity == '' ||
-            //     this.form.fkDistrictId == '' ||
-            //     // fkHospitalId == '' ||
-            //      this.form.memberhospital == '' ||
-            //      this.form.societyid == '' ||
-            //      this.form.memberEducation == '' ||
-            //     this.form.graduationTime == '' ||
-            //     this.form.graduationInstitutions == '' ||
-            //     this.form.beginTime == '' ||
-            //     this.form.endTime == '' || this.form.membercertificatetype == '' ){
-            //       this.$message.error('请完善所有数据')
-            //       return
-            //     }
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.isload = true;
-            var fkHospitalId = null;
-            if(this.form.inputhospital == ""){
-              fkHospitalId = Number(this.form.fkHospitalId);
-              this.form.memberhospital = "";
-            }else{
-              this.form.memberhospital = this.form.inputhospital;
-              this.form.fkHospitalId = "0";
-              fkHospitalId = null;
-            }
             var memberSex = null;
-            if(this.form.memberSex == 0){
+            if(this.form.memberSex === 0){
               memberSex = "男"
-            }else{
+            }else if(this.form.memberSex === 1){
               memberSex = "女"
             }
-            
 
+            var societyid = null
+            if(Boolean(this.form.societyid)){
+              societyid = this.form.societyid.join(',')
+            }
+            
+            var membertechnical = null
+            if(Boolean(this.form.membertechnical)){
+              membertechnical = this.form.membertechnical.join(',')
+            }
+            
+            var beginTime = null
+            if(Boolean(this.form.beginTime)){
+              beginTime = this.form.beginTime.slice(0,2)
+            }
+            var endTime = null
+            if(Boolean(this.form.endTime)){
+              endTime = this.form.endTime.slice(0,2)
+            }
+  
 
 
             this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
@@ -433,18 +416,18 @@
                 memberidcard: this.form.memberidcard,
                 membersectionoffice: Number(this.form.membersectionoffice),
                 administrativeposition: Number(this.form.administrativeposition),
-                membertechnical: this.form.membertechnical.join(','),
+                membertechnical: membertechnical,
                 memberProvince: Number(this.form.memberProvince),
                 memberCity: Number(this.form.memberCity),
                 fkDistrictId: Number(this.form.fkDistrictId),
-                fkHospitalId: fkHospitalId,
+                fkHospitalId: this.form.fkHospitalId,
                 memberhospital: this.form.memberhospital,
-                societyid: this.form.societyid.join(','),
+                societyid:societyid,
                 memberEducation: Number(this.form.memberEducation),
                 graduationTime: this.form.graduationTime,
                 graduationInstitutions: this.form.graduationInstitutions,
-                beginTime: Number(this.form.beginTime.slice(0,2)),
-                endTime: Number(this.form.endTime.slice(0,2)),
+                beginTime: beginTime,
+                endTime: endTime,
                 membercertificatetype:this.form.membercertificatetype//职业证
               },
             }).then((res) => {
@@ -458,6 +441,9 @@
                 this.isload = false  
                 this.$message.error(res.data.msg);
               }
+            }).catch(err=>{
+              this.isload = false   
+              this.$message.error(err.message);
             })
           }else {
             this.isload = false  
@@ -480,21 +466,21 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
-            this.form.filename = res.data.obj.filename
-            this.form.secondfilename = res.data.obj.secondfilename
+            console.log(res.data.obj);
+            this.form.filename = this.common.getApi() + res.data.obj.filename
+            debugger
+            this.form.secondfilename = this.common.getApi() + res.data.obj.secondfilename
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
             this.form.memberMail = res.data.obj.memberMail;
             this.form.recommendcode = res.data.obj.recommendcode;
-            if(res.data.obj.memberSex == '男'){
+            if(res.data.obj.memberSex === '男'){
               this.form.memberSex = 0;
-            }else{
+            }else if(res.data.obj.memberSex === '女'){
               this.form.memberSex = 1;
             }
-            this.form.memberBirYear = res.data.obj.memberBirYear.toString();
             this.form.departmentstle = res.data.obj.departmentstle;
-            this.form.workdate = res.data.obj.workdate.toString();
             this.form.memberstation = res.data.obj.memberstation;
             this.form.memberidcard = res.data.obj.memberidcard;
             this.form.administrativeposition = res.data.obj.administrativeposition;
@@ -513,9 +499,16 @@
             this.getSectionOfficeById();
             this.form.memberProvince = res.data.obj.memberProvince;
             this.getCityByProvince(this.form.memberProvince)
-            this.form.memberCity = res.data.obj.memberCity;
+
+            if(Boolean(res.data.obj.memberCity)){
+              this.form.memberCity = res.data.obj.memberCity;
+            }
+            if(Boolean(res.data.obj.fkDistrictId)){
+              this.form.fkDistrictId = res.data.obj.fkDistrictId;
+            }
+             
             this.getDistrictByCity(this.form.memberProvince,this.form.memberCity);
-            this.form.fkDistrictId = res.data.obj.fkDistrictId;
+           
             if(res.data.obj.fkHospitalId != 0){
               this.form.fkHospitalId = res.data.obj.fkHospitalId;              
             }else{
@@ -523,8 +516,19 @@
             }
             this.form.memberhospital = res.data.obj.memberhospital;
 //          this.form.inputhospital = res.data.obj.memberhospital;
-            this.form.memberEducation = res.data.obj.memberEducation;
-            this.form.graduationTime = res.data.obj.graduationTime;
+            if(Boolean(res.data.obj.memberEducation)){
+              this.form.memberEducation = res.data.obj.memberEducation;//改
+            }
+            if(Boolean(res.data.obj.memberBirYear)){
+              this.form.memberBirYear = res.data.obj.memberBirYear.toString();//改
+            }
+            if(Boolean(res.data.obj.workdate)){
+              this.form.workdate = res.data.obj.workdate.toString();//改
+            }
+            if(Boolean(res.data.obj.graduationTime)){
+              this.form.graduationTime = res.data.obj.graduationTime;//改
+            }
+            
             if(res.data.obj.beginTime < 10){
               this.form.beginTime = "0"+ res.data.obj.beginTime + ":00"
             }else if(res.data.obj.beginTime >= 10){
@@ -864,6 +868,13 @@
               this.professionalType = res.data.obj.professionalType;
             }
           })
+        }else{
+          this.level = null
+          this.grade = null
+          this.hospitalNature = null
+          this.hospitalType = null
+          this.numberOfBeds = null
+          this.professionalType = null
         }
       },
       getSociety(){
@@ -909,8 +920,11 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
-            this.form.province = res.data.obj.provinceid;
-            this.getGraduateList(this.form.province);
+            if(Boolean(res.data.obj)){
+              this.form.province = res.data.obj.provinceid;
+              this.getGraduateList(this.form.province);
+            }
+            
           }
         })        
       }

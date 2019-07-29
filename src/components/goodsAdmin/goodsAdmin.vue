@@ -45,7 +45,7 @@
               <el-option label="待审核商品" value="5"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="提供商：" prop="supplierid" required>
+          <el-form-item label="提供商：" >
             <el-select style="width: 100%;" v-model="addform.supplierid">
               <el-option label="大家说" value="0"></el-option>
               <el-option label="一点通" value="1"></el-option>
@@ -109,7 +109,7 @@
               <el-option label="待审核商品" value="5"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="提供商：" prop="supplierid" required>
+          <el-form-item label="提供商：" >
             <el-select style="width: 100%;" v-model="editform.supplierid">
               <el-option label="大家说" value="0"></el-option>
               <el-option label="一点通" value="1"></el-option>
@@ -137,13 +137,22 @@
             <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="商品状态：">
+          <el-select style="width: 120px;" v-model="giftStatus">
+            <el-option label="正常商品" value="0"></el-option>
+            <el-option label="热门奖品" value="1"></el-option>
+            <el-option label="下架奖品" value="2"></el-option>
+            <el-option label="待审核奖品" value="2"></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="兑换人数：">
           <el-select style="width: 90px;" v-model="type">
             <el-option label=">=" value="0"></el-option>
             <el-option label="<=" value="1"></el-option>
           </el-select>
-          <el-input style="width: 140px;" v-model="count"></el-input>
+          <el-input style="width: 140px;" type="number" v-model="count"></el-input>
         </el-form-item>
+        
         <br />
         <el-form-item style="padding-left: 50px;">
           <el-button type="primary" @click="getGiftsList(pageIndex,pageSize)">搜索</el-button>
@@ -224,6 +233,7 @@
   export default {
     data() {
       return {
+        giftStatus:'1',
         loading:true,
         baseurl: baseurl,
         dialogAddVisible:false,
@@ -247,6 +257,7 @@
           fileParam:null,
           giftsidcode:null,
           giftstaus:null,
+          supplierid:''
         },
         fileList: [],
         editform:{
@@ -261,6 +272,7 @@
           giftstaus:null,
           id:null,
           fileList:[],
+          supplierid:''
         },
         categoryList:[],
         rules: {
@@ -276,9 +288,9 @@
           giftdiscribe:[
             { required: true, message: '请填写商品描述', trigger: 'blur' }
           ],
-          supplierid:[
-            { required: true, message: '请选择提供商', trigger: 'change' }
-          ],
+          // supplierid:[
+          //   { required: true, message: '请选择提供商', trigger: 'change' }
+          // ],
           giftstaus:[
             { required: true, message: '请选择商品状态', trigger: 'change' }
           ],
@@ -555,4 +567,11 @@
     text-align: center;
     margin-top: 20px;
   }  
+  input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{
+
+    -webkit-appearance: none !important;
+    margin: 0; 
+}                                                                             
+
+input[type="number"]{-moz-appearance:textfield;}  
 </style>

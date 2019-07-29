@@ -89,10 +89,16 @@
         label="会员ID">
       </el-table-column>
       <el-table-column
+        prop="memberHandphone"
+        width="110"
+        label="会员手机">
+      </el-table-column>
+      <el-table-column
         prop="memberRealname"
         width="50"
-        label="会员账号">
+        label="会员姓名">
       </el-table-column>
+      
       <el-table-column
         prop="deliverstatus"
         width="80"
@@ -117,7 +123,7 @@
         label="兑换时间">
       </el-table-column>
       <el-table-column
-        prop=""
+        prop="verfynote"
         width="100"
         label="审核备注">
       </el-table-column>
@@ -183,7 +189,7 @@
         categoryName:null,
         id:null,
         userid:null,
-        deliverstatus: null,
+        deliverstatus: '0',
         converttime: null,
         editdialogVisible:false,
         editform:{
@@ -362,7 +368,7 @@
               params:{
                 id: Number(this.editform.id),
                 auditType: Number(this.editform.auditType),
-                remark: this.editform.remark
+                verfynote: this.editform.remark
               }
             }).then((res) => {
               if(res.data.success){

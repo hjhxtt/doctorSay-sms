@@ -57,7 +57,7 @@ export default {
     }
   },
   methods:{
-    handleExceed(files, fileList) {
+      handleExceed(files, fileList) {
         this.$message.warning(`最多只能选择1个文件`);
       },
       beforeUpload(file){

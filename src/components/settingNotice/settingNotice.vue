@@ -221,6 +221,7 @@
         if(formName == "addform"){
           this.$refs[formName].validate((valid) => {
             if (valid) {
+              debugger
               this.axios.post(this.common.getApi() + '/sys/api/message/addMessage',{
                 params:{
                   title: this.addform.title,

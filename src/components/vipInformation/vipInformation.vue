@@ -51,7 +51,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="审核状态:">
-          <el-select style="width: 200px;" v-model="form.auditState">
+          <el-select style="width: 200px;" v-model="form.auditState" multiple>
             <el-option label="未审核" value="0"></el-option>
             <el-option label="审核通过" value="2"></el-option>
             <el-option label="ID审核" value="3"></el-option>
@@ -60,7 +60,7 @@
             <el-option label="信息填写错误" value="6"></el-option>
             <el-option label="科室电话错误" value="7"></el-option>
             <el-option label="未联系到本人" value="8"></el-option>
-            <el-option label="兼职" value="9"></el-option>
+            <el-option label="不良和注销" value="9"></el-option>
             <el-option label="测试" value="10"></el-option>
           </el-select>
         </el-form-item>
@@ -133,7 +133,7 @@
           <el-input style="width:200px;" v-model="form.memberEmail"></el-input>
         </el-form-item>
         <el-form-item label="行政职位 :">
-          <el-select v-model="form.administrativeposition" style="width: 200px;">
+          <el-select v-model="form.administrativeposition" style="width: 200px;" multiple>
             <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
           </el-select>
         </el-form-item>
@@ -244,7 +244,7 @@
               
             </el-row>
           <el-form-item label="医院级别:">
-            <el-select v-model="form.hospitalLevel" style="width: 200px;">
+            <el-select v-model="form.hospitalLevel" style="width: 200px;" multiple>
               <el-option v-for="item in level_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
             </el-select>
           </el-form-item>
@@ -313,10 +313,10 @@
           <el-button type="primary" @click="dialogVisible = true">导出会员分析</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">会员信息批量更新</el-button>
+          <el-button type="primary" @click="memberVisible = true">会员信息批量更新</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">根据医生医院查询</el-button>
+          <el-button type="primary" @click="doctorVisible = true">根据医生医院查询</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -440,7 +440,7 @@
     @current-change="go">
   </el-pagination>
     <el-dialog
-      title="订单审核"
+      title="设置审核状态"
       :visible.sync="editdialogVisible"
       width="30%"
       center>
@@ -468,12 +468,71 @@
             </el-select>
           </el-form-item>
           <el-form-item label="备注： " >
-            <el-input  v-model="editform.isblackRemark" style="width: 80%;"></el-input>
+            <el-input  v-model="editform.remark" style="width: 80%;"></el-input>
           </el-form-item>
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer" >
         <el-button type="primary" @click="submitForm('editform')">保存</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="会员信息批量更新"
+      :visible.sync="memberVisible"
+      width="400px">
+      <el-form label-width="120px" ref="editform"   style="margin-top: 2%;">
+        
+          <el-form-item label="会员信息文本：">
+            <el-upload
+              class="upload-demo"
+              ref="upload"
+              action="123"
+              :auto-upload=false
+              :on-change="newhandleChange"
+              :on-success="newhandlesuccess"
+              :on-exceed="handleExceed"
+              :limit="1"
+              accept=".csv">
+              <el-button size="small" type="success">选择文件</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传csv文件</div>
+            </el-upload>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="small" type="primary" @click="submitUpload">上传文本</el-button>
+          </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="memberVisible = false">关闭</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="根据医生医院查询"
+      :visible.sync="doctorVisible"
+      width="30%">
+      <el-form label-width="120px" ref="editform"   style="margin-top: 2%;">
+        
+          <el-form-item label="医院信息文本：">
+            <el-upload
+              class="upload-demo"
+              ref="upload"
+              action="123"
+              :auto-upload=false
+              :on-change="newhandleChange"
+              :on-success="newhandlesuccess"
+              :on-exceed="handleExceed"
+              :limit="1"
+              accept=".csv">
+              <el-button size="small" type="success">选择文件</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传csv文件</div>
+            </el-upload>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="small" type="primary" @click="submitUploadDownload">结果查询下载</el-button>
+          </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="doctorVisible = false">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -483,6 +542,11 @@
   export default {
     data () {
       return {
+        fileParam:'',
+        uploadForm: new FormData(),
+        fileList:[],
+        doctorVisible:false,
+        memberVisible:false,
         showMoreQuery:false,
         loading:true,
         tableData: [],
@@ -524,7 +588,8 @@
           memberidcardState:null,
           checklist:[],
           serchState:null,
-          checkMethod:null
+          checkMethod:null,
+          administrativeposition:null
         },
         zc_1_options:[],
         zc_2_options:[],
@@ -572,7 +637,9 @@
       };
     },
     beforeDestroy() {
-      sessionStorage.setItem('form',JSON.stringify(this.form) )
+
+      sessionStorage.setItem('form',JSON.stringify(this.form))
+
       sessionStorage.setItem('province_tags',JSON.stringify(this.province_tags))
 
       sessionStorage.setItem('city_tags',JSON.stringify(this.city_tags))
@@ -597,7 +664,7 @@
       
       if ( Boolean(sessionStorage.getItem('form'))) {
         this.form = JSON.parse(sessionStorage.getItem('form'))
-
+        debugger
 
       if(Boolean(JSON.parse(sessionStorage.getItem('province_tags')))){
         this.province_tags = JSON.parse(sessionStorage.getItem('province_tags'))
@@ -629,6 +696,52 @@
       }
     },
     methods: {
+      submitUploadDownload(){
+
+      },
+      submitUpload(){
+        if(this.fileParam === ''){
+          this.$message.error('积分文本不能为空')
+          return false
+        }
+        this.uploadForm.append('file', this.fileParam[0].raw);
+        this.axios.post(this.common.getApi() + '/sys/api/member/batchUpdateMember',this.uploadForm,{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          console.log(res)
+          if(res.data.success){
+            this.$message({
+              message: '上传成功',
+              type: 'success'
+            });
+
+          this.$refs.upload.clearFiles()
+          this.uploadForm = new FormData()
+          this.memberVisible = false
+          this.fileParam  = ''
+          }else{
+            console.log(res)
+            this.$message.error(res.data.msg);
+            this.fileList = [];
+            this.fileParam = '';
+            this.uploadForm = new FormData()
+          }
+        })
+      },
+      handleExceed(files, fileList) {
+        this.$message.warning(`最多只能选择1个文件`);
+      },
+      beforeUpload(file){
+
+      },
+      newhandlesuccess(file){
+        console.log(file);
+      },
+      newhandleChange(response,file,filelist){
+        this.fileParam = file;
+      },
       resetForm(formName) {
           this.form.memberName = null
           this.form.memberId = null
@@ -841,12 +954,14 @@
         this.editdialogVisible = true;
       },
       submitForm(formName){
+        var that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
 
-            if(this.editform.isblackname != '0' && this.editform.isblackname != '2'){
-              if(this.editform.remark == ''){
-                this.$message.error('请填写备注')
+            if(that.editform.isblackname != '0' && that.editform.isblackname != '2'){
+              debugger
+              if(that.editform.remark == ''){
+                that.$message.error('请填写备注')
                 return false
               }
             }
@@ -855,7 +970,7 @@
               params:{
                 id: Number(this.editform.id),
                 isblackname: Number(this.editform.isblackname),
-                blackRemark :this.editform.remark
+                blackremark :this.editform.remark
               }
             }).then((res) => {
               if(res.data.success){
@@ -877,7 +992,7 @@
         });
       },
       downloadMember(){
-        debugger
+        
         if(this.ids){
           this.axios({
             url:this.common.getApi() + '/sys/api/member/downloadMember',
@@ -900,31 +1015,84 @@
             document.body.removeChild(elink)
           })
         }else{
+          
+           if(this.form.sex == 1){
+                this.form.sex = '女'
+              }else if(this.form.sex == 0){
+                this.form.sex = '男'
+              }
 
-           debugger
+              if(this.province_tags.length>0){
+                this.province_tags.map(e=>{
+                  this.queryProvince.push(e.id)
+                })
+              }
 
-          this.axios({
-            url:this.common.getApi() + '/sys/api/member/downloadMember',
-            method:'get',
-            params: {
+              if(this.city_tags.length>0){
+                this.city_tags.map(e=>{
+                  this.queryCity.push(e.id)
+                })
+              }
+
+              if(this.zc_tags.length>0){
+                this.zc_tags.map(e=>{
+                  this.memberstationQuery.push(e.id)
+                })
+              }
+
+              if(this.room_tags.length>0){
+                this.room_tags.map(e=>{
+                  this.membersectionofficeQuery.push(e.id)
+                })
+              }
+
+              //完成项目参数
+              var completeProjectId = null
+              if(this.form.completeProjectId !== null){
+                if(this.form.completeProjectId.indexOf(',') !=-1){
+                  completeProjectId = this.form.completeProjectId.split(',')
+                  completeProjectId = completeProjectId.map(Number)
+                }else{
+                  completeProjectId = []
+                  completeProjectId.push(Number(this.form.completeProjectId))
+                }
+              }
+              //参与项目参数
+              var projectId = null
+              if(this.form.projectId !== null){
+                if(this.form.projectId.indexOf(',') !=-1){
+                  projectId = this.form.projectId.split(',')
+                  projectId = projectId.map(Number)
+                }else{
+                  projectId = []
+                  projectId.push(Number(this.form.projectId))
+                }
+              }
+
+
+
+
+
+              var jsonStr = JSON.stringify({
+              memberId: this.form.memberId,
               memberName:this.form.memberName,
               realName: this.form.realName,
-              hospitalLevel: this.form.hospitalLevel,
+              hospitalLevel: this.form.hospitalLevel,//医院级别
               state: this.form.state,
-              auditState: this.form.auditState,
-              projectId: this.form.projectId,
+              auditState:this.form.auditState,//审核状态
+              projectId: projectId,//参与项目
               certificateState: this.form.certificateState,
               recommandCode: this.form.recommandCode,
-              completeProjectId: this.form.completeProjectId,
+              completeProjectId: completeProjectId,//完成项目
               smscode: this.form.smscode,
-              provinceId:this.form.provinceId,//省份
-              cityId: this.form.cityId,//城市
+              provinceId:this.queryProvince,//省份 this.queryProvince todo
+              cityId: this.queryCity,//城市
               birDate: this.form.birDate,
               doctorAgeBegin: this.form.doctorAgeBegin,
               docotorAgeEnd: this.form.docotorAgeEnd,
-              memberstation: this.form.memberstation,//职称
-              membersectionoffice: this.form.membersectionoffice,//科室
-              administrativeposition: this.form.administrativeposition,
+              memberstation: this.memberstationQuery,//职称
+              membersectionoffice: this.membersectionofficeQuery,//科室
+              administrativeposition:this.form.administrativeposition,//行政职位
               memberEmail: this.form.memberEmail,
               sex: this.form.sex,
               serchState: this.form.serchState,
@@ -933,7 +1101,15 @@
               fizz:this.form.fizz,
               memberidcard: this.form.memberidcard,
               memberidcardState: this.form.memberidcardState,
-              membertechnical: this.form.membertechnical
+              membertechnical: this.form.membertechnical,
+              checkMethod:this.form.checkMethod//审核方式
+            })
+            console.log(jsonStr)
+          this.axios({
+            url:this.common.getApi() + '/sys/api/member/downloadMember',
+            method:'get',
+            params: {
+              jsonStr:jsonStr
             },
             responseType: 'blob',
           }).then((res) => {
@@ -977,28 +1153,86 @@
                 document.body.removeChild(elink)
               })
             }else{
+
+
+              if(this.form.sex == 1){
+                this.form.sex = '女'
+              }else if(this.form.sex == 0){
+                this.form.sex = '男'
+              }
+
+              if(this.province_tags.length>0){
+                this.province_tags.map(e=>{
+                  this.queryProvince.push(e.id)
+                })
+              }
+
+              if(this.city_tags.length>0){
+                this.city_tags.map(e=>{
+                  this.queryCity.push(e.id)
+                })
+              }
+
+              if(this.zc_tags.length>0){
+                this.zc_tags.map(e=>{
+                  this.memberstationQuery.push(e.id)
+                })
+              }
+
+              if(this.room_tags.length>0){
+                this.room_tags.map(e=>{
+                  this.membersectionofficeQuery.push(e.id)
+                })
+              }
+
+              //完成项目参数
+              var completeProjectId = null
+              if(this.form.completeProjectId !== null){
+                if(this.form.completeProjectId.indexOf(',') !=-1){
+                  completeProjectId = this.form.completeProjectId.split(',')
+                  completeProjectId = completeProjectId.map(Number)
+                }else{
+                  completeProjectId = []
+                  completeProjectId.push(Number(this.form.completeProjectId))
+                }
+              }
+              //参与项目参数
+              var projectId = null
+              if(this.form.projectId !== null){
+                if(this.form.projectId.indexOf(',') !=-1){
+                  projectId = this.form.projectId.split(',')
+                  projectId = projectId.map(Number)
+                }else{
+                  projectId = []
+                  projectId.push(Number(this.form.projectId))
+                }
+              }
+
+
+
               this.axios({
                 url:this.common.getApi() + '/sys/api/member/downloadMemberAnalysis',
                 method:'get',
                 params: {
+                  memberId: this.form.memberId,
                   memberName:this.form.memberName,
                   realName: this.form.realName,
-                  hospitalLevel: this.form.hospitalLevel,
+                  hospitalLevel: this.form.hospitalLevel,//医院级别
                   state: this.form.state,
-                  auditState: this.form.auditState,
-                  projectId: this.form.projectId,
+                  auditState:this.form.auditState,//审核状态
+                  projectId: projectId,//参与项目
                   certificateState: this.form.certificateState,
                   recommandCode: this.form.recommandCode,
-                  completeProjectId: this.form.completeProjectId,
+                  completeProjectId: completeProjectId,//完成项目
                   smscode: this.form.smscode,
-                  provinceId:this.form.provinceId,
-                  cityId: this.form.cityId,
+                  provinceId:this.queryProvince,//省份 this.queryProvince todo
+                  cityId: this.queryCity,//城市
                   birDate: this.form.birDate,
                   doctorAgeBegin: this.form.doctorAgeBegin,
                   docotorAgeEnd: this.form.docotorAgeEnd,
-                  memberstation: this.form.memberstation,
-                  membersectionoffice: this.form.membersectionoffice,
-                  administrativeposition: this.form.administrativeposition,
+                  memberstation: this.memberstationQuery,//职称
+                  membersectionoffice: this.membersectionofficeQuery,//科室
+                  administrativeposition:this.form.administrativeposition,//行政职位
                   memberEmail: this.form.memberEmail,
                   sex: this.form.sex,
                   serchState: this.form.serchState,
@@ -1008,7 +1242,8 @@
                   memberidcard: this.form.memberidcard,
                   memberidcardState: this.form.memberidcardState,
                   membertechnical: this.form.membertechnical,
-                  monthNum: this.ruleForm.monthNum
+                  checkMethod:this.form.checkMethod,//审核方式
+                  monthNum: this.ruleForm.monthNum //月份
                 },
                 responseType: 'blob',
               }).then((res) => {
@@ -1073,11 +1308,6 @@
           this.form.sex = '男'
         }
         this.loading = true
-        console.log(pageIndex)
-
-
-       
-
 
         if(this.province_tags.length>0){
           this.province_tags.map(e=>{
@@ -1103,11 +1333,29 @@
           })
         }
 
+        //完成项目参数
+        var completeProjectId = null
+        if(Boolean(this.form.completeProjectId)){
+          if(this.form.completeProjectId.indexOf(',') !=-1){
+            completeProjectId = this.form.completeProjectId.split(',')
+            completeProjectId = completeProjectId.map(Number)
+          }else{
+            completeProjectId = []
+            completeProjectId.push(Number(this.form.completeProjectId))
+          }
+        }
+        //参与项目参数
+        var projectId = null
+        if(Boolean(this.form.projectId)){
+          if(this.form.projectId.indexOf(',') !=-1){
+            projectId = this.form.projectId.split(',')
+            projectId = projectId.map(Number)
+          }else{
+            projectId = []
+            projectId.push(Number(this.form.projectId))
+          }
+        }
         
-
-       
-
-
 
 
         this.axios.post(this.common.getApi() + '/sys/api/member/getMemberList',{
@@ -1117,13 +1365,13 @@
             memberId: this.form.memberId,
             memberName:this.form.memberName,
             realName: this.form.realName,
-            hospitalLevel: this.form.hospitalLevel,
+            hospitalLevel: this.form.hospitalLevel,//医院级别
             state: this.form.state,
-            auditState: this.form.auditState,
-            projectId: this.form.projectId,
+            auditState:this.form.auditState,//审核状态
+            projectId: projectId,//参与项目
             certificateState: this.form.certificateState,
             recommandCode: this.form.recommandCode,
-            completeProjectId: this.form.completeProjectId,
+            completeProjectId: completeProjectId,//完成项目
             smscode: this.form.smscode,
             provinceId:this.queryProvince,//省份 this.queryProvince todo
             cityId: this.queryCity,//城市
@@ -1132,7 +1380,7 @@
             docotorAgeEnd: this.form.docotorAgeEnd,
             memberstation: this.memberstationQuery,//职称
             membersectionoffice: this.membersectionofficeQuery,//科室
-            administrativeposition: this.form.administrativeposition,
+            administrativeposition:this.form.administrativeposition,//行政职位
             memberEmail: this.form.memberEmail,
             sex: this.form.sex,
             serchState: this.form.serchState,
@@ -1142,7 +1390,7 @@
             memberidcard: this.form.memberidcard,
             memberidcardState: this.form.memberidcardState,
             membertechnical: this.form.membertechnical,
-            checkMethod:this.form.checkMethod
+            checkMethod:this.form.checkMethod//审核方式
 
           },
         }).then((res) => {
@@ -1150,9 +1398,9 @@
           if(res.data.success){
             for(var i = 0; i < res.data.obj.list.length; i++){
               //性别
-              if(res.data.obj.list[i].memberSex == 0){
+              if(res.data.obj.list[i].memberSex === 0){
                 res.data.obj.list[i].memberSex = "男"
-              }else if(res.data.obj.list[i].memberSex == 1){
+              }else if(res.data.obj.list[i].memberSex === 1){
                 res.data.obj.list[i].memberSex = "女"
               }
               //活跃度
@@ -1189,7 +1437,7 @@
               }else if(res.data.obj.list[i].isblackname == 8){
                 res.data.obj.list[i].isblackname = "未联系到本人"
               }else if(res.data.obj.list[i].isblackname == 9){
-                res.data.obj.list[i].isblackname = "兼职"
+                res.data.obj.list[i].isblackname = "不良和注销"
               }else if(res.data.obj.list[i].isblackname == 10){
                 res.data.obj.list[i].isblackname = "测试"
               }

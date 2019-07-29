@@ -30,7 +30,7 @@
     </el-dialog>
     <div class="query-wrapper">
       <el-form :inline="true" :model="formInline" size="mini">
-        <el-form-item label="项目编号">
+        <el-form-item label="项目id">
           <el-input v-model="formInline.pro_id" placeholder="" size=""></el-input>
         </el-form-item>
         <el-form-item label="项目标题">

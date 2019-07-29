@@ -12,7 +12,7 @@
           <!--<el-option label="请选择" value=""></el-option>-->
           <el-option label="审核中" value="1"></el-option>
           <el-option label="审核通过" value="2"></el-option>
-          <el-option label="审核不通过" value="3"></el-option>
+          <el-option label="审核不通过" value="5"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="下次访问时间">
@@ -54,16 +54,16 @@
         </el-time-select>
       </el-form-item>
       <el-form-item label="备注">
-        <el-input v-model="qcform.comment" type="textarea" placeholder="备注信息不要太长" style="width: 200px"></el-input>
+        <el-input v-model="qcform.comment" type="textarea" placeholder="备注可输入最大30个汉字" style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm('qcform')" :loading="isload">保存</el-button>
         <el-button @click="deblockingMember()">取消</el-button>
       </el-form-item>
     </el-form>
-    <el-form label-width="120px" size="mini" :inline-message='true'>
+    <el-form :model="form" ref="form" label-width="120px" size="mini" :rules="rules" :inline-message='true'>
       <el-form-item label="推荐人" prop="memberHandphone" >
-        <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>我的推荐码：{{form.smscode}}
+        <el-input v-model="form.recommendcode"  style="width: 200px;margin-right: 10px;"></el-input>我的推荐码：{{form.smscode}}
       </el-form-item>
       <el-form-item label="手机号码" prop="memberHandphone" >
         <el-input v-model="form.memberHandphone"  style="width: 200px;margin-right: 10px;"></el-input>我们将只会使用该手机号码，已短信的形式通知您参加调查
@@ -101,6 +101,11 @@
           <el-option v-for="item in zc_2_options" :value="item.stationId" :key="item.stationId" :label="item.stationName"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="执业证类型" prop="membercertificatetype">
+        <el-select v-model="form.membercertificatetype" style="width: 200px;">
+          <el-option v-for="item in member_options" :label="item.label" :value="item.id" :key="item.id"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="证件号" prop="memberidcard">
         <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;" ></el-input>
       </el-form-item>
@@ -119,16 +124,6 @@
           <el-option v-for="item in xzzw_options" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="从医领域" prop="medical_field_2">
-        <el-select v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" >
-          <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
-        </el-select>
-        <br />
-        <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;" >
-          <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
-        </el-select>
-      </el-form-item>
-
       <el-form-item label="所在医院" prop="fkHospitalId">
         <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
@@ -140,20 +135,34 @@
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
-        <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" >
-          <el-option value="-1" label="其他"></el-option>
+        <el-input style="width: 400px;margin-top: 10px;" v-if="form.memberProvince == 0" v-model="form.memberhospital" ></el-input>
+        <el-select placeholder="请选择" v-else style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId"  @change="getHospitalById(form.fkHospitalId)">
           <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
-        <br />
-        <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.inputhospital" ></el-input>
+        
       </el-form-item>
-      <el-form-item label="医院信息:" v-if = "form.fkHospitalId != -1">
+      <el-form-item label="医院信息:" v-if = "form.memberProvince != 0">
         <div>医院级别：{{level}}</div>
         <div>医院等级：{{grade}}</div>
         <div>医院性质：{{hospitalNature}}</div>
         <div>医院类型：{{hospitalType}}</div>
         <div>床位数：{{numberOfBeds}}</div>
       </el-form-item>
+      <el-form-item label="从医领域" prop="medical_field_2"> 
+        <el-row><el-button @click="visi=true" style="margin-bottom:10px;">选择</el-button></el-row>
+        <span style="display:none;">
+          <el-select  v-model="form.medical_field_1" placeholder="请选择" multiple style="width:400px;margin-bottom: 10px;" @change="getSonFields2(form.medical_field_1)">
+            <el-option v-for="item in field_1_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
+          </el-select>
+        </span>
+        
+        <!-- <br /> -->
+        <el-select v-model="form.membertechnical" placeholder="请选择" multiple style="width: 400px;">
+          <el-option v-for="item in field_2_options" :label="item.fieldname" :key="item.id" :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+
+      
 
       
 
@@ -186,7 +195,7 @@
           }">
         </el-time-select>
       </el-form-item>
-      <el-form-item label="从医年份" prop="workdate">
+      <el-form-item label="从医年份">
         <el-date-picker
           style="width: 200px;"
           v-model="form.workdate"
@@ -196,7 +205,7 @@
           >
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="出生年份" prop="memberBirYear">
+      <el-form-item label="出生年份">
         <el-date-picker
           style="width: 200px;"
           v-model="form.memberBirYear"
@@ -238,6 +247,31 @@
         <el-button type="primary" @click="submitForm2('form')" :loading="isload">保存</el-button>
       </el-form-item>
     </el-form>
+    <el-dialog title="列表" width="800px" :visible.sync="visi">
+      <div class="info_body">
+        <div class="box" style="overflow-y:scroll;">
+        
+          <div style="margin: 15px 0;"></div>
+          <el-checkbox-group v-model="form.medical_field_1"  @change="getSonFields2(form.medical_field_1)">
+            <el-checkbox v-for="item in field_1_options"  :label="item.id"  :key="item.id"  >{{item.fieldname}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+        
+
+
+
+        <div class="box" style="overflow-y:scroll;">
+          <div style="margin: 15px 0;"></div>
+          <el-checkbox-group v-model="form.membertechnical">
+            <el-checkbox v-for="item in field_2_options" :label="item.id" :value="item.id" :key="item.id">{{item.fieldname}}</el-checkbox>
+          </el-checkbox-group>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visi = false">取 消</el-button>
+        <el-button type="primary" @click="listSelect">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -245,6 +279,15 @@
   export default {
     data() {
       return {
+        member_options:[
+          {label:"医师资格证", id:1},
+          {label:"医师执业证", id:2},
+          {label:"护士资格证", id:3},
+          {label:"药师资格证", id:4},
+          {label:"药师执业证", id:5},
+          {label:"护士执业证", id:8},
+        ],
+        visi:false,
         qcform:{
           telnum:null,
           mobilenum:null,
@@ -255,6 +298,7 @@
           comment:null,
         },
         form: {
+          recommendcode:null,
           memberHandphone: null,
           smscode: null,
           memberRealname:null,
@@ -285,6 +329,7 @@
           inputhospital: null,
           province:null,
           graduationInstitutions:null,
+          membercertificatetype:null
         },
         rules: {
           telnum: [
@@ -308,6 +353,40 @@
           endTime:[
             { required: true, message: '请选择结束时间', trigger: 'change' }
           ],
+          memberHandphone: [
+            { required: true, message: '请填写手机号', trigger: 'blur' }
+          ],
+          memberRealname:[
+            { required: true, message: '请填写真实姓名', trigger: 'blur' }
+          ],
+          memberSex:[
+            { required: true, message: '请选择性别', trigger: 'change' }
+          ],
+          fkHospitalId:[
+            { required: true, message: '请选择所在医院', trigger: 'change' }
+          ],
+          departmentstle:[
+            { required: true, message: '请填写科室电话', trigger: 'blur' }
+          ],
+          membersectionoffice:[
+            { required: true, message: '请选择工作科室', trigger: 'change' }
+          ],
+          memberidcard:[
+            { required: true, message: '请填写证件号', trigger: 'blur' }
+          ],
+          administrativeposition:[
+            { required: true, message: '请选择行政职位', trigger: 'change' }
+          ],
+          memberstation:[
+            { required: true, message: '请选择职称', trigger: 'change' }
+          ],
+          membertechnical:[
+            { required: true, message: '请选择从医领域', trigger: 'change' }
+          ],
+          registerTime:[
+            { required: true, message: '请选择注册时间', trigger: 'change' }
+          ],
+          
         },
         zc_1_options:[],
         zc_2_options:[],
@@ -340,27 +419,33 @@
       this.getMemberInfoForEdit();
       this.getEducational();
       this.getSociety();
-      var qcinfo = JSON.parse(sessionStorage.getItem('qcinfo'));
-      console.log(qcinfo)
-      this.qcform.mobilenum = qcinfo.mobilenum;
-      this.qcform.telnum = qcinfo.telnum;
-      debugger
-      this.qcform.state = qcinfo.state.toString();
-      this.qcform.week = qcinfo.week.toString();
-      this.qcform.comment = qcinfo.comment;
-      if(qcinfo.beginTime < 10){
-        this.qcform.beginTime = "0"+ qcinfo.beginTime + ":00"
-      }else if(qcinfo.beginTime >= 10){
-        this.qcform.beginTime = qcinfo.beginTime + ":00"
+      if(Boolean(sessionStorage.getItem('qcinfo'))){
+        var qcinfo = JSON.parse(sessionStorage.getItem('qcinfo'));
+        this.qcform.mobilenum = qcinfo.mobilenum;
+        this.qcform.telnum = qcinfo.telnum;
+        var nstate = qcinfo.state.toString()
+        if(nstate == 5 || nstate == 6){
+          nstate = 3
+        }
+        this.qcform.state = nstate;
+        this.qcform.week = qcinfo.week.toString();
+        this.qcform.comment = qcinfo.comment;
+        if(qcinfo.beginTime < 10){
+          this.qcform.beginTime = "0"+ qcinfo.beginTime + ":00"
+        }else if(qcinfo.beginTime >= 10){
+          this.qcform.beginTime = qcinfo.beginTime + ":00"
+        }
+        if(qcinfo.endTime < 10){
+          this.qcform.endTime = "0"+ qcinfo.endTime + ":00"
+        }else if(qcinfo.endTime >= 10){
+          this.qcform.endTime = qcinfo.endTime + ":00"
+        }
       }
-      if(qcinfo.endTime < 10){
-        this.qcform.endTime = "0"+ qcinfo.endTime + ":00"
-      }else if(qcinfo.endTime >= 10){
-        this.qcform.endTime = qcinfo.endTime + ":00"
-      }
-//    this.goQcMemberAudit();
     },
     methods: {
+      listSelect(){
+        this.visi = false
+      },
       clearSchool(){
         this.form.graduationInstitutions = ''
       },
@@ -384,24 +469,42 @@
       },
       submitForm2(formName) {
             this.isload = true;
-            var fkHospitalId = null;
-            if(this.form.inputhospital == ""){
-              fkHospitalId = Number(this.form.fkHospitalId);
-              this.form.memberhospital = "";
-            }else{
-              this.form.memberhospital = this.form.inputhospital;
-              this.form.fkHospitalId = "0";
-              fkHospitalId = null;
-            }
             var memberSex = null;
             if(this.form.memberSex == 0){
               memberSex = "男"
             }else{
               memberSex = "女"
             }
+
+            var societyid = null
+            if(Boolean(this.form.societyid)){
+              societyid = this.form.societyid.join(',')
+            }
+            
+            var membertechnical = null
+            if(Boolean(this.form.membertechnical)){
+              membertechnical = this.form.membertechnical.join(',')
+            }
+            
+            var beginTime = null
+            if(Boolean(this.form.beginTime)){
+              beginTime = this.form.beginTime.slice(0,2)
+            }
+            var endTime = null
+            if(Boolean(this.form.endTime)){
+              endTime = this.form.endTime.slice(0,2)
+            }
+
+            if(Boolean(this.form.fkHospitalId)){
+              var hospital = this.hospital_options.find(e=>{
+                return e.id == this.form.fkHospitalId
+              })
+              this.form.memberhospital = hospital.name
+            }
+
             this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
               params:{
-                id: Number(sessionStorage.getItem("userid")),
+                id: Number(sessionStorage.getItem("id")),
                 memberRealname: this.form.memberRealname,
                 memberMail: this.form.memberMail,
                 memberSex: memberSex,
@@ -413,18 +516,18 @@
                 memberidcard: this.form.memberidcard,
                 membersectionoffice: Number(this.form.membersectionoffice),
                 administrativeposition: Number(this.form.administrativeposition),
-                membertechnical: this.form.membertechnical.join(','),
+                membertechnical: membertechnical,
                 memberProvince: Number(this.form.memberProvince),
                 memberCity: Number(this.form.memberCity),
                 fkDistrictId: Number(this.form.fkDistrictId),
-                fkHospitalId: fkHospitalId,
+                fkHospitalId: this.form.fkHospitalId,
                 memberhospital: this.form.memberhospital,
-                societyid: this.form.societyid.join(','),
+                societyid: societyid,
                 memberEducation: Number(this.form.memberEducation),
                 graduationTime: this.form.graduationTime,
                 graduationInstitutions: this.form.graduationInstitutions,
-                beginTime: Number(this.form.beginTime.slice(0,2)),
-                endTime: Number(this.form.endTime.slice(0,2)),
+                beginTime: beginTime,
+                endTime: endTime,
                 membercertificatetype:this.form.membercertificatetype//职业证
               },
             }).then((res) => {
@@ -440,6 +543,10 @@
             })
       },
       submitForm(formName) {
+        if(this.qcform.state == '3' && this.qcform.comment == ''){
+         this.$message.error('请填写审核备注') 
+         return false
+        }
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.isload = true;
@@ -508,6 +615,8 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
+            console.log(res.data.obj);
+            
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
@@ -517,13 +626,13 @@
             }else{
               this.form.memberSex = 1
             }
-            this.form.memberBirYear = res.data.obj.memberBirYear.toString();
+            
             this.form.departmentstle = res.data.obj.departmentstle;
-            this.form.workdate = res.data.obj.workdate.toString();
+            
+            this.form.recommendcode = res.data.obj.recommendcode
             this.form.memberstation = res.data.obj.memberstation;
             this.form.memberidcard = res.data.obj.memberidcard;
             this.form.administrativeposition = res.data.obj.administrativeposition;
-            console.log(this.form.memberstation)
             this.getStationById();
             this.form.membertechnical = res.data.obj.membertechnical;
             if(this.form.membertechnical.length != 0){
@@ -533,21 +642,38 @@
                 a.push(Number(this.form.membertechnical[i]));
               }
               this.form.membertechnical = a;
-              console.log(this.form.membertechnical);
               this.getFieldsById();
             }
             this.form.membersectionoffice = res.data.obj.membersectionoffice;
+            this.form.membercertificatetype = res.data.obj.membercertificatetype;
             this.getSectionOfficeById();
             this.form.memberProvince = res.data.obj.memberProvince;
             this.getCityByProvince(this.form.memberProvince)
-            this.form.memberCity = res.data.obj.memberCity;
+
+            if(Boolean(res.data.obj.memberCity)){
+              this.form.memberCity = res.data.obj.memberCity;
+            }
+            if(Boolean(res.data.obj.fkDistrictId)){
+              this.form.fkDistrictId = res.data.obj.fkDistrictId;
+            }
+
             this.getDistrictByCity(this.form.memberProvince,this.form.memberCity);
-            this.form.fkDistrictId = res.data.obj.fkDistrictId;
+
+            
             this.form.fkHospitalId = Number(res.data.obj.fkHospitalId);
-            console.log(this.form.fkHospitalId);
             this.form.memberhospital = res.data.obj.memberhospital;
-            this.form.memberEducation = res.data.obj.memberEducation;
-            this.form.graduationTime = res.data.obj.graduationTime;
+            if(Boolean(res.data.obj.memberEducation)){
+              this.form.memberEducation = res.data.obj.memberEducation;//改
+            }
+            if(Boolean(res.data.obj.memberBirYear)){
+              this.form.memberBirYear = res.data.obj.memberBirYear.toString();//改
+            }
+            if(Boolean(res.data.obj.workdate)){
+              this.form.workdate = res.data.obj.workdate.toString();//改
+            }
+            if(Boolean(res.data.obj.graduationTime)){
+              this.form.graduationTime = res.data.obj.graduationTime;//改
+            }
             if(res.data.obj.beginTime < 10){
               this.form.beginTime = "0"+ res.data.obj.beginTime + ":00"
             }else if(res.data.obj.beginTime >= 10){
@@ -570,10 +696,16 @@
                 b.push(Number(this.form.societyid[i]));
               }
               this.form.societyid = b;
-              console.log(this.form.societyid);
             }
             this.form.graduationInstitutions = res.data.obj.graduationInstitutions;
             this.getGraduateById(Number(this.form.graduationInstitutions));
+            if(Boolean(res.data.obj.filename)){
+              this.form.filename = this.common.getApi() + res.data.obj.filename
+            }
+             if(Boolean(res.data.obj.secondfilename)){
+              this.form.secondfilename = this.common.getApi() + res.data.obj.secondfilename
+            }
+            
           }
         })
       },
@@ -650,7 +782,6 @@
         })
       },
       getSonFields1(parentId){
-        console.log(parentId);
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
             params:{
               params:{
@@ -667,10 +798,13 @@
             }
           })
         //}
-        console.log(this.field_2_options);
       },
       getSonFields2(parentId){
-        console.log(parentId);
+        console.log(this.form.membertechnical);
+        if(this.field_2_options.length == 0){
+          this.form.membertechnical = []
+        }
+        
         this.field_2_options = [];
         for(var i = 0; i < parentId.length; i++){
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
@@ -689,10 +823,8 @@
             }
           })
         }
-        console.log(this.field_2_options);
-      },
+      },   
       getFieldsById(){
-        console.log(this.form.membertechnical);
         this.form.medical_field_1 = [];
         for(var i = 0; i < this.form.membertechnical.length;i++){
           this.axios.get(this.common.getApi() + '/sys/api/fields/getFieldsById',{
@@ -707,10 +839,13 @@
             }
           }).then((res) => {
             if(res.data.code == '200'){
-              if(this.form.medical_field_1.indexOf(res.data.obj.parentid) == -1){
-                this.form.medical_field_1.push(res.data.obj.parentid);
-                this.getSonFields1(res.data.obj.parentid);
+              if(Boolean(res.data.obj)){
+                if(this.form.medical_field_1.indexOf(res.data.obj.parentid) == -1){
+                  this.form.medical_field_1.push(res.data.obj.parentid);
+                  this.getSonFields1(res.data.obj.parentid);
+                }
               }
+              
             }
           })
         }
@@ -869,7 +1004,6 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          console.log(res);
           if(res.data.code == '200'){
             this.meeting_options = res.data.obj
           }
@@ -907,8 +1041,11 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
-            this.form.province = res.data.obj.provinceid;
-            this.getGraduateList(this.form.province);
+            if(Boolean(res.data.obj)){
+              this.form.province = res.data.obj.provinceid;
+              this.getGraduateList(this.form.province);
+            }
+            
           }
         })
       }
@@ -917,4 +1054,26 @@
 </script>
 
 <style>
+.info_body{
+    border:1px solid #ccc;
+    display: flex;
+    justify-content: space-around;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .info_body .box{
+    height: 300px;
+    width: 300px;
+    margin:0 20px;
+  }
+  .el-checkbox {
+    display: block;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    margin-right: 30px;
+}
 </style>
