@@ -349,6 +349,7 @@
                   this.peopleNum = res.data.obj;
                   
                 }
+              this.getQcMemberList(this.pageIndex,this.pageSize)
             }else{
               this.$message.error(res.data.msg);
             }
@@ -448,6 +449,7 @@
         }).then((res) => {
           if(res.data.code == '200'){
             if(Boolean(res.data.obj)){
+              debugger
               sessionStorage.setItem('qcinfo',JSON.stringify(res.data.obj));
             }
             this.$router.push({ path: 'vipTelVerify'})            

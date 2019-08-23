@@ -26,16 +26,15 @@
     <div class="intr-txt">
       <p>上传参数文本说明：上传的文本需是.csv格式的文件，上传的参数必须统一为会员数字ID或者会员手机号</p>
       <p>1.每个参数文本可包含N条参数；</p>
-      <p>2.每条参数应包含4种数据，会员ID（需要统一数字ID或者会员手机号）|类型|分值|积分明细；</p>
+      <p>2.每条参数应包含3种数据，会员ID（需要统一数字ID或者会员手机号），分值，积分明细；</p>
       <p>3.积分明细中，如果出现标点符号，必须是中文状态下的标点符号，否则会出错。</p>
       <p>4.参数文本实例：<span style="color: red;font-weight: bold;">(注意：如果写的是负分，那么就是扣除积分)</span></p>
       <div style="margin-left: 40px;">
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>10<span style="color: red;">|</span>参加商业调查系统奖励10积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>30<span style="color: red;">|</span>8月份推荐10名医生系统奖励30积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>10<span style="color: red;">|</span>参与活动系统奖励10积分<span style="color: red;">,</span></p>
-        <p style="color: #000000;">15365095178<span style="color: red;">|</span>1<span style="color: red;">|</span>20<span style="color: red;">|</span>参与论坛系统奖励20积分<span style="color: red;">,</span></p>
+        <p style="color: #000000;">15365095178，30，8月份推荐10名医生系统奖励30积分,</p>
+        <p style="color: #000000;">15365095178，10，参与活动系统奖励10积分,</p>
+        <p style="color: #000000;">15365095178，20，参与论坛系统奖励20积分,</p>
       </div>
-      <p>请注意以上红色符号！</p>
+      <p>请注意以上红色文字标注！</p>
     </div>
     <!--:auto-upload=false
     :before-upload="beforeUpload"
@@ -68,6 +67,7 @@ export default {
       },
       newhandleChange(response,file,filelist){
         this.fileParam = file;
+        this.fileName = file[0].name
       },
       submitUpload(){
         if(this.fileParam === ''){
@@ -75,6 +75,7 @@ export default {
           return false
         }
         this.uploadForm.append('file', this.fileParam[0].raw);
+        var that = this
         this.axios.post(this.common.getApi() + '/sys/api/memberintegral/uploadIntegral',this.uploadForm,{
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -86,12 +87,28 @@ export default {
               message: '上传成功',
               type: 'success'
             });
-          }else{
-            console.log(res)
-            this.$message.error(res.data.msg);
             this.fileList = [];
             this.fileParam = '';
             this.uploadForm = new FormData()
+            this.$refs.upload.clear()
+          }else{
+             this.$message({
+                showClose: true,
+                message: '上传文件有误，请查看错误信息',
+                type: 'error',
+                duration:0
+              });
+            // this.$message.error(res.data.msg);
+            let a = document.createElement('a');
+            let content="\ufeff"+res.data;
+            let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+            debugger
+            let filename = that.fileName.slice(0,that.fileName.indexOf('.'))+'_error.csv';
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
           }
         })
       },

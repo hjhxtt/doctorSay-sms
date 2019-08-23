@@ -228,7 +228,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          this.ruleForm.type = res.data.obj.ptype;
+          this.ruleForm.type = res.data.obj.ptype.toString();
           this.ruleForm.pro_id = res.data.obj.id;
           this.ruleForm.pro_num = res.data.obj.projectId;
           this.ruleForm.pro_title = res.data.obj.projectName;

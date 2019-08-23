@@ -10,7 +10,7 @@
       <el-form-item label="QC结果" prop="state">
         <el-select v-model="qcform.state" placeholder="请选择" style="width: 200px">
           <!--<el-option label="请选择" value=""></el-option>-->
-          <el-option label="审核中" value="1"></el-option>
+          <el-option label="审核中" value="0"></el-option>
           <el-option label="审核通过" value="2"></el-option>
           <el-option label="审核不通过" value="5"></el-option>
         </el-select>
@@ -125,23 +125,26 @@
         </el-select>
       </el-form-item>
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP()">
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;"  @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC()">
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;"  @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD()">
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
-        <el-input style="width: 400px;margin-top: 10px;" v-if="form.memberProvince == 0" v-model="form.memberhospital" ></el-input>
-        <el-select placeholder="请选择" v-else style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId"  @change="getHospitalById(form.fkHospitalId)">
+        <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId"  @change="getHospitalById(form.fkHospitalId)">
           <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option label="其他" :value="-1"></el-option>
         </el-select>
+        <br>
+        <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.memberhospital" ></el-input>
+        
         
       </el-form-item>
-      <el-form-item label="医院信息:" v-if = "form.memberProvince != 0">
+      <el-form-item label="医院信息:" v-if = "form.fkHospitalId != -1">
         <div>医院级别：{{level}}</div>
         <div>医院等级：{{grade}}</div>
         <div>医院性质：{{hospitalNature}}</div>
@@ -419,6 +422,7 @@
       this.getMemberInfoForEdit();
       this.getEducational();
       this.getSociety();
+      debugger
       if(Boolean(sessionStorage.getItem('qcinfo'))){
         var qcinfo = JSON.parse(sessionStorage.getItem('qcinfo'));
         this.qcform.mobilenum = qcinfo.mobilenum;
@@ -495,12 +499,15 @@
               endTime = this.form.endTime.slice(0,2)
             }
 
-            if(Boolean(this.form.fkHospitalId)){
-              var hospital = this.hospital_options.find(e=>{
-                return e.id == this.form.fkHospitalId
-              })
-              this.form.memberhospital = hospital.name
-            }
+            // if(Boolean(this.form.fkHospitalId)){
+            //   var hospital = this.hospital_options.find(e=>{
+            //     return e.id == this.form.fkHospitalId
+            //   })
+            //   this.form.memberhospital = hospital.name
+            // }
+
+            // form.fkHospitalId
+            // form.memberhospital
 
             this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
               params:{
@@ -528,7 +535,7 @@
                 graduationInstitutions: this.form.graduationInstitutions,
                 beginTime: beginTime,
                 endTime: endTime,
-                membercertificatetype:this.form.membercertificatetype//职业证
+                membercertificatetype:this.form.membercertificatetype//执业证
               },
             }).then((res) => {
               this.isload = false                
@@ -616,7 +623,7 @@
         }).then((res) => {
           if(res.data.code == '200'){
             console.log(res.data.obj);
-            
+            this.qcform.state = res.data.obj.isblackname.toString()
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
@@ -630,16 +637,16 @@
             this.form.departmentstle = res.data.obj.departmentstle;
             
             this.form.recommendcode = res.data.obj.recommendcode
-            this.form.memberstation = res.data.obj.memberstation;
+            this.form.memberstation = res.data.obj.memberstation.toString();
             this.form.memberidcard = res.data.obj.memberidcard;
-            this.form.administrativeposition = res.data.obj.administrativeposition;
+            this.form.administrativeposition = res.data.obj.administrativeposition.toString();
             this.getStationById();
             this.form.membertechnical = res.data.obj.membertechnical;
             if(this.form.membertechnical.length != 0){
               this.form.membertechnical = this.form.membertechnical.split(',');
               var a = [];
               for(var i = 0; i < this.form.membertechnical.length; i++){
-                a.push(Number(this.form.membertechnical[i]));
+                a.push(this.form.membertechnical[i]);
               }
               this.form.membertechnical = a;
               this.getFieldsById();
@@ -654,7 +661,7 @@
               this.form.memberCity = res.data.obj.memberCity;
             }
             if(Boolean(res.data.obj.fkDistrictId)){
-              this.form.fkDistrictId = res.data.obj.fkDistrictId;
+              this.form.fkDistrictId = res.data.obj.fkDistrictId.toString();
             }
 
             this.getDistrictByCity(this.form.memberProvince,this.form.memberCity);
@@ -663,7 +670,7 @@
             this.form.fkHospitalId = Number(res.data.obj.fkHospitalId);
             this.form.memberhospital = res.data.obj.memberhospital;
             if(Boolean(res.data.obj.memberEducation)){
-              this.form.memberEducation = res.data.obj.memberEducation;//改
+              this.form.memberEducation = res.data.obj.memberEducation.toString();//改
             }
             if(Boolean(res.data.obj.memberBirYear)){
               this.form.memberBirYear = res.data.obj.memberBirYear.toString();//改
@@ -693,7 +700,7 @@
               this.form.societyid = this.form.societyid.split(',');
               var b = [];
               for(var i = 0; i < this.form.societyid.length; i++){
-                b.push(Number(this.form.societyid[i]));
+                b.push(this.form.societyid[i]);
               }
               this.form.societyid = b;
             }
@@ -722,7 +729,7 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
-            this.form.zc_1 = res.data.obj.parentid;
+            this.form.zc_1 = res.data.obj.parentid.toString();
             this.getStationTechnicalTitle(this.form.zc_1)
           }
         })
@@ -744,7 +751,7 @@
         this.axios.get(this.common.getApi() + '/sys/api/station/getStationTechnicalTitle',{
           params:{
             params:{
-              parentId: parentId
+              parentId: Number(parentId)
             }
           }
         },{
@@ -945,12 +952,34 @@
             this.region_options = res.data.obj;
           }
         })
-        //获取医院
+        this.getHospital(this.form.memberProvince,this.form.memberCity,this.form.fkDistrictId,null)
+        // //获取医院
+        // this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospital',{
+        //   params:{
+        //     params:{
+        //       provinceId: provinceId,
+        //       cityId: cityId
+        //     }
+        //   }
+        // },{
+        //   headers: {
+        //     'Content-Type': 'application/x-www-form-urlencoded'
+        //   }
+        // }).then((res) => {
+        //   if(res.data.code == '200'){
+        //     this.hospital_options = res.data.obj;
+        //   }
+        // })
+      },
+      //获取医院
+      getHospital(provinceId,cityId,fkDistrictId,hospitalLevel){
         this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospital',{
           params:{
             params:{
-              provinceId: provinceId,
-              cityId: cityId
+              provinceId:provinceId,
+              cityId: cityId,
+              fkDistrictId:fkDistrictId,
+              hospitalLevel:hospitalLevel
             }
           }
         },{
@@ -1042,8 +1071,8 @@
         }).then((res) => {
           if(res.data.code == '200'){
             if(Boolean(res.data.obj)){
-              this.form.province = res.data.obj.provinceid;
-              this.getGraduateList(this.form.province);
+              this.form.province = res.data.obj.provinceid.toString();
+              this.getGraduateList(Number(this.form.province));
             }
             
           }

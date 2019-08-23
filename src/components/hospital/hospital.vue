@@ -1,77 +1,169 @@
 <template>
-  <div class="goodAdmin-wrapper">
-
+  <div class="hospitalList-wrapper">
     <el-dialog
-      title="编辑商品"
+      title="新增医院"
+      :visible.sync="dialogAddVisible"
+      width="30%"
+      center>
+      <div>
+        <el-form ref="addform" :model="addform" label-width="120px" :rules="rules" size="mini" style=" height:500px;overflow-y:scroll;padding-right:20px;">
+          <el-form-item label="省："  prop="province" required>
+            <el-select style="width: 100%;" v-model="addform.province" @change="getCityByProvince(addform.province)">
+              <el-option v-for="item in provinceList" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="市："  prop="city" required>
+            <el-select style="width: 100%;"  v-model="addform.city">
+              <el-option v-for="item in cityList" :label="item.cityName" :value="item.cityId" :key="item.cityId"></el-option>
+            </el-select>
+          </el-form-item>  
+          <el-form-item label="医院名称：" prop="hospitalName" required>
+            <el-input v-model="addform.hospitalName"></el-input>
+          </el-form-item>
+          <el-form-item label="医院级别：" prop="hospitalLevel" required>
+            <el-select style="width: 100%;" v-model="addform.hospitalLevel">
+              <el-option v-for="item in hospitalLevelList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>    
+          
+          <el-form-item label="医院等级：" prop="hospitalGrade" required>
+            <el-select style="width: 100%;" v-model="addform.hospitalGrade">
+              <el-option v-for="item in hospitalGradeList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="医院性质：" prop="hospitalNature" required>
+            <el-select style="width: 100%;" v-model="addform.hospitalNature">
+              <el-option v-for="item in hospitalNatureList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="医院类型：" prop="hospitalType" required>
+            <el-select style="width: 100%;" v-model="addform.hospitalType">
+              <el-option v-for="item in hospitalTypeList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="专科类型：" prop="specialtys" required>
+            <el-select style="width: 100%;" v-model="addform.specialtys">
+              <el-option v-for="item in specialtysList" :label="item.name" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="床位数：" prop="bedNumber" required>
+            <el-input type="text" v-model="addform.bedNumber"></el-input>
+          </el-form-item>
+          <el-form-item label="别名1：">
+            <el-input type="text" v-model="addform.aka1"></el-input>
+          </el-form-item>
+          <el-form-item label="别名2：">
+            <el-input type="text" v-model="addform.aka2"></el-input>
+          </el-form-item>
+          <el-form-item label="别名3：">
+            <el-input type="text" v-model="addform.aka3"></el-input>
+          </el-form-item>
+          <el-form-item label="别名4：">
+            <el-input type="text" v-model="addform.aka4"></el-input>
+          </el-form-item>
+          <el-form-item label="别名5：">
+            <el-input type="text" v-model="addform.aka5"></el-input>
+          </el-form-item>
+          <el-form-item label="别名6：">
+            <el-input type="text" v-model="addform.aka6"></el-input>
+          </el-form-item>
+          <el-form-item label="别名7：">
+            <el-input type="text" v-model="addform.aka7"></el-input>
+          </el-form-item>
+          <el-form-item label="别名8：">
+            <el-input type="text" v-model="addform.aka8"></el-input>
+          </el-form-item>
+          <el-form-item label="别名9：">
+            <el-input type="text" v-model="addform.aka9"></el-input>
+          </el-form-item>
+          <el-form-item label="别名10：">
+            <el-input type="text" v-model="addform.aka10"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button type="primary" @click="onSubmit('addform')">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="编辑医院"
       :visible.sync="dialogEditVisible"
       width="30%"
       center>
       <div>
         <el-form ref="editform" :model="editform" label-width="120px" :rules="rules" size="mini" style=" height:500px;overflow-y:scroll;padding-right:20px;">
-          <el-form-item label="编号：" prop="giftname" required>
-            <el-input v-model="editform.giftname"></el-input>
-          </el-form-item>
-          <el-form-item label="医院名称：" prop="giftsidcode" required>
-            <el-input v-model="editform.giftsidcode"></el-input>
-          </el-form-item>
-          <el-form-item label="医院级别：" prop="giftsecondkind" required>
-            <el-select style="width: 100%;" v-model="editform.giftsecondkind">
-              <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
-            </el-select>
-          </el-form-item>        
-          <el-form-item label="医院等级：" prop="giftprize" required>
-            <el-input v-model="editform.giftprize"></el-input>
-          </el-form-item>
-          <el-form-item label="医院性质：" prop="giftstaus" required>
-            <el-select style="width: 100%;" v-model="editform.giftstaus">
-              <el-option label="正常商品" value="0"></el-option>
-              <el-option label="热门奖品" value="1"></el-option>
-              <el-option label="下架奖品" value="2"></el-option>
-              <el-option label="待审核商品" value="5"></el-option>
+          <el-form-item label="省：" prop="province" required>
+            <el-select  style="width: 100%;" v-model="editform.province" @change="getCityByProvince(editform.province)">
+              <el-option v-for="item in provinceList" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="医院类型：" >
-            <el-select style="width: 100%;" v-model="editform.supplierid">
-              <el-option label="大家说" value="0"></el-option>
-              <el-option label="一点通" value="1"></el-option>
-              <el-option label="一点通录入" value="2"></el-option>
+          <el-form-item label="市：" prop="city" required>
+            <el-select  style="width: 100%;" v-model="editform.city">
+              <el-option v-for="item in cityList" :label="item.cityName" :value="item.cityId" :key="item.cityId"></el-option>
+            </el-select>
+          </el-form-item> 
+          <el-form-item label="医院名称：" prop="hospitalName" required>
+            <el-input v-model="editform.hospitalName"></el-input>
+          </el-form-item>
+          <el-form-item label="医院级别：" prop="hospitalLevel" required>
+            <el-select style="width: 100%;" v-model="editform.hospitalLevel">
+              <el-option v-for="item in hospitalLevelList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
+          </el-form-item>    
+          
+          <el-form-item label="医院等级：" prop="hospitalGrade" required>
+            <el-select style="width: 100%;" v-model="editform.hospitalGrade">
+              <el-option v-for="item in hospitalGradeList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专科类型：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="医院性质：" prop="hospitalNature" required>
+            <el-select style="width: 100%;" v-model="editform.hospitalNature">
+              <el-option v-for="item in hospitalNatureList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="床位数：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="医院类型：" prop="hospitalType" required>
+            <el-select style="width: 100%;" v-model="editform.hospitalType">
+              <el-option v-for="item in hospitalTypeList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="别名1：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="专科类型：" prop="specialtys" required>
+            <el-select style="width: 100%;" v-model="editform.specialtys">
+              <el-option v-for="item in specialtysList" :label="item.name" :value="item.id" :key="item.id"></el-option>
+            </el-select>
           </el-form-item>
-          <el-form-item label="别名2：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="床位数：" prop="bedNumber" required>
+            <el-input type="text" v-model="editform.bedNumber"></el-input>
           </el-form-item>
-          <el-form-item label="别名3：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名1：">
+            <el-input type="text" v-model="editform.aka1"></el-input>
           </el-form-item>
-          <el-form-item label="别名4：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名2：">
+            <el-input type="text" v-model="editform.aka2"></el-input>
           </el-form-item>
-          <el-form-item label="别名5：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名3：">
+            <el-input type="text" v-model="editform.aka3"></el-input>
           </el-form-item>
-          <el-form-item label="别名6：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名4：">
+            <el-input type="text" v-model="editform.aka4"></el-input>
           </el-form-item>
-          <el-form-item label="别名7：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名5：">
+            <el-input type="text" v-model="editform.aka5"></el-input>
           </el-form-item>
-          <el-form-item label="别名8：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名6：">
+            <el-input type="text" v-model="editform.aka6"></el-input>
           </el-form-item>
-          <el-form-item label="别名9：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名7：">
+            <el-input type="text" v-model="editform.aka7"></el-input>
           </el-form-item>
-          <el-form-item label="别名10：" prop="giftdiscribe" required>
-            <el-input type="textarea" v-model="editform.giftdiscribe"></el-input>
+          <el-form-item label="别名8：">
+            <el-input type="text" v-model="editform.aka8"></el-input>
+          </el-form-item>
+          <el-form-item label="别名9：">
+            <el-input type="text" v-model="editform.aka9"></el-input>
+          </el-form-item>
+          <el-form-item label="别名10：">
+            <el-input type="text" v-model="editform.aka10"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -80,41 +172,52 @@
         <el-button type="primary" @click="onSubmit('editform')">确 定</el-button>
       </span>
     </el-dialog>
-
+    <el-dialog
+      title="确定删除？"
+      :visible.sync="hospitalDialogVisible"
+      width="30%"
+      center>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="hospitalDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="deleteHospital">确 定</el-button>
+      </span>
+    </el-dialog>
     <div class="query-wrapper">
       <el-form label-width="100px" size="mini" :inline="true">
         <el-form-item label="省：">
-          <el-select style="width: 200px;" v-model="province">
-            <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
+          <el-select style="width: 200px;" v-model="province" @change="getCityByProvince(province)">
+            <el-option v-for="item in provinceList" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="市：">
           <el-select style="width: 200px;" v-model="city">
-            <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
+            <el-option v-for="item in cityList" :label="item.cityName" :value="item.cityId" :key="item.cityId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="医院级别：">
           <el-select style="width: 200px;" v-model="hospitalLevel">
-            <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
+            <el-option v-for="item in hospitalLevelList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="医院名称：" >
-          <el-input style="width: 200px;" type="number" v-model="hospitalName"></el-input>
+          <el-input style="width: 200px;" placeholder="请输入医院名"  v-model="hospitalName"></el-input>
         </el-form-item>
         
         <el-form-item>
-          <el-button type="primary" @click="getGiftsList(pageIndex,pageSize)">查询</el-button>
+          <el-button type="primary" @click="getHospitalPage(pageIndex,pageSize)">查询</el-button>
           <el-button type="primary" @click="resetForm">重置</el-button>
         </el-form-item>
         <br />
         <el-form-item style="padding-left: 50px;">
           
-          <el-button type="primary" @click="dialogEditVisible = true">增加</el-button>
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="dialogAddVisible = true">增加</el-button>
+          <el-button type="primary" @click="exportHospital">导出</el-button>
         </el-form-item>
       </el-form>
     </div>
-    
+    <div class="title">
+      <i class="el-icon-search"></i><span>医院搜索结果</span><span v-if="pageTotal" style="color:red;font-size:14px;">共{{pageTotal}}条数据</span><span v-else style="color:red;font-size:14px;">共0条数据</span>
+    </div>
     <el-table
       ref="multipleTable"
       :data="tableData"
@@ -122,91 +225,88 @@
       :header-cell-style="{background:'#E9EEF3',color:'#606266'}"
       tooltip-effect="dark"
       style="width: 100%"
-      border
-      @selection-change="handleSelectionChange">
-      <el-table-column
-        type="selection"
-        width="55">
-      </el-table-column>
+      border>
       <el-table-column
         type="index"
         label="编号"
         width="55">
       </el-table-column>
       <el-table-column
-        prop="id"
+        prop="name"
+        width="150"
         label="医院名">
       </el-table-column>
       <el-table-column
-        prop="giftstairkind"
+        prop="hospitalLevelStr"
         label="医院级别">
       </el-table-column>
       <el-table-column
-        prop="giftname"
+        prop="hospitalGradeStr"
         label="医院等级">
       </el-table-column>
       <el-table-column
-        prop="giftstaus"
+        prop="natureStr"
         label="医院性质">
       </el-table-column>
       <el-table-column
-        prop="groundingtime"
+        prop="fkPolyclinicIdStr"
         label="医院类型">
       </el-table-column>
       <el-table-column
-        prop="convertcount"
+        prop="fkSpecialtyIdStr"
         label="专科类型">
       </el-table-column>
       <el-table-column
-        prop="giftprize"
+        prop="numberOfBeds"
         label="床位数">
       </el-table-column>
       <el-table-column
-        prop="giftprize"
+        prop="alias1"
         label="别名1">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias2"
         label="别名2">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias3"
         label="别名3">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias4"
         label="别名4">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias5"
         label="别名5">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias6"
         label="别名6">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias7"
         label="别名7">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias8"
         label="别名8">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias9"
         label="别名9">
       </el-table-column> 
       <el-table-column
-        prop="giftprize"
+        prop="alias10"
         label="别名10">
       </el-table-column> 
       <el-table-column
         fixed="right"
+        width="100"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="editshow(scope.row)">编辑</el-button>
-          <el-button type="text" size="small" @click="changeGrounding(scope.row)">删除</el-button>
+          <el-button type="text" size="small" @click="confirmDel(scope.row)">删除</el-button>
         </template>
         
       </el-table-column> 
@@ -225,6 +325,17 @@
   export default {
     data() {
       return {
+        hospitalDialogVisible:false,
+        editProvince:null,
+        editCity:null,
+        editId:null,
+        specialtysList:null,
+        hospitalTypeList:null,
+        hospitalNatureList:null,
+        hospitalGradeList:null,
+        provinceList:null,
+        cityList:null,
+        hospitalLevelList:null,
         province:null,
         city:null,
         hospitalLevel:null,
@@ -237,211 +348,211 @@
         tableData: [],
         multipleSelection: [],
         pageIndex: 1,
-        pageSize: 6,
+        pageSize: 30,
         pageTotal: null,      
         giftsId:null,
         categoryName: null,
         type: null,
         count:null,
         addform:{
-          giftname:null,
-          giftsecondkind:null,
-          giftprize:null,
-          giftdiscribe:null,
-          giftsidcode:null,
-          giftstaus:null,
-          fileParam:null,
-          giftsidcode:null,
-          giftstaus:null,
-          supplierid:''
+          province:null,
+          city:null,
+          number:null,
+          hospitalName:null,
+          hospitalLevel:null,
+          hospitalGrade:null,
+          hospitalNature:null,
+          hospitalType:null,
+          specialtys:null,
+          bedNumber:null,
+          aka1:null,
+          aka2:null,
+          aka3:null,
+          aka4:null,
+          aka5:null,
+          aka6:null,
+          aka7:null,
+          aka8:null,
+          aka9:null,
+          aka10:null,
         },
         fileList: [],
         editform:{
-          giftname:null,
-          giftsecondkind:null,
-          giftprize:null,
-          giftdiscribe:null,
-          giftsidcode:null,
-          giftstaus:null,
-          fileParam:null,
-          giftsidcode:null,
-          giftstaus:null,
-          id:null,
-          fileList:[],
-          supplierid:''
+          province:null,
+          city:null,
+          number:null,
+          hospitalName:null,
+          hospitalLevel:null,
+          hospitalGrade:null,
+          hospitalNature:null,
+          hospitalType:null,
+          specialtys:null,
+          bedNumber:null,
+          specialtys:null,
+          aka1:null,
+          aka2:null,
+          aka3:null,
+          aka4:null,
+          aka5:null,
+          aka6:null,
+          aka7:null,
+          aka8:null,
+          aka9:null,
+          aka10:null,
         },
         categoryList:[],
         rules: {
-          giftname: [
-            { required: true, message: '请填写商品名称', trigger: 'blur' },
+          province:[
+            { required: true, message: '请选择省份', trigger: 'blur' },
           ],
-          giftsecondkind: [
-            { required: true, message: '请选择所属系列', trigger: 'change' }
+          city:[
+            { required: true, message: '请选择市', trigger: 'blur' },
           ],
-          giftprize:[
-            { required: true, message: '请填写商品价格', trigger: 'blur' }
+          hospitalName: [
+            { required: true, message: '请填写医院名', trigger: 'blur' },
           ],
-          giftdiscribe:[
-            { required: true, message: '请填写商品描述', trigger: 'blur' }
+          
+          hospitalLevel: [
+            { required: true, message: '请选择医院级别', trigger: 'change' }
           ],
-          // supplierid:[
-          //   { required: true, message: '请选择提供商', trigger: 'change' }
-          // ],
-          giftstaus:[
-            { required: true, message: '请选择商品状态', trigger: 'change' }
+          hospitalGrade: [
+            { required: true, message: '请选择医院等级', trigger: 'change' }
           ],
-          giftsidcode:[
-            { required: true, message: '请填写商品编号', trigger: 'blur' }
-          ]
+          hospitalNature:[
+            { required: true, message: '请选择医院性质', trigger: 'change' }
+          ],
+          hospitalType:[
+            { required: true, message: '请选择医院类型', trigger: 'change' }
+          ],
+          bedNumber:[
+            { required: true, message: '请填写床位数', trigger: 'change' }
+          ],
+          specialtys:[
+            { required: true, message: '请填写专科类型', trigger: 'change' }
+          ],
         }
       }
     },
     mounted(){
-      this.getGiftsList(this.pageIndex,this.pageSize);
-      this.getGiftCategoryList();
+      this.getProvince()
+      this.getHospitalLevel()
+      this.getHospitalGrade()
+      this.getHospitalNature()
+      this.getHospitalType()
+      this.getSpecialtys()
+      this.getHospitalPage(this.pageIndex,this.pageSize)
     },
     methods:{
-      handleSelectionChange(){
+      exportHospital(){
+        console.log(this.city);
         
-      },
-      resetForm(){
-        this.giftsId = null;
-        this.categoryName = null;
-        this.type = null;
-        this.count = null;
-      },
-      handleExceed1(files, fileList) {
-        this.$message.warning(`最多只能选择1个文件`);
-      },
-      beforeUpload1(file){
-        
-      },
-      newhandlesuccess1(file){
-        console.log(file);
-      },
-      newhandleChange1(response,file,filelist){
-        this.addform.fileParam = file;
-        console.log(this.addform.fileParam);
-      },      
-      handleExceed2(files, fileList) {
-        this.$message.warning(`最多只能选择1个文件`);
-      },
-      beforeUpload2(file){
-        
-      },
-      newhandlesuccess2(file){
-        console.log(file);
-      },
-      newhandleChange2(response,file,filelist){
-        this.editform.fileParam = file;
-        console.log(this.editform.fileParam);
-      },       
-      changeGrounding(row){
-        console.log(row.giftstaus)
-        var type = null;
-        if(row.giftstaus == "待审核商品" || row.giftstaus == "下架奖品"){
-          type = 1;
-        }else if(row.giftstaus == "正常商品" || row.giftstaus == "热门奖品"){
-          type = 0;
-        }
-        this.axios.post(this.common.getApi() + '/sys/api/gifts/changeGrounding',{
+        debugger
+        const loading = this.$loading({
+          lock: true,
+          text: '导出中...',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+        this.axios.get(this.common.getApi() + '/sys/api/hospital/downloadHospitalConfig',{
           params:{
-            id: Number(row.id),
-            type: type
-          },
-        }).then((res) => {
-          if(res.data.success){
-            this.$message({
-              type: 'success',
-              message: '修改成功'
-            })
-            this.getGiftsList(this.pageIndex,this.pageSize);
-          }else{
-            this.$message.error(res.data.msg);
-          }
-        })        
-      },
-      getGiftsList(pageIndex,pageSize){
-        this.loading = true
-        var countEntity = null;
-        if(this.type && this.count){
-         countEntity = {type:Number(this.type),count:Number(this.count)}
-        }else{
-          countEntity = null;
-        }
-        this.axios.get(this.common.getApi() + '/sys/api/gifts/getGiftsList',{
-          params:{
-            pageIndex: pageIndex,
-            pageSize: pageSize,
             params:{
-              giftsId: this.giftsId,
-              categoryName: this.categoryName,
-              countEntity: countEntity
-            }            
+              provinceId:this.province,
+              cityId:this.city,
+              hospitalLevel:this.hospitalLevel,
+              name:this.hospitalName
+            }
           }
-          
+        },{
+        }).then((res) => {
+          this.fileList = [];
+            this.fileParam = '';
+            this.uploadForm = new FormData()
+            this.$message.success('成功导出医院信息文件')
+            let a = document.createElement('a');
+            let content="\ufeff"+res.data;
+            let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+            let filename = '医院信息.csv';
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            loading.close();
+        }) 
+      },
+      confirmDel(row){
+        this.hospitalDialogVisible = true
+        this.delId = row.id
+      } , 
+      deleteHospital(){
+        this.axios.get(this.common.getApi() + '/sys/api/hospital/delHospital',{
+          params:{
+            params:{
+              id:this.delId
+            }
+          }
         },{
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          this.tableData = res.data.obj.list
-          for(var i = 0; i < this.tableData.length; i++){
-            if(this.tableData[i].giftstaus == 0){
-              this.tableData[i].giftstaus = "正常商品"
-            }else if(this.tableData[i].giftstaus == 1){
-              this.tableData[i].giftstaus = "热门奖品"
-            }else if(this.tableData[i].giftstaus == 2){
-              this.tableData[i].giftstaus = "下架奖品"
-            }else if(this.tableData[i].giftstaus == 5){
-              this.tableData[i].giftstaus = "待审核商品"
-            }
+          if(res.data.success){
+            this.$message.success('删除成功')
+            this.hospitalDialogVisible = false
+            this.getHospitalPage(this.pageIndex,this.pageSize)
+          }else{
+            this.$message.error(res.data.msg)
           }
-          this.loading =false
-          this.pageTotal = res.data.obj.pager.total;
-          console.log(this.pageTotal);
-        })
-      },
-      go(currentPage){
-        this.getGiftsList(currentPage,this.pageSize);
+        })  
       },
       onSubmit(formName) {
         if(formName == 'addform'){
           this.$refs[formName].validate((valid) => {
             if (valid) {
-  //          this.isload = true;
-              if(this.addform.fileParam){
-                var addform = new FormData();
-                addform.append('giftname', this.addform.giftname);
-                addform.append('giftstairkind', this.addform.giftsecondkind);
-                addform.append('giftprize', Number(this.addform.giftprize));
-                addform.append('giftdiscribe', this.addform.giftdiscribe);
-                addform.append('file', this.addform.fileParam[0].raw);
-                addform.append('giftsidcode', this.addform.giftsidcode);
-                addform.append('giftstaus', this.addform.giftstaus);
-                addform.append('supplierid', this.addform.supplierid);
+
+
+
+                  var params =  {
+                      "params": {
+                        "id":null,
+                        "name": this.addform.hospitalName,
+                        "fkProvId": Number(this.addform.province),
+                        "fkCityId": Number(this.addform.city),
+                        "hospitalLevel": Number(this.addform.hospitalLevel),
+                        "hospitalGrade": Number(this.addform.hospitalGrade),
+                        "nature": Number(this.addform.hospitalNature),
+                        "fkPolyclinicId": Number(this.addform.hospitalType),
+                        "fkSpecialtyId": Number(this.addform.specialtys),//专科类型
+                        "numberOfBeds": Number(this.addform.bedNumber),
+                        "alias1": this.addform.aka1,
+                        "alias2": this.addform.aka2,
+                        "alias3": this.addform.aka3,
+                        "alias4": this.addform.aka4,
+                        "alias5": this.addform.aka5,
+                        "alias6": this.addform.aka6,
+                        "alias7": this.addform.aka7,
+                        "alias8": this.addform.aka8,
+                        "alias9": this.addform.aka9,
+                        "alias10": this.addform.aka10
+                      }
+                    }
+                   
+
                 
-                this.axios.post(this.common.getApi() + '/sys/api/gifts/addGifts',addform,{
-                  headers: {
-                    'Content-Type': 'multipart/form-data'
-                  }
+                this.axios.post(this.common.getApi() + '/sys/api/hospital/updeteInsertHospitl',params,{
                 }).then((res) => {
-  //              this.isload = false                
+              //  this.isload = false                
                   if(res.data.success){
                     this.$message({
                       type: 'success',
                       message: '保存成功'
                     })
-                    this.getGiftsList(this.pageIndex,this.pageSize);
+                    this.getHospitalPage(this.pageIndex,this.pageSize);
                     this.dialogAddVisible = false;
                   }else{
                     this.$message.error(res.data.msg);
                   }
                   
                 })
-              }else{
-                this.$message.error("请上传图片");
-              }
             }else {
               console.log('error submit!!');
               return false;
@@ -450,37 +561,43 @@
         }else if(formName == 'editform'){
           this.$refs[formName].validate((valid) => {
             if (valid) {
-  //          this.isload = true;
+          //  this.isload = true;
               
-              var editform = new FormData();
-              editform.append('id', this.editform.id);
-              editform.append('giftname', this.editform.giftname);
-              editform.append('giftstairkind', this.editform.giftsecondkind);
-              editform.append('giftprize', Number(this.editform.giftprize));
-              editform.append('giftdiscribe', this.editform.giftdiscribe);
-              if(this.editform.fileParam){
-                editform.append('file', this.editform.fileParam[0].raw);                
-              }else{
-                console.log(this.editform.giftpicurl);
-                editform.append('giftpicurl', this.editform.giftpicurl);
-              }
-              editform.append('giftsidcode', this.editform.giftsidcode);
-              editform.append('giftstaus', this.editform.giftstaus);
-              editform.append('supplierid', this.editform.supplierid);
+              var params =  {
+                      "params": {
+                        "id":this.editId,
+                        "name": this.editform.hospitalName,
+                        "fkProvId": Number(this.editform.province),
+                        "fkCityId": Number(this.editform.city),
+                        "hospitalLevel": Number(this.editform.hospitalLevel),
+                        "hospitalGrade": Number(this.editform.hospitalGrade),
+                        "nature": Number(this.editform.hospitalNature),
+                        "fkPolyclinicId": Number(this.editform.hospitalType),
+                        "fkSpecialtyId": Number(this.editform.specialtys),//专科类型
+                        "numberOfBeds": Number(this.editform.bedNumber),
+                        "alias1": this.editform.aka1,
+                        "alias2": this.editform.aka2,
+                        "alias3": this.editform.aka3,
+                        "alias4": this.editform.aka4,
+                        "alias5": this.editform.aka5,
+                        "alias6": this.editform.aka6,
+                        "alias7": this.editform.aka7,
+                        "alias8": this.editform.aka8,
+                        "alias9": this.editform.aka9,
+                        "alias10": this.editform.aka10
+                      }
+                    }
               
               
-              this.axios.post(this.common.getApi() + '/sys/api/gifts/editGifts',editform,{
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
+              this.axios.post(this.common.getApi() + '/sys/api/hospital/updeteInsertHospitl',params,{
               }).then((res) => {
-//              this.isload = false
+            //  this.isload = false
                 if(res.data.success){
                   this.$message({
                     type: 'success',
-                    message: '保存成功'
+                    message: '编辑成功'
                   })
-                  this.getGiftsList(this.pageIndex,this.pageSize);
+                  this.getHospitalPage(this.pageIndex,this.pageSize);
                   this.dialogEditVisible = false;
                 }else{
                   this.$message.error(res.data.msg);
@@ -494,28 +611,19 @@
           })          
         }
 
-      },      
-      getGiftCategoryList(){
-        this.axios.get(this.common.getApi() + '/sys/api/giftcategory/getGiftCategoryList',{
+      }, 
+      
+      getHospitalPage(pageIndex,pageSize){
+        this.loading = true
+        this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospitalPage',{
           params:{
-//          pageIndex: pageIndex,
-//          pageSize: pageSize
-          }
-        },{
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then((res) => {
-          this.categoryList = res.data.obj.list;
-//        this.pageTotal = res.data.obj.pager.total;
-//        console.log(this.pageTotal);
-        })
-      },  
-      editshow(row){
-        this.axios.get(this.common.getApi() + '/sys/api/gifts/getGifts',{
-          params:{
+            pageIndex:pageIndex,
+            pageSize:pageSize,
             params:{
-              id: row.id
+              provinceId:this.province,
+              cityId:this.city,
+              hospitalLevel:this.hospitalLevel,
+              name:this.hospitalName
             }
           }
         },{
@@ -523,33 +631,155 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
-          if(res.data.success){
-            this.dialogEditVisible = true;
-            this.editform.giftname = res.data.obj.giftname;
-            this.editform.giftsidcode = res.data.obj.giftsidcode;
-            this.editform.giftprize = res.data.obj.giftprize;
-            this.editform.giftsecondkind = res.data.obj.giftstairkind;
-            this.editform.giftstaus = res.data.obj.giftstaus.toString();
-            this.editform.supplierid = res.data.obj.supplierid.toString();
-            this.editform.giftdiscribe = res.data.obj.giftdiscribe;
-            this.editform.id = res.data.obj.id;
-            this.editform.giftpicurl = res.data.obj.giftpicurl;
-            this.editform.fileList.push(res.data.obj.giftpicurl);
-          }else{
-            this.$message.error(res.data.msg);
+          if(res.data.code == '200'){
+            this.tableData = res.data.obj.list;
+            this.loading = false
+            this.pageTotal = res.data.obj.pager.total
           }
-//        this.categoryList = res.data.obj.list;
-//        this.pageTotal = res.data.obj.pager.total;
-//        console.log(this.pageTotal);
         })        
-//      this.dialogEditVisible = true;
+      }, 
+      getSpecialtys(){
+        this.axios.get(this.common.getApi() + '/sys/api/specialty/getSpecialtys','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.specialtysList = res.data.obj;
+          }
+        })        
+      }, 
+      getHospitalType(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalType','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalTypeList = res.data.obj;
+          }
+        })        
+      }, 
+      getHospitalNature(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalNature','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalNatureList = res.data.obj;
+          }
+        })        
+      }, 
+      getHospitalGrade(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalGrade','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalGradeList = res.data.obj;
+          }
+        })        
+      }, 
+      getHospitalLevel(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalLevel','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalLevelList = res.data.obj;
+          }
+        })        
+      }, 
+      getProvince(){
+        this.axios.get(this.common.getApi() + '/sys/api/area/getProvince','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.provinceList = res.data.obj;
+          }
+        })        
+      }, 
+      //获取城市列表
+      getCityByProvince(provinceId){
+        debugger
+        this.city = null
+        this.addform.city = null
+        this.editform.city = null
+        this.axios.get(this.common.getApi() + '/sys/api/area/getCityByProvince',{
+          params:{
+            params:{
+              provinceId: provinceId
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.cityList = res.data.obj;
+
+          }
+        })           
+      }, 
+      resetForm(){
+        
+        this.province = null;
+        this.city = null;
+        this.hospitalLevel = null;
+        this.hospitalName = null;
+      },
+    
+      go(currentPage){
+        this.pageIndex = currentPage
+        this.getHospitalPage(this.pageIndex,this.pageSize);
+      },
+     
+      editshow(row){
+        debugger
+        this.editform.province = row.fkProvId.toString()
+        if(Boolean(row.fkProvId)){
+          this.getCityByProvince(row.fkProvId)
+        }
+        
+        this.editform.city = row.fkCityId.toString()
+        this.dialogEditVisible = true;
+       this.editId = row.id
+       this.editform.hospitalName = row.name
+       this.editform.hospitalLevel = row.hospitalLevel.toString()
+       this.editform.hospitalGrade = row.hospitalGrade.toString()
+       this.editform.hospitalNature = row.nature.toString()
+       this.editform.hospitalType = row.fkPolyclinicId.toString()
+       if(!Boolean(row.fkSpecialtyId)){
+         this.editform.specialtys = ''
+       }else{
+         this.editform.specialtys = row.fkSpecialtyId.toString()
+       }
+       
+       this.editform.bedNumber = row.numberOfBeds
+       this.editform.aka1 = row.alias1
+       this.editform.aka2 = row.alias2
+       this.editform.aka3 = row.alias3
+       this.editform.aka4 = row.alias4
+       this.editform.aka5 = row.alias5
+       this.editform.aka6 = row.alias6
+       this.editform.aka7 = row.alias7
+       this.editform.aka8 = row.alias8
+       this.editform.aka9 = row.alias9
+       this.editform.aka10 = row.alias10
+
       }
     }
   }  
 </script>
 
 <style>
-  .goodAdmin-wrapper .query-wrapper {
+  .hospitalList-wrapper .query-wrapper {
     min-height: 100px;
     width: 100%;
     padding: 10px;
@@ -559,7 +789,7 @@
     margin-bottom: 20px;
   }
   
-  .goodAdmin-wrapper .el-pagination{
+  .hospitalList-wrapper .el-pagination{
     text-align: center;
     margin-top: 20px;
   }  
@@ -570,4 +800,25 @@
 }                                                                             
 
 input[type="number"]{-moz-appearance:textfield;}  
+.hospitalList-wrapper .title{
+    width: 100%;
+    padding: 10px 15px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-radius: 13px;
+    font-size: 14px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #E9EEF3;
+  }
+
+  .hospitalList-wrapper .title span{
+    font-size: 17px;
+    font-weight: bold;
+    margin-right: 20px;
+  }
+
+  .hospitalList-wrapper .title i{
+    font-size: 17px;
+    margin-right: 5px;
+  }
 </style>

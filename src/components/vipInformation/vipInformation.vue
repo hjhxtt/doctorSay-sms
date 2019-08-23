@@ -20,6 +20,18 @@
               <el-option label="10" value="10"></el-option>
               <el-option label="11" value="11"></el-option>
               <el-option label="12" value="12"></el-option>
+              <el-option label="13" value="13"></el-option>
+              <el-option label="14" value="14"></el-option>
+              <el-option label="15" value="15"></el-option>
+              <el-option label="16" value="16"></el-option>
+              <el-option label="17" value="17"></el-option>
+              <el-option label="18" value="18"></el-option>
+              <el-option label="19" value="19"></el-option>
+              <el-option label="20" value="20"></el-option>
+              <el-option label="21" value="21"></el-option>
+              <el-option label="22" value="22"></el-option>
+              <el-option label="23" value="23"></el-option>
+              <el-option label="24" value="24"></el-option>
             </el-select>
           </el-form-item>
         </el-form>
@@ -307,7 +319,7 @@
           <el-button type="primary" @click="resetForm('form')">重置</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="downloadMember">导出全部选中</el-button>
+          <el-button type="primary" @click="downloadMember">导出搜索结果</el-button>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="dialogVisible = true">导出会员分析</el-button>
@@ -528,7 +540,7 @@
             </el-upload>
           </el-form-item>
           <el-form-item>
-            <el-button size="small" type="primary" @click="submitUploadDownload">结果查询下载</el-button>
+            <el-button size="small" type="primary" @click="submitUploadDownload">结果查询</el-button>
           </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -633,7 +645,8 @@
         queryCity:[],
         queryProvince:[],
         memberstationQuery:[],
-        membersectionofficeQuery:[]
+        membersectionofficeQuery:[],
+        goType:''
       };
     },
     beforeDestroy() {
@@ -650,11 +663,8 @@
       
       sessionStorage.setItem('showMoreQuery',JSON.stringify(this.showMoreQuery))
       
-  
-
     },
     mounted(){
-      
       this.getProvince();
       this.getStationDuties();
       this.getAdminiStraion();
@@ -697,6 +707,107 @@
     },
     methods: {
       submitUploadDownload(){
+        console.log(this.fileParam);
+        if(this.fileParam === ''){
+          this.$message.error('请选择文件')
+          return false
+        }
+        const loading = this.$loading({
+          lock: true,
+          text: '数据上传中。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+
+        let formData = new FormData();
+        formData.append('file',this.fileParam[0].raw)
+        formData.append('pageSize',this.pageSize)
+        formData.append('pageIndex',this.pageIndex)
+        formData.append('flag',true)
+        this.axios({
+                url:this.common.getApi() + '/sys/api/member/getHospitalDoctor',
+                method:'post',
+                data: formData,
+              }).then((res) => {
+                
+                if(Boolean(res.data.obj)){
+
+                  res.data.obj.list.map(e=>{
+                              //性别
+                        if(e.memberSex === 0){
+                          e.memberSex = "男"
+                        }else if(e.memberSex === 1){
+                          e.memberSex = "女"
+                        }
+                        //活跃度
+                        if(e.memberFizz == 1){
+                          e.memberFizz = "休眠用户"
+                        }else if(e.memberFizz == 2){
+                          e.memberFizz = "边缘"
+                        }else if(e.memberFizz == 3){
+                          e.memberFizz = "活跃"
+                        }else if(e.memberFizz == 4){
+                          e.memberFizz = "忠诚"
+                        }
+                        //激活状态
+                        if(e.memberState == 0){
+                          e.memberState = "未激活"
+                        }else if(e.memberState == 1){
+                          e.memberState = "已激活"
+                        }
+                        //会员状态
+                        if(e.isblackname == 0){
+                          e.isblackname = "未审核"
+                        }else if(e.isblackname == 2){
+                          e.isblackname = "审核通过"
+                        }else if(e.isblackname == 3){
+                          e.isblackname = "ID审核"
+                        }else if(e.isblackname == 4){
+                          e.isblackname = "待定"
+                        }else if(e.isblackname == 5){
+                          e.isblackname = "未审核通过"
+                        }else if(e.isblackname == 6){
+                          e.isblackname = "信息填写错误"
+                        }else if(e.isblackname == 7){
+                          e.isblackname = "科室电话错误"
+                        }else if(e.isblackname == 8){
+                          e.isblackname = "未联系到本人"
+                        }else if(e.isblackname == 9){
+                          e.isblackname = "不良和注销"
+                        }else if(e.isblackname == 10){
+                          e.isblackname = "测试"
+                        }
+                      
+                  })
+
+                  this.tableData = res.data.obj.list
+                  debugger
+                  //todo
+                  this.total = res.data.obj.pager.total
+                  this.goType = 'hospitalPage'
+                  this.doctorVisible = false
+                  loading.close()
+
+                }else{
+                  
+                  loading.close()
+                  this.doctorVisible = false
+                  let data = res.data
+                  const blob = data
+                  const fileName = '查询结果.csv'
+                  const elink = document.createElement('a')
+                  elink.download = fileName
+                  elink.style.display = 'none'
+                  elink.href = URL.createObjectURL(blob)
+                  document.body.appendChild(elink)
+                  elink.click()
+                  URL.revokeObjectURL(elink.href) // 释放URL 对象
+                  document.body.removeChild(elink)
+                  
+
+                }
+                
+              })
 
       },
       submitUpload(){
@@ -705,28 +816,35 @@
           return false
         }
         this.uploadForm.append('file', this.fileParam[0].raw);
+        const loading = this.$loading({
+          lock: true,
+          text: '数据上传中。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         this.axios.post(this.common.getApi() + '/sys/api/member/batchUpdateMember',this.uploadForm,{
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then((res) => {
           console.log(res)
+          loading.close();
           if(res.data.success){
             this.$message({
               message: '上传成功',
               type: 'success'
             });
-
           this.$refs.upload.clearFiles()
           this.uploadForm = new FormData()
           this.memberVisible = false
           this.fileParam  = ''
           }else{
-            console.log(res)
-            this.$message.error(res.data.msg);
-            this.fileList = [];
-            this.fileParam = '';
-            this.uploadForm = new FormData()
+            this.$message({
+              showClose: true,
+              message: res.data.msg,
+              type: 'error',
+              duration:0
+            });
           }
         })
       },
@@ -804,7 +922,6 @@
             type:'',
             id:e
           })
-
         })
         var that = this
         objArr = objArr.filter( item=>{
@@ -814,23 +931,16 @@
             return item
           }
         })
-
         this.room_tags=this.room_tags.concat(objArr)
-
-
-    
       },
       addZc(){
-
         var objArr = []
         this.form.zc_2.map(e=>{
-
           objArr.push({
             name: this.getLable(e,this.zc_2_options,'stationId','stationName'),
             type:'',
             id:e
           })
-
         })
         var that = this
         objArr = objArr.filter( item=>{
@@ -840,14 +950,12 @@
             return item
           }
         })
-
         this.zc_tags=this.zc_tags.concat(objArr)
         
       },
       addCity(){
           var objArr = []
           this.form.city.map(e=>{
-
             objArr.push({
               name: this.getLable(e,this.city_options,'cityId','cityName'),
               type:'',
@@ -863,14 +971,9 @@
               return item
             }
           })
-
-          this.city_tags=this.city_tags.concat(objArr)
-
-
-             
+          this.city_tags=this.city_tags.concat(objArr)      
       },
       addProvince(){
-
         var obj = {
                 name: this.getLable(this.form.province,this.province_options,'provinceId','provinceName'),
                 type:'',
@@ -888,8 +991,7 @@
           }else{
             this.province_tags.push(obj);
           }
-          console.log(this.province_tags);
-          
+          console.log(this.province_tags);          
       },
       closeTag(index,taglist,paramlist){
         taglist.splice(index,1);
@@ -952,24 +1054,46 @@
         this.editform.name = row.memberRealname;
         this.editform.isblackname = row.isblackname;
         this.editdialogVisible = true;
+        this.editform.remark = row.blackremark
       },
       submitForm(formName){
         var that = this
         this.$refs[formName].validate((valid) => {
           if (valid) {
-
             if(that.editform.isblackname != '0' && that.editform.isblackname != '2'){
-              debugger
               if(that.editform.remark == ''){
                 that.$message.error('请填写备注')
                 return false
               }
             }
-
+            //会员状态
+            // debugger
+            var isblackname = this.editform.isblackname
+            if(that.editform.isblackname == "未审核"){
+              isblackname = 0
+            }else if(this.editform.isblackname == "审核通过"){
+              isblackname = 2
+            }else if(this.editform.isblackname == "ID审核"){
+              isblackname = 3
+            }else if(this.editform.isblackname == "待定"){
+              isblackname = 4
+            }else if(this.editform.isblackname == "未审核通过"){
+              isblackname = 5
+            }else if(this.editform.isblackname == "信息填写错误"){
+              isblackname = 6
+            }else if(this.editform.isblackname == "科室电话错误"){
+              isblackname =  7
+            }else if(this.editform.isblackname == "未联系到本人"){
+              isblackname = 8
+            }else if(this.editform.isblackname == "不良和注销"){
+              isblackname = 9
+            }else if(this.editform.isblackname == "测试"){
+              isblackname = 10
+            }
             this.axios.post(this.common.getApi() + '/sys/api/member/setAuditState',{
               params:{
                 id: Number(this.editform.id),
-                isblackname: Number(this.editform.isblackname),
+                isblackname: Number(isblackname),
                 blackremark :this.editform.remark
               }
             }).then((res) => {
@@ -991,31 +1115,7 @@
           }
         });
       },
-      downloadMember(){
-        
-        if(this.ids){
-          this.axios({
-            url:this.common.getApi() + '/sys/api/member/downloadMember',
-            method:'get',
-            params: {
-              ids: this.ids
-            },
-            responseType: 'blob',
-          }).then((res) => {
-            let data = res.data
-            const blob = data
-            const fileName = '会员信息.csv'
-            const elink = document.createElement('a')
-            elink.download = fileName
-            elink.style.display = 'none'
-            elink.href = URL.createObjectURL(blob)
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href) // 释放URL 对象
-            document.body.removeChild(elink)
-          })
-        }else{
-          
+      downloadMember(){   
            if(this.form.sex == 1){
                 this.form.sex = '女'
               }else if(this.form.sex == 0){
@@ -1045,7 +1145,6 @@
                   this.membersectionofficeQuery.push(e.id)
                 })
               }
-
               //完成项目参数
               var completeProjectId = null
               if(this.form.completeProjectId !== null){
@@ -1068,11 +1167,6 @@
                   projectId.push(Number(this.form.projectId))
                 }
               }
-
-
-
-
-
               var jsonStr = JSON.stringify({
               memberId: this.form.memberId,
               memberName:this.form.memberName,
@@ -1104,15 +1198,22 @@
               membertechnical: this.form.membertechnical,
               checkMethod:this.form.checkMethod//审核方式
             })
-            console.log(jsonStr)
+            var formdata = new FormData()
+            formdata.append('jsonStr',jsonStr)
+            const loading = this.$loading({
+              lock: true,
+              text: '正在导出请稍后。。。',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+            });
           this.axios({
             url:this.common.getApi() + '/sys/api/member/downloadMember',
-            method:'get',
-            params: {
-              jsonStr:jsonStr
-            },
+            method:'post',
+            data: formdata,
             responseType: 'blob',
           }).then((res) => {
+            loading.close();
+            this.$message.success('已生成文件会员信息')
             let data = res.data
             const blob = data
             const fileName = '会员信息.csv'
@@ -1125,34 +1226,17 @@
             URL.revokeObjectURL(elink.href) // 释放URL 对象
             document.body.removeChild(elink)
           })
-        }
+        
       },
       downloadMemberAnalysis(formName){
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            if(this.ids){
-              this.axios({
-                url:this.common.getApi() + '/sys/api/member/downloadMemberAnalysis',
-                method:'get',
-                params: {
-                  ids: this.ids,
-                  monthNum: this.ruleForm.monthNum
-                },
-                responseType: 'blob',
-              }).then((res) => {
-                let data = res.data
-                const blob = data
-                const fileName = '会员信息.csv'
-                const elink = document.createElement('a')
-                elink.download = fileName
-                elink.style.display = 'none'
-                elink.href = URL.createObjectURL(blob)
-                document.body.appendChild(elink)
-                elink.click()
-                URL.revokeObjectURL(elink.href) // 释放URL 对象
-                document.body.removeChild(elink)
-              })
-            }else{
+            const loading = this.$loading({
+              lock: true,
+              text: '正在导出，请稍后。',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+            });
 
 
               if(this.form.sex == 1){
@@ -1208,12 +1292,7 @@
                 }
               }
 
-
-
-              this.axios({
-                url:this.common.getApi() + '/sys/api/member/downloadMemberAnalysis',
-                method:'get',
-                params: {
+              var jsonStr = JSON.stringify({
                   memberId: this.form.memberId,
                   memberName:this.form.memberName,
                   realName: this.form.realName,
@@ -1243,13 +1322,21 @@
                   memberidcardState: this.form.memberidcardState,
                   membertechnical: this.form.membertechnical,
                   checkMethod:this.form.checkMethod,//审核方式
-                  monthNum: this.ruleForm.monthNum //月份
-                },
+            })
+            var formdata = new FormData()
+            formdata.append('jsonStr',jsonStr)
+            formdata.append('monthNum',this.ruleForm.monthNum)
+              this.axios({
+                url:this.common.getApi() + '/sys/api/member/downloadMemberAnalysis',
+                method:'post',
+                data:formdata,
                 responseType: 'blob',
               }).then((res) => {
+                loading.close();
+                this.$message.success('已生成会员分析文件')
                 let data = res.data
                 const blob = data
-                const fileName = '会员信息.csv'
+                const fileName = '会员分析.csv'
                 const elink = document.createElement('a')
                 elink.download = fileName
                 elink.style.display = 'none'
@@ -1259,7 +1346,7 @@
                 URL.revokeObjectURL(elink.href) // 释放URL 对象
                 document.body.removeChild(elink)
               })
-            }
+            
           } else {
             console.log('error submit!!');
             return false;
@@ -1299,7 +1386,28 @@
         this.getMemberList(this.pageIndex,this.pageSize);
       },
       go(currentPage){
-        this.getMemberList(currentPage,this.pageSize);
+        if(this.goType == 'hospitalPage'){
+          let formData = new FormData();
+        formData.append('pageSize',this.pageSize)
+        formData.append('pageIndex',currentPage)
+        formData.append('flag',false)
+        this.axios({
+                url:this.common.getApi() + '/sys/api/member/getHospitalDoctor',
+                method:'post',
+                data: formData,
+              }).then((res) => {
+                
+                if(Boolean(res.data.obj)){
+                  this.tableData = res.data.obj.list
+                  this.total = res.data.obj.pager.total
+
+                }
+                
+              })
+        }else{
+          this.getMemberList(currentPage,this.pageSize);
+        }
+        
       },
       getMemberList(pageIndex,pageSize){
         if(this.form.sex == 1){
@@ -1311,25 +1419,42 @@
 
         if(this.province_tags.length>0){
           this.province_tags.map(e=>{
-            this.queryProvince.push(e.id)
+            if(this.queryProvince.indexOf(e.id) == -1){
+
+              this.queryProvince.push(e.id)
+
+            } 
           })
         }
 
         if(this.city_tags.length>0){
           this.city_tags.map(e=>{
-            this.queryCity.push(e.id)
+            if(this.queryCity.indexOf(e.id) == -1){
+              this.queryCity.push(e.id)
+            }
+            
+
           })
         }
 
         if(this.zc_tags.length>0){
           this.zc_tags.map(e=>{
-            this.memberstationQuery.push(e.id)
+            if(this.memberstationQuery.indexOf(e.id) == -1){
+              this.memberstationQuery.push(e.id)
+            }
+            
+
           })
         }
 
         if(this.room_tags.length>0){
           this.room_tags.map(e=>{
-            this.membersectionofficeQuery.push(e.id)
+
+             if(this.membersectionofficeQuery.indexOf(e.id) == -1){
+               this.membersectionofficeQuery.push(e.id)
+            }
+           
+
           })
         }
 
@@ -1355,7 +1480,20 @@
             projectId.push(Number(this.form.projectId))
           }
         }
-        
+
+
+        if(!Boolean(this.form.memberName)){
+          this.form.memberName = null
+        }
+        if(!Boolean(this.form.memberEmail)){
+          this.form.memberEmail = null
+        }
+        if(!Boolean(this.form.recommandCode)){
+          this.form.recommandCode = null
+        }
+        if(!Boolean(this.form.smscode)){
+          this.form.smscode = null
+        }
 
 
         this.axios.post(this.common.getApi() + '/sys/api/member/getMemberList',{
@@ -1431,7 +1569,7 @@
               }else if(res.data.obj.list[i].isblackname == 5){
                 res.data.obj.list[i].isblackname = "未审核通过"
               }else if(res.data.obj.list[i].isblackname == 6){
-                res.data.obj.list[i].isblackname = "信息填写错误 "
+                res.data.obj.list[i].isblackname = "信息填写错误"
               }else if(res.data.obj.list[i].isblackname == 7){
                 res.data.obj.list[i].isblackname = "科室电话错误"
               }else if(res.data.obj.list[i].isblackname == 8){
@@ -1501,7 +1639,7 @@
         this.axios.get(this.common.getApi() + '/sys/api/station/getStationTechnicalTitle',{
           params:{
             params:{
-              parentId: parentId
+              parentId: Number(parentId)
             }
           }
         },{
@@ -1599,9 +1737,7 @@
           }
         })
       },
-
       toEdit(row){
-        console.log(row.id);
         sessionStorage.setItem('userid',row.id);
         this.$router.push({ path: 'vipEdit'});
       },
@@ -1614,7 +1750,6 @@
         this.$router.push({ path: 'vipRecommendRecord'});
       },
       toIntegrationRecord(row){
-        
         sessionStorage.setItem('userid',row.id);
         sessionStorage.setItem('userName',row.memberRealname);
         this.$router.push({ path: 'vipIntegrationRecord'});
@@ -1624,7 +1759,6 @@
         this.$router.push({ path: 'vipActivity'});
       },
       cancelMemer(row){
-        console.log(row)
         this.axios.post(this.common.getApi() + '/sys/api/member/cancelMemer',{
           params:{
             id: Number(row.id),
@@ -1642,15 +1776,12 @@
         })
       }
     },
-
   };
 </script>
 
 <style>
   .vipInformation-wrapper{
-
   }
-
   .vipInformation-wrapper .title{
     width: 100%;
     padding: 10px 15px;
@@ -1709,7 +1840,6 @@
     color: #606266;
     line-height: 24px;
     min-height: 27px;
-
   }
    .secondBox span {
      font-size: 12px;

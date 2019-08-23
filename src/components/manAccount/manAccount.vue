@@ -84,7 +84,6 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="160"
               >
               <template slot-scope="scope">
                 <el-button
@@ -163,7 +162,7 @@
                   }
                 }).then((res) => {
                   if(res.data.success){
-                    this.getUserList(this.pageSize,this.pageSize)
+                    this.getUserList(this.pageIndex,this.pageSize)
                     this.$message.success(res.data.msg)
                     console.log('1');
                     
@@ -187,7 +186,7 @@
                 }
               }).then((res) => {
                 if(res.data.success){
-                  this.getUserList(this.pageSize,this.pageSize)
+                  this.getUserList(this.pageIndex,this.pageSize)
                   this.$message.success(res.data.msg)
                   
                 }else{
@@ -208,24 +207,16 @@
             this.userInfo.userName = row.userName
             this.editId = row.id
             this.centerDialogVisible = true
-            console.log(row);
+            debugger
+            this.value = row.userRole
+                      
+
             
             let para = {
               id:row.id,
               
             }
             
-          //   this.axios.post(this.common.getApi() + '/sys/api/user/editUser',{
-          //   params:para
-          // }).then((res) => {
-            
-          //       if(res.data.success){
-          //         this.$message.success(res.data.msg)
-          //       }else{
-          //         this.$message.error(res.data.msg)
-          //       }
-          //     }).catch(function(err){
-          //   })
           },
           //下拉框选中事件
           selectGet(value){//这个vId也就是value值
@@ -246,6 +237,7 @@
                 }
               }).then((res) => {
                 if(res.data.success){
+                  
                   this.options =res.data.obj.list
                   console.log(this.options);
                   
@@ -258,6 +250,7 @@
             },
           //开关状态
             turnStopFlag(row,data){
+              debugger
               let state = data?0:1
               let id = row.id
 
@@ -328,7 +321,7 @@
           },
           //添加管理员
           addUser(){
-            var role = Number(this.value)
+            var role = this.value
             console.log(role);
 
 
@@ -349,7 +342,7 @@
                     if(res.data.success){
                       this.userInfo.userName = ''
                       this.value = ''
-                      this.getUserList(this.pageSize,this.pageSize)
+                      this.getUserList(this.pageIndex,this.pageSize)
                       this.$message.success(res.data.msg)
                       this.centerDialogVisible = false
                     }else{
@@ -373,7 +366,8 @@
                   this.userInfo.userName = ''
                   this.$message.success(res.data.msg)
                   this.centerDialogVisible = false
-                  this.getUserList(this.pageSize,this.pageSize)
+                  debugger
+                  this.getUserList(this.pageIndex,this.pageSize)
                 }else{
                   this.$message.error(res.data.msg)
                 }

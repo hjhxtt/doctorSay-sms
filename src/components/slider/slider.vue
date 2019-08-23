@@ -15,7 +15,7 @@
   			        <i :class="item.icon"></i>
   			        <span>{{item.title}}</span>
   			      </template>
-  			      <el-menu-item-group >
+  			      <el-menu-item-group>
   			        <el-menu-item v-for="child in item.children" :key="child.url" :index='child.url'>{{child.authorityName}}</el-menu-item>
   			      </el-menu-item-group>
   			    </el-submenu>
@@ -353,8 +353,6 @@ export default {
       },
     //拿到用户权限列表
     getUserList(){
-            console.log('1');
-            
             this.axios.get(this.common.getApi() + '/sys/api/auth/getAuthority').then((res) => {
             if(res.data.success){
                 console.log(res.data);

@@ -73,8 +73,8 @@
         fixed="right"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="doCertificateAudit(scope.row,2)">通过</el-button>
-          <el-button type="text" size="small" @click="doCertificateAudit(scope.row,3)">不通过</el-button>
+          <el-button type="text" v-show="scope.row.isblackname!='未审核通过' && scope.row.isblackname!='审核通过'" size="small" @click="doCertificateAudit(scope.row,2)">通过</el-button>
+          <el-button type="text" v-show="scope.row.isblackname!='未审核通过' && scope.row.isblackname!='审核通过' " size="small" @click="doCertificateAudit(scope.row,5)">不通过</el-button>
         </template>
       </el-table-column>      
     </el-table>      
@@ -95,7 +95,6 @@
   export default {
     data() {
       return {
-        state:'',
         loading:true,
         picUrl:'',
         tableData: [],
@@ -131,6 +130,7 @@
         this.memberId = null;
         this.memberMobile = null;
         this.memberName = null;
+        this.state = null
       },
       getCertificateMemberList(pageIndex,pageSize){
 
@@ -187,6 +187,8 @@
         this.getCertificateMemberList(currentPage,this.pageSize);
       },
       doCertificateAudit(row,state){
+        console.log(row.isblackname);
+        
 //      console.log(this.state);
 //      var state = null;
 //      if(this.state == true){

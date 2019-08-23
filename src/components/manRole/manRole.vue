@@ -151,10 +151,10 @@
               }).then((res) => {
                 if(res.data.success){
                   console.log('1');
-                  this.getRoleList()
+                  this.getRoleList(this.pageIndex,this.pageSize)
                   this.$message.success('删除成功')
                 }else{
-
+                  this.$message.error(res.data.msg)
                 }
               }).catch(function(err){
               })

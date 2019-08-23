@@ -85,55 +85,55 @@
                   var childList = []
                   res.data.obj.twoList.map(e=>{
                      switch (e) {
-            case 5:
+            case '5':
               childList.push('会员信息')
               break;
-            case 6:
+            case '6':
               childList.push('电话qc记录')
               break;
-            case 7:
+            case '7':
               childList.push('执业证审核')
               break;
-            case 8:
+            case '8':
               childList.push('积分管理')
               break;
-            case 9:
+            case '9':
               childList.push('商品系列')
               break;
-            case 10:
+            case '10':
               childList.push('商品管理')
               break;
-            case 11 :
+            case '11' :
               childList.push('订单列表')
               break;
-            case 12:
+            case '12':
               childList.push('项目管理')
               break;
-            case 13:
+            case '13':
               childList.push( 'banner配置')
               break;
-            case 14:
+            case '14':
               childList.push('网站公告')
               break;
-            case 15:
+            case '15':
               childList.push('常见问题')
               break;
-            case 16:
+            case '16':
               childList.push('兑换规则')
               break;
-            case 17 :
+            case '17' :
               childList.push('业务联系')
               break;
-            case 19:
+            case '19':
               childList.push('账户管理')
               break;
-            case 20:
+            case '20':
               childList.push('角色管理')
               break;
-            case 21:
+            case '21':
               childList.push('活跃度管理')
               break;
-            case 22:
+            case '22':
               childList.push('医院管理')
               break;
                     }

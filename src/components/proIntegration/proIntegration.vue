@@ -157,15 +157,19 @@
             this.integrationForm.addSQValue = ''
             this.integrationForm.addCValue = ''
             this.fileParam = ''
+            this.$refs.upload.clearFiles()
+            this.uploadForm = new FormData()
             
           }else{
             if(Boolean(res.data.msg)){
-              this.$message.error(res.data.msg);
+               this.$message({
+                showClose: true,
+                message: res.data.msg,
+                type: 'error',
+                duration:0
+              });
             }else{
             this.$message.error('文件格式有误，请查看错误日志');
-            this.fileList = [];
-            this.fileParam = '';
-            this.uploadForm = new FormData()
             // var aaaa = "data:text/csv;charset=utf-8,\ufeff" + res.data;
             // var link = document.createElement("a");
             // link.setAttribute("href", aaaa);
@@ -190,9 +194,6 @@
             a.click();
             window.URL.revokeObjectURL(url);
             
-            this.integrationForm.addSQValue = ''
-            this.integrationForm.addCValue = ''
-            this.fileParam = ''
             }
             this.openLoading().close()
           }

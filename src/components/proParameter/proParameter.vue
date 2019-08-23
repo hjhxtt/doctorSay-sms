@@ -2,7 +2,7 @@
   <div class="proParameter-wrapper">
     <el-form ref="form" :model="form" label-width="170px" size="mini" label-position="left">
       <el-form-item label="文件格式">
-        TXT格式-参数随机
+        CSV格式-参数随机
       </el-form-item>
       <el-form-item label="项目id">
         <el-input v-model="form.pro_id" class="inputlength" disabled></el-input>
@@ -153,17 +153,24 @@
               message: '上传成功',
               type: 'success'
             });
-            this.uploadForm=''
+            this.$refs.upload.clearFiles()
+            this.uploadForm = new FormData()
+            this.fileParam  = ''
             this.openLoading().close()
           }else{
 
             if(Boolean(res.data.msg)){
-              this.$message.error(res.data.msg);
+               this.$message({
+                showClose: true,
+                message: res.data.msg,
+                type: 'error',
+                duration:0
+              });
             }else{
               this.$message.error('文件格式有误，请查看错误日志');
-              this.fileList = [];
-              this.fileParam = '';
-              this.uploadForm = new FormData()
+              // this.fileList = [];
+              // this.fileParam = '';
+              // this.uploadForm = new FormData()
               // var aaaa = "data:text/csv;charset=utf-8,\ufeff" + res.data;
               // var link = document.createElement("a");
               // link.setAttribute("href", aaaa);
@@ -182,7 +189,8 @@
 
             
             
-            this.uploadForm=''
+            this.$refs.upload.clearFiles()
+            this.uploadForm = new FormData()
             this.openLoading().close()
           }
         })
@@ -214,6 +222,7 @@
             });
           }else{
             this.$message.error(res.data.msg);
+            this.openLoading().close()
           }
         })
       },

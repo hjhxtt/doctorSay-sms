@@ -2,6 +2,7 @@
   <div class="goodAdmin-wrapper">
     <el-dialog
       title="新增商品"
+      @close="closeDialog('addform')"
       :visible.sync="dialogAddVisible"
       width="30%"
       center>
@@ -10,15 +11,15 @@
           <el-form-item label="商品名称：" prop="giftname" required>
             <el-input v-model="addform.giftname"></el-input>
           </el-form-item>
-          <el-form-item label="商品编号：" prop="giftsidcode" required>
+          <!-- <el-form-item label="商品编号：" prop="giftsidcode" required>
             <el-input v-model="addform.giftsidcode"></el-input>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="所属系列：" prop="giftsecondkind" required>
             <el-select style="width: 100%;" v-model="addform.giftsecondkind">
               <el-option v-for="item in categoryList" :label="item.categoryName" :value="item.categoryName" :key="item.categoryName"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="图片：" required>
+          <el-form-item label="图片：">
             <el-upload
               class="upload-demo"
               ref="upload1"
@@ -45,7 +46,7 @@
               <el-option label="待审核商品" value="5"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="提供商：" >
+          <el-form-item label="提供商：">
             <el-select style="width: 100%;" v-model="addform.supplierid">
               <el-option label="大家说" value="0"></el-option>
               <el-option label="一点通" value="1"></el-option>
@@ -58,7 +59,7 @@
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogAddVisible = false">取 消</el-button>
+        <el-button @click="closeFrom('addform')">取 消</el-button>
         <el-button type="primary" @click="onSubmit('addform')">确 定</el-button>
       </span>
     </el-dialog>
@@ -72,9 +73,6 @@
         <el-form ref="editform" :model="editform" label-width="120px" :rules="rules" size="mini">
           <el-form-item label="商品名称：" prop="giftname" required>
             <el-input v-model="editform.giftname"></el-input>
-          </el-form-item>
-          <el-form-item label="商品编号：" prop="giftsidcode" required>
-            <el-input v-model="editform.giftsidcode"></el-input>
           </el-form-item>
           <el-form-item label="所属系列：" prop="giftsecondkind" required>
             <el-select style="width: 100%;" v-model="editform.giftsecondkind">
@@ -138,11 +136,11 @@
           </el-select>
         </el-form-item>
         <el-form-item label="商品状态：">
-          <el-select style="width: 120px;" v-model="giftStatus">
+          <el-select style="width: 120px;" v-model="giftstaus">
             <el-option label="正常商品" value="0"></el-option>
             <el-option label="热门奖品" value="1"></el-option>
             <el-option label="下架奖品" value="2"></el-option>
-            <el-option label="待审核奖品" value="2"></el-option>
+            <el-option label="待审核奖品" value="5"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="兑换人数：">
@@ -233,7 +231,7 @@
   export default {
     data() {
       return {
-        giftStatus:'1',
+        giftstaus:'1',
         loading:true,
         baseurl: baseurl,
         dialogAddVisible:false,
@@ -256,8 +254,7 @@
           giftstaus:null,
           fileParam:null,
           giftsidcode:null,
-          giftstaus:null,
-          supplierid:''
+          supplierid:null
         },
         fileList: [],
         editform:{
@@ -269,10 +266,9 @@
           giftstaus:null,
           fileParam:null,
           giftsidcode:null,
-          giftstaus:null,
           id:null,
           fileList:[],
-          supplierid:''
+          supplierid:null
         },
         categoryList:[],
         rules: {
@@ -305,6 +301,19 @@
       this.getGiftCategoryList();
     },
     methods:{
+      closeFrom(formName){
+            this.dialogAddVisible = false;
+            // 点击取消 数据重置
+            this.$refs[formName].resetFields();
+        },
+        // 对话框关闭事件
+      closeDialog(formName){
+            // 点击关闭 数据重置
+            this.$refs[formName].resetFields();
+            this.addform.supplierid = null
+            
+      },
+
       handleSelectionChange(){
         
       },
@@ -313,6 +322,7 @@
         this.categoryName = null;
         this.type = null;
         this.count = null;
+        this.giftstaus = null
       },
       handleExceed1(files, fileList) {
         this.$message.warning(`最多只能选择1个文件`);
@@ -380,7 +390,8 @@
             params:{
               giftsId: this.giftsId,
               categoryName: this.categoryName,
-              countEntity: countEntity
+              countEntity: countEntity,
+              giftStaus:Number(this.giftstaus)
             }            
           }
           
@@ -414,16 +425,20 @@
           this.$refs[formName].validate((valid) => {
             if (valid) {
   //          this.isload = true;
-              if(this.addform.fileParam){
                 var addform = new FormData();
                 addform.append('giftname', this.addform.giftname);
                 addform.append('giftstairkind', this.addform.giftsecondkind);
                 addform.append('giftprize', Number(this.addform.giftprize));
                 addform.append('giftdiscribe', this.addform.giftdiscribe);
-                addform.append('file', this.addform.fileParam[0].raw);
-                addform.append('giftsidcode', this.addform.giftsidcode);
+                if(this.addform.fileParam){
+                  addform.append('file', this.addform.fileParam[0].raw);
+                }
+                
                 addform.append('giftstaus', this.addform.giftstaus);
-                addform.append('supplierid', this.addform.supplierid);
+                if(Boolean(this.addform.supplierid)){
+                  addform.append('supplierid', this.addform.supplierid);
+                }
+                
                 
                 this.axios.post(this.common.getApi() + '/sys/api/gifts/addGifts',addform,{
                   headers: {
@@ -438,14 +453,12 @@
                     })
                     this.getGiftsList(this.pageIndex,this.pageSize);
                     this.dialogAddVisible = false;
+                    this.$refs.editform.resetFields()
                   }else{
                     this.$message.error(res.data.msg);
                   }
                   
                 })
-              }else{
-                this.$message.error("请上传图片");
-              }
             }else {
               console.log('error submit!!');
               return false;
@@ -454,8 +467,6 @@
         }else if(formName == 'editform'){
           this.$refs[formName].validate((valid) => {
             if (valid) {
-  //          this.isload = true;
-              
               var editform = new FormData();
               editform.append('id', this.editform.id);
               editform.append('giftname', this.editform.giftname);
@@ -470,15 +481,16 @@
               }
               editform.append('giftsidcode', this.editform.giftsidcode);
               editform.append('giftstaus', this.editform.giftstaus);
-              editform.append('supplierid', this.editform.supplierid);
-              
-              
+
+              if(Boolean(this.addform.supplierid)){
+                  addform.append('supplierid', this.editform.supplierid);
+                }
+                
               this.axios.post(this.common.getApi() + '/sys/api/gifts/editGifts',editform,{
                 headers: {
                   'Content-Type': 'multipart/form-data'
                 }
               }).then((res) => {
-//              this.isload = false
                 if(res.data.success){
                   this.$message({
                     type: 'success',
@@ -486,6 +498,7 @@
                   })
                   this.getGiftsList(this.pageIndex,this.pageSize);
                   this.dialogEditVisible = false;
+                  this.$refs.editform.resetFields()
                 }else{
                   this.$message.error(res.data.msg);
                 }
@@ -497,6 +510,9 @@
             }
           })          
         }
+          
+        
+        
 
       },      
       getGiftCategoryList(){
@@ -516,6 +532,7 @@
         })
       },  
       editshow(row){
+        debugger
         this.axios.get(this.common.getApi() + '/sys/api/gifts/getGifts',{
           params:{
             params:{
@@ -534,7 +551,10 @@
             this.editform.giftprize = res.data.obj.giftprize;
             this.editform.giftsecondkind = res.data.obj.giftstairkind;
             this.editform.giftstaus = res.data.obj.giftstaus.toString();
-            this.editform.supplierid = res.data.obj.supplierid.toString();
+            if(Boolean(res.data.obj.supplierid)){
+              this.editform.supplierid = res.data.obj.supplierid.toString();
+            }
+            
             this.editform.giftdiscribe = res.data.obj.giftdiscribe;
             this.editform.id = res.data.obj.id;
             this.editform.giftpicurl = res.data.obj.giftpicurl;

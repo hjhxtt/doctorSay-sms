@@ -1420,7 +1420,7 @@
         this.axios.get(this.common.getApi() + '/sys/api/station/getStationTechnicalTitle',{
           params:{
             params:{
-              parentId: parentId
+              parentId: Number(parentId)
             }
           }
         },{

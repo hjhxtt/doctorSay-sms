@@ -10,15 +10,15 @@
       border
       style="width: 100%">
       <el-table-column
-        prop="integralrecordid"
+        prop="label"
         label="活跃度">
       </el-table-column>
       <el-table-column
-        prop="integral"
+        prop="min"
         label="下限（%）">
       </el-table-column>
       <el-table-column
-        prop="projectName"
+        prop="max"
         label="上限（%）">
       </el-table-column>
       
@@ -26,7 +26,7 @@
         prop="integralrecordmsg"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="edit">编辑</el-button>
+          <el-button type="text" size="small" @click="edit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -38,22 +38,20 @@
       :visible.sync="centerDialogVisible"
       width="400px"
       center>
-      <el-item>
-        <el-form label-position="left" label-width="120px" :model="formEdit">
+        <el-form label-position="left" label-width="120px" :model="form">
           <el-form-item label="活跃度类型">
-            {{formEdit.type}}
+            {{form.label}}
           </el-form-item>
           <el-form-item label="下限（%）">
-            <el-input v-model="formEdit.low"></el-input>
+            <el-input v-model="form.min"></el-input>
           </el-form-item>
           <el-form-item label="上限（%）">
-            <el-input v-model="formEdit.heigh"></el-input>
+            <el-input v-model="form.max"></el-input>
           </el-form-item>
         </el-form>
-      </el-item>
       <span slot="footer" class="dialog-footer">
         <el-button @click="centerDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -77,56 +75,113 @@
       total:'',
       exchangeTotal:'',
       now:'',
-      formEdit: {
-        low: '',
-        heigh: '',
-        type: '忠诚'
+      form: {
+        id: null,
+        label: null,
+        max: null,
+        min: null,
+        sysid: null,
+        sysname: null
       }
     }
   },
   mounted(){
-    this.getMemberIngretalRecord(this.pageIndex,this.pageSize)
+    this.getActivity()
   },
   methods:{
+    submit(){
+      debugger
+      if(Number(this.form.min) > Number(this.form.max)){
+        this.$message.error('上限必须大于下限')
+        return false
+      }
+
+      var jsonStr = {
+        sysid:this.form.sysid,//修改的时候固定传值
+        id:this.form.id,
+        sysname:this.form.min+'-'+this.form.max,
+        label:this.form.label
+      }
+      var params = new URLSearchParams()
+      params.append('jsonStr',JSON.stringify(jsonStr))
+      this.axios({
+          url:this.common.getApi() + '/sys/api/systemmaster/editActivity',
+          method:'post',
+          params:params
+        }).then((res) => {
+          if(res.data.success){
+            this.$message.success('编辑成功')
+            this.centerDialogVisible = false
+            this.getActivity()
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      
+    },
     handleMounth(){
       if(this.handleText === "编辑"){
         this.disabled = false
         this.handleText = "保存"
+
       }else{
-        this.disabled = true
-        this.handleText = "编辑"
+        if(this.mounth<0 || this.mounth>12){
+          this.$message.error('请输入正确月份')
+          return false
+        }
+        
+        
+        var jsonStr = {
+          sysid:10,//月份候固定传值
+          id:5,//月份固定传值
+          sysname:this.mounth,
+          label:"活跃度评判月份"
+        }
+        var params = new URLSearchParams()
+        params.append('jsonStr',JSON.stringify(jsonStr))
+        this.axios({
+            url:this.common.getApi() + '/sys/api/systemmaster/editActivity',
+            method:'post',
+            params:params
+          }).then((res) => {
+            if(res.data.success){
+              this.$message.success('编辑成功')
+              this.disabled = true
+              this.handleText = "编辑"
+              this.centerDialogVisible = false
+              this.getActivity()
+            }else{
+              this.$message.error(res.data.msg)
+            }
+          })
       }
     },
-    edit(){
+    edit(row){
       this.centerDialogVisible = true
+      this.form.min = row.min
+      this.form.max = row.max
+      this.form.label = row.label
+      this.form.id = row.id
+      this.form.sysid = row.sysid
+      this.form.sysname = row.sysname
     },
-    getMemberIngretalRecord(pageIndex,pageSize){
-      this.axios.get(this.common.getApi() + '/sys/api/member/getMemberIngretalRecord',{
-        params:{
-          pageIndex: pageIndex,
-          pageSize: pageSize,
-          params:{
-            id: Number(sessionStorage.getItem('userid'))
+    getActivity(){
+      this.axios({
+          url:this.common.getApi() + '/sys/api/systemmaster/getActivity',
+          method:'get',
+        }).then((res) => {
+          if(res.data.success){
+            var mounth = res.data.obj.splice(res.data.obj.length-1,1)
+            res.data.obj.map(e=>{
+              e.min = e.sysname.split('-')[0]
+              e.max = e.sysname.split('-')[1]
+            })
+             this.tableData = res.data.obj
+             this.mounth = mounth[0].sysname
+          }else{
+            this.$message.error(res.data.msg)
           }
-        }
-      },{
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }).then((res) => {
-
-          var resu = res.data.obj.list
-
-          resu.sort((a,b) => {
-            return a.integralrecordtime > b.integralrecordtime ? -1 : 1;
-          })
-
-          console.log(resu);
-
-
-        this.tableData = resu;
-        this.pageTotal = res.data.obj.pager.total;
-      })
+        })
     },
   }
 }

@@ -21,14 +21,28 @@
           </el-select>
         </el-form-item>
         <el-form-item label="兑换时间：">
-          <!--<el-input style="width: 200px;" v-model="converttime"></el-input>-->
           <el-date-picker
             v-model="converttime"
-            type="date"
-            placeholder="选择日期"
-            value-format="yyyy-MM-dd">
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+            end-placeholder="结束日期">
           </el-date-picker>
         </el-form-item>
+        <el-form-item label="审核日期：">
+          <el-date-picker
+            v-model="adminCheckTime"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            format="yyyy 年 MM 月 dd 日"
+            value-format="yyyy-MM-dd"
+            end-placeholder="结束日期">
+          </el-date-picker>
+        </el-form-item>
+        
         <br />
         <el-form-item style="padding-left: 50px;">
           <el-button type="primary" @click="getConvertGifsList(pageIndex,pageSize);">查询</el-button>
@@ -76,11 +90,11 @@
       @selection-change="handleSelectionChange">
       <el-table-column
         type="selection"
-        width="55">
+        width="80">
       </el-table-column>
       <el-table-column
         prop="id"
-        width="60"
+        width="80"
         label="订单ID">
       </el-table-column>
       <el-table-column
@@ -95,7 +109,7 @@
       </el-table-column>
       <el-table-column
         prop="memberRealname"
-        width="50"
+        width="100"
         label="会员姓名">
       </el-table-column>
       
@@ -106,6 +120,7 @@
       </el-table-column>
       <el-table-column
         prop="adress"
+        width="250"
         label="兑换联系信息">
       </el-table-column>
       <el-table-column
@@ -114,26 +129,23 @@
       </el-table-column>
       <el-table-column
         prop="giftprize"
-        width="60"
+        width="100"
         label="价格(积分)">
       </el-table-column>
       <el-table-column
         prop="converttime"
-        width="100"
+        width="200"
         label="兑换时间">
       </el-table-column>
       <el-table-column
         prop="verfynote"
-        width="100"
         label="审核备注">
       </el-table-column>
       <el-table-column
         fixed="right"
-        width="100"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="showdialog(scope.row)">审核</el-button>
-          <!--<el-button type="text" size="small" @click="del(scope.row)">删除</el-button>-->
         </template>
       </el-table-column>
     </el-table>
@@ -152,6 +164,9 @@
       center>
       <div>
         <el-form label-width="120px" ref="editform" :model="editform" style="margin-top: 2%;" :rules="rules">
+          <el-form-item label="用户姓名："  prop="auditType">
+            {{editform.name}}
+          </el-form-item>
           <el-form-item label="审核状态： " prop="auditType">
             <el-select v-model="editform.auditType" style="width: 80%;">
               <el-option value='1' label='已支付'></el-option>
@@ -174,6 +189,7 @@
   export default {
     data() {
       return {
+        fileName:null,
         loading:true,
         tableData: [],
         categoryList:[],
@@ -191,11 +207,13 @@
         userid:null,
         deliverstatus: '0',
         converttime: null,
+        adminCheckTime:null,
         editdialogVisible:false,
         editform:{
           auditType:null,
           remark:null,
           id:null,
+          name:null
         },
         rules: {
           auditType: [
@@ -228,9 +246,16 @@
       },
       newhandleChange(response,file,filelist){
         this.fileParam = file;
+        this.fileName = file[0].name
       },
       submitUpload(){
-        this.centerDialogVisible = false;
+        var that = this
+        const loading = this.$loading({
+          lock: true,
+          text: '正在检查文件。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         this.uploadForm.append('file', this.fileParam[0].raw);
         this.axios.post(this.common.getApi() + '/sys/api/convertgifs/uploadConvertGifsAudit',this.uploadForm,{
           headers: {
@@ -238,6 +263,7 @@
           }
         }).then((res) => {
           console.log(res)
+          loading.close()
           if(res.data.success){
             this.$message({
               message: '上传成功',
@@ -245,13 +271,30 @@
             });
             this.getGiftCategoryList();
             this.getConvertGifsList(this.pageIndex,this.pageSize);
-
+            this.$refs.upload.clearFiles()
+            this.uploadForm = new FormData()
+            
+        this.centerDialogVisible = false;
+            
           }else{
             console.log(res)
-            this.$message.error(res.data.msg);
-            this.fileList = [];
-            this.fileParam = '';
-            this.uploadForm = new FormData()
+             this.$message({
+                showClose: true,
+                message: '上传文件有误，请查看错误信息',
+                type: 'error',
+                duration:0
+              });
+            // this.$message.error(res.data.msg);
+            let a = document.createElement('a');
+            let content="\ufeff"+res.data;
+            let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+            debugger
+            let filename = that.fileName.slice(0,that.fileName.indexOf('.'))+'_error.csv';
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
           }
         })
       },
@@ -261,6 +304,7 @@
         this.userid = null;
         this.deliverstatus = null;
         this.converttime = null;
+        this.adminCheckTime = null;
       },
       handleSelectionChange(val){
         this.multipleSelection = val;
@@ -272,6 +316,15 @@
         console.log(this.ids);
       },
       downloadConvertGifs(){
+        var time = new Date
+        var mm = (time.getMinutes()>10)?time.getMinutes():'0'+time.getMinutes()
+        var timeStap = time.getFullYear()+'-'+(time.getMonth()+1)+'-'+time.getDate()+' '+time.getHours()+'：'+mm
+        const loading = this.$loading({
+          lock: true,
+          text: '导出中，请稍后。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
         if(this.ids){
           this.axios({
             url:this.common.getApi() + '/sys/api/convertgifs/downloadConvertGifs',
@@ -281,9 +334,11 @@
             },
             responseType: 'blob',
           }).then((res) => {
+            loading.close()
+            this.$message.success('生成文件：订单信息')
             let data = res.data
             const blob = data
-            const fileName = '订单导出.csv'
+            const fileName = '订单_'+timeStap+'.csv'
             const elink = document.createElement('a')
             elink.download = fileName
             elink.style.display = 'none'
@@ -294,6 +349,23 @@
             document.body.removeChild(elink)
           })
         }else{
+          var convertStartTime = null
+          var convertEndTime = null
+          var adminCheckTimeStartTime = null
+          var adminCheckTimeEndTime = null
+         if(Boolean(this.converttime)){
+           convertStartTime = this.converttime[0],
+           convertEndTime = this.converttime[1]
+         }
+         if(Boolean(this.adminCheckTime)){
+           adminCheckTimeStartTime = this.converttime[0],
+           adminCheckTimeEndTime = this.converttime[1]
+         }
+         this.id = this.id?Number(this.id): null;
+          this.userid = this.userid?Number(this.userid): null;
+          var deliverstatus = this.deliverstatus?Number(this.deliverstatus): null;
+
+
           this.axios({
             url:this.common.getApi() + '/sys/api/convertgifs/downloadConvertGifs',
             method:'get',
@@ -301,14 +373,18 @@
               categoryName: this.categoryName,
               id: this.id,
               userid: this.userid,
-              deliverstatus: this.deliverstatus,
-              converttime: this.converttime
+              deliverstatus: deliverstatus,
+              convertStartTime:convertStartTime,
+              convertEndTime:convertEndTime,
+              adminCheckTimeStartTime:adminCheckTimeStartTime,
+              adminCheckTimeEndTime:adminCheckTimeEndTime
             },
             responseType: 'blob',
           }).then((res) => {
+             loading.close()
             let data = res.data
             const blob = data
-            const fileName = '订单导出.csv'
+            const fileName = '订单_'+timeStap+'.csv'
             const elink = document.createElement('a')
             elink.download = fileName
             elink.style.display = 'none'
@@ -321,6 +397,20 @@
         }
       },
       getConvertGifsList(pageIndex,pageSize){
+        console.log(this.converttime);
+         console.log(this.adminCheckTime);
+         var convertStartTime = null
+          var convertEndTime = null
+          var adminCheckTimeStartTime = null
+          var adminCheckTimeEndTime = null
+         if(Boolean(this.converttime)){
+           convertStartTime = this.converttime[0],
+           convertEndTime = this.converttime[1]
+         }
+         if(Boolean(this.adminCheckTime)){
+           adminCheckTimeStartTime = this.adminCheckTime[0],
+           adminCheckTimeEndTime = this.adminCheckTime[1]
+         }
         this.loading = true
         this.id = this.id?Number(this.id): null;
         this.userid = this.userid?Number(this.userid): null;
@@ -334,7 +424,10 @@
               id: this.id,
               userid: this.userid,
               deliverstatus: deliverstatus,
-              converttime: this.converttime
+              convertStartTime:convertStartTime,
+              convertEndTime:convertEndTime,
+              adminCheckTimeStartTime:adminCheckTimeStartTime,
+              adminCheckTimeEndTime:adminCheckTimeEndTime
             }
           }
         },{
@@ -351,7 +444,10 @@
               this.tableData[i].deliverstatus = '已支付';
             }else if(this.tableData[i].deliverstatus == 3){
               this.tableData[i].deliverstatus = '无效订单';
+            }else if(this.tableData[i].deliverstatus == 5){
+              this.tableData[i].deliverstatus = '未发放显示原因';
             }
+            
           }
           this.pageTotal = res.data.obj.pager.total;
           console.log(this.pageTotal);
@@ -364,11 +460,19 @@
       submitForm(formName){
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            if (this.editform.auditType == 3) {
+              if (!Boolean(this.editform.remark)) {
+                this.$message.error('备注不可为空')
+                return false
+              }
+            }
+            console.log('1');
+            
             this.axios.post(this.common.getApi() + '/sys/api/convertgifs/auditConvertGifs',{
               params:{
                 id: Number(this.editform.id),
                 auditType: Number(this.editform.auditType),
-                verfynote: this.editform.remark
+                remark: this.editform.remark
               }
             }).then((res) => {
               if(res.data.success){
@@ -377,6 +481,8 @@
                   message: '修改成功'
                 })
                 this.editdialogVisible = false;
+                this.editform.auditType = ''
+                this.editform.remark = ''
                 
                 this.getConvertGifsList(this.pageIndex,this.pageSize);
               }else{
@@ -388,8 +494,7 @@
             return false;
           }
         });
-        this.editdialogVisible = false;
-        this.editform.auditType = ''
+        
       },
       del(row){
 //      this.axios.get(this.common.getApi() + '/sys/api/rule/delExchangeRule',{
@@ -415,8 +520,10 @@
 //      })
       },
       showdialog(row){
+        debugger
         this.editform.id = row.id;
-        
+        this.editform.name = row.memberRealname
+        this.editform.remark = row.verfynote
         this.editdialogVisible = true;
       },
       getGiftCategoryList(){

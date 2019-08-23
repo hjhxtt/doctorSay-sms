@@ -10,28 +10,28 @@
       </el-table-column>
       <el-table-column
         prop="customName"
-        label="用户名称">
+        label="真实姓名">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="email"
         label="用户邮箱">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="linkMobile"
         label="联系电话">
       </el-table-column>
       <el-table-column
         prop="position"
-        label="职位">
+        label="公司职位">
       </el-table-column>
       <el-table-column
         prop="projectDetail"
-        label="项目细节">
+        label="需求">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="projectName"
         label="项目名称">
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <el-pagination
       small
