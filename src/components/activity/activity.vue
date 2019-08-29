@@ -31,8 +31,11 @@
       </el-table-column>
     </el-table>
     <div class="search" style="margin-top:20px;">
-      最近 <el-input type="number" v-model="mounth" placeholder="单行输入" style="width:120px;margin:0 8px;" :disabled="disabled"></el-input>月内 <el-button type="primary" style="margin-left:40px;" @click="handleMounth">{{handleText}}</el-button>
+      最近 <el-input type="number" v-model="mounth" placeholder="单行输入" style="width:120px;margin:0 8px;" :disabled="disabled"></el-input>月内 
+      <el-button type="primary" style="margin-left:40px;" @click="handleMounth">{{handleText}}</el-button>
+      <el-button type="primary" style="margin-left:40px;" @click="setFizz" >更新活跃度</el-button>
     </div>
+    
     <el-dialog
       title=""
       :visible.sync="centerDialogVisible"
@@ -89,8 +92,19 @@
     this.getActivity()
   },
   methods:{
+    setFizz(){
+      this.axios({
+        url:this.common.getApi() + '/sys/api/systemmaster/setFizz',
+        method:'post',
+      }).then((res) => {
+        if(res.data.success){
+          this.$message.success('更新成功')
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
+    },
     submit(){
-      debugger
       if(Number(this.form.min) > Number(this.form.max)){
         this.$message.error('上限必须大于下限')
         return false
@@ -125,7 +139,7 @@
         this.handleText = "保存"
 
       }else{
-        if(this.mounth<0 || this.mounth>12){
+        if(this.mounth<0 || this.mounth>24){
           this.$message.error('请输入正确月份')
           return false
         }

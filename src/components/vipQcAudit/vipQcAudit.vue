@@ -220,6 +220,9 @@
         width="500px"
         center>
         <div>
+            <span style="margin-right:40px">手机号：</span>{{showData.memberHandPhone}}
+            <br>
+            <br>
             <span>激活码</span><el-input disabled type="text" v-model="code" style="width:150px;margin:0 50px;margin-bottom:30px;"></el-input>
             <el-button  @click="getCode()">刷新激活码</el-button>
             <el-button  style="margin-left:90px;" @click="sendCode()">发送激活码</el-button>
@@ -267,7 +270,9 @@
         pageSize:20,
         pageTotal:null,
         dialogAddVisible:false ,
-        showData:null,
+        showData:{
+          memberHandPhone:''
+        },
         msgtype:null,
         msgNum:null
       };

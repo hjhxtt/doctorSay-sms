@@ -422,7 +422,6 @@
       this.getMemberInfoForEdit();
       this.getEducational();
       this.getSociety();
-      debugger
       if(Boolean(sessionStorage.getItem('qcinfo'))){
         var qcinfo = JSON.parse(sessionStorage.getItem('qcinfo'));
         this.qcform.mobilenum = qcinfo.mobilenum;
@@ -432,7 +431,12 @@
           nstate = 3
         }
         this.qcform.state = nstate;
-        this.qcform.week = qcinfo.week.toString();
+        if(Boolean(qcinfo.week)){
+          this.qcform.week = qcinfo.week.toString();
+        }else{
+          this.qcform.week = null
+        }
+        
         this.qcform.comment = qcinfo.comment;
         if(qcinfo.beginTime < 10){
           this.qcform.beginTime = "0"+ qcinfo.beginTime + ":00"
@@ -652,7 +656,12 @@
               this.getFieldsById();
             }
             this.form.membersectionoffice = res.data.obj.membersectionoffice;
-            this.form.membercertificatetype = res.data.obj.membercertificatetype;
+            if(Boolean(res.data.obj.membercertificatetype)){
+              this.form.membercertificatetype = res.data.obj.membercertificatetype;
+            }else{
+              this.form.membercertificatetype = null
+            }
+            
             this.getSectionOfficeById();
             this.form.memberProvince = res.data.obj.memberProvince;
             this.getCityByProvince(this.form.memberProvince)
@@ -667,7 +676,12 @@
             this.getDistrictByCity(this.form.memberProvince,this.form.memberCity);
 
             
-            this.form.fkHospitalId = Number(res.data.obj.fkHospitalId);
+             if(res.data.obj.fkHospitalId != 0){
+              this.form.fkHospitalId = res.data.obj.fkHospitalId.toString();              
+            }else{
+              this.form.fkHospitalId = null;              
+            }
+
             this.form.memberhospital = res.data.obj.memberhospital;
             if(Boolean(res.data.obj.memberEducation)){
               this.form.memberEducation = res.data.obj.memberEducation.toString();//改

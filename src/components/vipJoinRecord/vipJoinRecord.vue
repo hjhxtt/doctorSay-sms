@@ -1,7 +1,8 @@
 <template>
   <div class="vipJoinRecord-wrapper">
     <div class="title">
-      <i class="el-icon-search"></i><span>会员参与项目搜索结果    </span>
+      <i class="el-icon-search"></i><span>会员参与项目搜索结果 </span>
+      <span  style="color:red;font-size:14px;">共{{total}}条数据</span>
     </div>    
     <el-table
       :data="tableData"
@@ -61,6 +62,7 @@
       pageIndex: 1,
       pageSize:20,
       tableData:[],
+      total:0,
     }
   },
   mounted(){
@@ -83,6 +85,7 @@
       }).then((res) => {
         this.tableData = res.data.obj.list;
         this.pageTotal = res.data.obj.pager.total;
+        this.total = res.data.obj.pager.total;
         console.log(this.pageTotal);
         for(var i = 0; i < this.tableData.length; i++){
           if(this.tableData[i].projectState == 0){

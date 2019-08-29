@@ -542,6 +542,9 @@
           <el-form-item>
             <el-button size="small" type="primary" @click="submitUploadDownload">结果查询</el-button>
           </el-form-item>
+          <el-form-item>
+            <el-button size="small" type="primary" @click="exportRes">结果导出</el-button>
+          </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="doctorVisible = false">取 消</el-button>
@@ -706,6 +709,49 @@
       }
     },
     methods: {
+      exportRes(){
+       if(this.fileParam === ''){
+          this.$message.error('请选择文件')
+          return false
+        }
+        const loading = this.$loading({
+          lock: true,
+          text: '导出中。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+
+        let formData = new FormData();
+        formData.append('file',this.fileParam[0].raw)
+
+        this.axios({
+                url:this.common.getApi() + '/sys/api/member/downloadByHospitalDoctorCsv',
+                method:'post',
+                data: formData,
+                responseType: 'blob',
+              }).then((res) => {
+
+                loading.close()
+                this.doctorVisible = false
+                let data = res.data
+                const blob = data
+                const fileName = '导出结果.csv'
+                const elink = document.createElement('a')
+                elink.download = fileName
+                elink.style.display = 'none'
+                elink.href = URL.createObjectURL(blob)
+                document.body.appendChild(elink)
+                elink.click()
+                URL.revokeObjectURL(elink.href) // 释放URL 对象
+                document.body.removeChild(elink)
+
+
+              })
+
+
+
+
+      },
       submitUploadDownload(){
         console.log(this.fileParam);
         if(this.fileParam === ''){
@@ -790,20 +836,35 @@
 
                 }else{
                   
+                  // loading.close()
+                  // this.doctorVisible = false
+                  // let data = res.data
+                  // const blob = data
+                  // const fileName = '查询结果.csv'
+                  // const elink = document.createElement('a')
+                  // elink.download = fileName
+                  // elink.style.display = 'none'
+                  // elink.href = URL.createObjectURL(blob)
+                  // document.body.appendChild(elink)
+                  // elink.click()
+                  // URL.revokeObjectURL(elink.href) // 释放URL 对象
+                  // document.body.removeChild(elink)
                   loading.close()
-                  this.doctorVisible = false
-                  let data = res.data
-                  const blob = data
-                  const fileName = '查询结果.csv'
-                  const elink = document.createElement('a')
-                  elink.download = fileName
-                  elink.style.display = 'none'
-                  elink.href = URL.createObjectURL(blob)
-                  document.body.appendChild(elink)
-                  elink.click()
-                  URL.revokeObjectURL(elink.href) // 释放URL 对象
-                  document.body.removeChild(elink)
-                  
+                   this.$message({
+                      showClose: true,
+                      message: '上传文件有误，请查看错误信息',
+                      type: 'error',
+                      duration:0
+                    });
+                  // this.$message.error(res.data.msg);
+                  let a = document.createElement('a');
+                  let content="\ufeff"+res.data;
+                  let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+                  let filename = '错误信息.csv';
+                  a.href = url;
+                  a.download = filename;
+                  a.click();
+                  window.URL.revokeObjectURL(url);
 
                 }
                 

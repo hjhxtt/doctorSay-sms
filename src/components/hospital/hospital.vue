@@ -41,7 +41,7 @@
               <el-option v-for="item in hospitalTypeList" :label="item.sysname" :value="item.id" :key="item.id"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="专科类型：" prop="specialtys" required>
+          <el-form-item label="专科类型：">
             <el-select style="width: 100%;" v-model="addform.specialtys">
               <el-option v-for="item in specialtysList" :label="item.name" :value="item.id" :key="item.id"></el-option>
             </el-select>
@@ -82,7 +82,7 @@
         </el-form>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogEditVisible = false">取 消</el-button>
+        <el-button @click="dialogAddVisible = false">取 消</el-button>
         <el-button type="primary" @click="onSubmit('addform')">确 定</el-button>
       </span>
     </el-dialog>
@@ -227,7 +227,7 @@
       style="width: 100%"
       border>
       <el-table-column
-        type="index"
+        prop="id"
         label="编号"
         width="55">
       </el-table-column>

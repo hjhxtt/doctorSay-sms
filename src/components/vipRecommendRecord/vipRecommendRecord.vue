@@ -2,6 +2,7 @@
   <div class="vipRecommendRecord-wrapper">
     <div class="title">
       <i class="el-icon-search"></i><span>会员推荐搜索结果</span>
+      <span  style="color:red;font-size:14px;">共{{pageTotal}}条数据</span>
     </div>    
     <el-table
       :data="tableData"

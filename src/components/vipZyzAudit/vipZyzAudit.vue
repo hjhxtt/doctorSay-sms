@@ -83,6 +83,7 @@
       layout="prev, pager, next"
       :total="pageTotal"
       :page-size="pageSize"
+      :current-page.sync="pageIndex"
       @current-change="go">
     </el-pagination>
     <div class="bigPic" v-if="showPic" @click="showPic=false">

@@ -336,7 +336,6 @@
       this.getMemberInfoForEdit();
       this.getEducational();
       this.getSociety();
-      debugger
       console.log(this.$route.params.idnh);
     },
     methods: {
@@ -459,6 +458,7 @@
       },
       getMemberInfoForEdit(){
         var id = sessionStorage.getItem("userid");
+        var that = this
         this.axios.get(this.common.getApi() + '/sys/api/member/getMemberInfoForEdit',{
           params:{
             params:{
@@ -473,7 +473,6 @@
           if(res.data.code == '200'){
             console.log(res.data.obj);
             this.form.filename = this.common.getApi() + res.data.obj.filename
-            debugger
             this.form.secondfilename = this.common.getApi() + res.data.obj.secondfilename
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
@@ -493,15 +492,18 @@
             }
             
             this.getStationById();
-            this.form.membertechnical = res.data.obj.membertechnical;
-            if(this.form.membertechnical.length != 0){
-              this.form.membertechnical = this.form.membertechnical.split(',');
+            that.form.membertechnical = res.data.obj.membertechnical;
+            if(that.form.membertechnical == '0'){
+                that.form.membertechnical = []
+            }
+            if(that.form.membertechnical.length != 0){
+              that.form.membertechnical = that.form.membertechnical.split(',');
               var a = [];
-              for(var i = 0; i < this.form.membertechnical.length; i++){
-                a.push(this.form.membertechnical[i]);
+              for(var i = 0; i < that.form.membertechnical.length; i++){
+                a.push(that.form.membertechnical[i]);
               }
-              this.form.membertechnical = a;
-              this.getFieldsById();
+              that.form.membertechnical = a;
+              that.getFieldsById();
             }
             this.form.membersectionoffice = res.data.obj.membersectionoffice;
             this.getSectionOfficeById();
@@ -511,17 +513,15 @@
             if(Boolean(res.data.obj.memberCity)){
               this.form.memberCity = res.data.obj.memberCity;
             }
-            debugger
             if(Boolean(res.data.obj.fkDistrictId) && Number(res.data.obj.fkDistrictId)>=0){
               this.form.fkDistrictId = res.data.obj.fkDistrictId.toString();
             }
              
             this.getDistrictByCity(this.form.memberProvince,this.form.memberCity);
-            debugger
             if(res.data.obj.fkHospitalId != 0){
               this.form.fkHospitalId = res.data.obj.fkHospitalId.toString();              
             }else{
-              this.form.fkHospitalId = res.data.obj.fkHospitalId.toString();              
+              this.form.fkHospitalId = null;              
             }
             this.form.memberhospital = res.data.obj.memberhospital.toString();
 //          this.form.inputhospital = res.data.obj.memberhospital;
@@ -667,7 +667,7 @@
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
             params:{
               params:{
-                parentId:parentId,
+                parentId:Number(parentId),
               }
             }
           },{
@@ -692,7 +692,7 @@
           this.axios.get(this.common.getApi() + '/sys/api/fields/getSonFields',{
             params:{
               params:{
-                parentId:parentId[i],
+                parentId:Number(parentId[i]),
               }
             }
           },{
@@ -721,10 +721,14 @@
             }
           }).then((res) => {
             if(res.data.code == '200'){
-              if(this.form.medical_field_1.indexOf(res.data.obj.parentid) == -1){
-                this.form.medical_field_1.push(res.data.obj.parentid);
-                this.getSonFields1(res.data.obj.parentid);
+              
+              if(Boolean(res.data.obj)){
+                if(this.form.medical_field_1.indexOf(res.data.obj.parentid) == -1){
+                  this.form.medical_field_1.push(res.data.obj.parentid);
+                  this.getSonFields1(res.data.obj.parentid);
+                }
               }
+              
             }
           })
         }

@@ -1,7 +1,7 @@
 <template>
   <div class="vipIntegrationRecord-wrapper">
     <div class="title">
-      <i class="el-icon-search"></i><span>会员积分记录</span>
+      <i class="el-icon-search"></i><span>会员积分记录</span><span  style="color:red;font-size:14px;">共{{pageTotal}}条数据</span>
       <p style="float:right;" > <span style="font-size:14px;">用户id：{{id}}</span><span style="font-size:14px;margin-right:0px;">用户名：{{name}}</span></p>
     </div>
     <div style="margin-bottom: 15px;padding-left:20px ;">总获得积分：{{total}},总兑换积分：{{exchangeTotal}},当前积分：{{now}}</div>

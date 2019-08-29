@@ -28,10 +28,10 @@
         prop="projectDetail"
         label="需求">
       </el-table-column>
-      <!-- <el-table-column
-        prop="projectName"
-        label="项目名称">
-      </el-table-column> -->
+      <el-table-column
+        prop="sendTime"
+        label="创建时间">
+      </el-table-column>
     </el-table>
     <el-pagination
       small

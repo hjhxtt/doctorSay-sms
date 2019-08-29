@@ -61,7 +61,7 @@
         <el-button size="small" type="success" @click="submitUpload">上传积分文本并加分</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" @click="download">下载积分文本</el-button>
+        <el-button size="small" type="primary" @click="download">下载项目积分</el-button>
       </el-form-item>      
     </el-form>
   </div>

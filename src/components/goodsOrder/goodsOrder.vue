@@ -48,7 +48,7 @@
           <el-button type="primary" @click="getConvertGifsList(pageIndex,pageSize);">查询</el-button>
           <el-button type="primary" @click="downloadConvertGifs">导出</el-button>
           <el-button type="primary" @click="resetForm">重置</el-button>
-          <el-button type="primary" @click="centerDialogVisible = true">订单编号批量处理</el-button>
+          <el-button type="primary" @click="centerDialogVisible = true">成功订单批量上传</el-button>
           <el-dialog
             title="上传参数文本"
             :visible.sync="centerDialogVisible"
@@ -361,15 +361,12 @@
            adminCheckTimeStartTime = this.converttime[0],
            adminCheckTimeEndTime = this.converttime[1]
          }
-         this.id = this.id?Number(this.id): null;
+          this.id = this.id?Number(this.id): null;
           this.userid = this.userid?Number(this.userid): null;
           var deliverstatus = this.deliverstatus?Number(this.deliverstatus): null;
 
 
-          this.axios({
-            url:this.common.getApi() + '/sys/api/convertgifs/downloadConvertGifs',
-            method:'get',
-            params: {
+          var jsonStr = {
               categoryName: this.categoryName,
               id: this.id,
               userid: this.userid,
@@ -378,7 +375,17 @@
               convertEndTime:convertEndTime,
               adminCheckTimeStartTime:adminCheckTimeStartTime,
               adminCheckTimeEndTime:adminCheckTimeEndTime
-            },
+          }
+          var data = new URLSearchParams()
+
+          data.append('jsonStr',JSON.stringify(jsonStr))
+              
+
+
+          this.axios({
+            url:this.common.getApi() + '/sys/api/convertgifs/downloadConvertGifs',
+            method:'get',
+            params: data,
             responseType: 'blob',
           }).then((res) => {
              loading.close()

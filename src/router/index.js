@@ -39,6 +39,7 @@ import manRole from '@/components/manRole/manRole'
 import allList from '@/components/allList/allList'
 import activity from '@/components/activity/activity'
 import hospital from '@/components/hospital/hospital'
+import dataPaper from '@/components/dataPaper/dataPaper'
 
 
 Vue.use(Router)
@@ -246,6 +247,12 @@ const router = new Router({
       name: 'login',
       component: login,
     },
+    {
+      path: '/dataPaper',
+      name: 'dataPaper',
+      component: dataPaper,
+    },
+    
   ]
 })
 
