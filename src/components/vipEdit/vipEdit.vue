@@ -46,7 +46,7 @@
         </el-select>
       </el-form-item>
       
-      <el-form-item label="证件号" prop="memberidcard">
+      <el-form-item label="证件号">
         <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;"></el-input>
       </el-form-item>
       
@@ -65,22 +65,31 @@
         </el-select>
       </el-form-item>
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;" @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
           
         </el-select>
-        <br>
+        <br />
+          <el-form-item label="医院级别" style="margin-left:-120px;">
+            <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.memberhospitallevel" @change="clearByL();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
+              <el-option v-for="item in hospitalLevelList" :key="item.id" :label="item.sysname" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+
         <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId" @change="getHospitalById(form.fkHospitalId)">
           <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
           <el-option label="其他" value="-1"></el-option>
         </el-select>
         <br>
+        {{memberhospitalShow}}
+        <br/>
         <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.memberhospital"></el-input>
         
         
@@ -176,10 +185,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="执业证1">
-        <img style="max-width:400px;max-height:400px;" :src="form.filename" alt="">
+        <img style="max-width:400px;max-height:400px;" :src="'../upload/pic/pic_certificate/'+form.filename" alt="">
       </el-form-item>  
       <el-form-item label="执业证2">
-        <img style="max-width:400px;max-height:400px;" :src="form.secondfilename" alt="">
+        <img style="max-width:400px;max-height:400px;" :src="'../upload/pic/pic_certificate/'+form.secondfilename" alt="">
       </el-form-item>     
       <el-form-item>
         <el-button type="primary" @click="submitForm('form')" :loading="isload">保存</el-button>
@@ -220,6 +229,8 @@
   export default {
     data() {
       return {
+        memberhospitalShow:'',
+        hospitalLevelList:null,
         professionalType:'',
         checkAll: false,
         checkedCities: ['上海', '北京'],
@@ -267,7 +278,8 @@
           inputhospital: null,
           province:null,
           graduationInstitutions:null,
-          membercertificatetype:null//执业证类型
+          membercertificatetype:null,//执业证类型
+          memberhospitallevel:null
         },
         rules: {
           memberHandphone: [
@@ -288,9 +300,9 @@
           membersectionoffice:[
             { required: true, message: '请选择工作科室', trigger: 'change' }
           ],
-          memberidcard:[
-            { required: true, message: '请填写证件号', trigger: 'blur' }
-          ],
+          // memberidcard:[
+          //   { required: true, message: '请填写证件号', trigger: 'blur' }
+          // ],
           administrativeposition:[
             { required: true, message: '请选择行政职位', trigger: 'change' }
           ],
@@ -323,11 +335,11 @@
         hospitalNature:null,
         hospitalType:null,
         numberOfBeds:null,
-        
         isload: false,
       };
     },
     mounted(){
+      this.getHospitalLevel()
       this.getStationDuties();
       this.getAdminiStraion();
       this.getParentFields();
@@ -339,6 +351,36 @@
       console.log(this.$route.params.idnh);
     },
     methods: {
+      getHospitalNameById(id){
+
+          this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospitalNameById',{
+            params:{
+              params:{
+                id: id
+              }
+            }
+          },{
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then((res) => {
+            if(res.data.code == '200'){
+              this.memberhospitalShow = res.data.obj.name
+            }
+          })
+        
+      },
+      getHospitalLevel(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalLevel','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalLevelList = res.data.obj;
+          }
+        })        
+      }, 
       clearSchool(){
         this.form.graduationInstitutions = ''
       },
@@ -346,13 +388,19 @@
         this.form.memberCity = ''
       this.form.fkDistrictId = ''
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel = ''
       },
       clearByC(){
       this.form.fkDistrictId = ''
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel = ''
       },
       clearByD(){
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel = ''
+      },
+      clearByL(){
+        this.form.fkHospitalId = ''
       },
       clear2(){
         this.form.membersectionoffice = ''
@@ -404,7 +452,7 @@
               endTime = this.form.endTime.slice(0,2)
             }
   
-
+          
 
             this.axios.post(this.common.getApi() + '/sys/api/member/editMember',{
               params:{
@@ -432,7 +480,8 @@
                 graduationInstitutions: this.form.graduationInstitutions,
                 beginTime: beginTime,
                 endTime: endTime,
-                membercertificatetype:this.form.membercertificatetype//执业证
+                membercertificatetype:this.form.membercertificatetype,//执业证
+                memberhospitallevel:this.form.memberhospitallevel
               },
             }).then((res) => {
               this.isload = false                
@@ -472,8 +521,12 @@
         }).then((res) => {
           if(res.data.code == '200'){
             console.log(res.data.obj);
-            this.form.filename = this.common.getApi() + res.data.obj.filename
-            this.form.secondfilename = this.common.getApi() + res.data.obj.secondfilename
+            if(Boolean(res.data.obj.memberhospitallevel)){
+              this.form.memberhospitallevel = res.data.obj.memberhospitallevel.toString()
+            }
+            
+            this.form.filename = res.data.obj.filename
+            this.form.secondfilename = res.data.obj.secondfilename
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
             this.form.memberRealname = res.data.obj.memberRealname;
@@ -549,7 +602,8 @@
               this.form.endTime = res.data.obj.endTime + ":00"
             }
             
-            this.getHospitalById(this.form.fkHospitalId);    
+            this.getHospitalById(this.form.fkHospitalId); 
+            this.getHospitalNameById(this.form.fkHospitalId);    
             
             this.form.registerTime = res.data.obj.registerTime;
             this.form.societyid = res.data.obj.societyid;
@@ -885,7 +939,19 @@
         })           
       },
       getHospitalById(id){
-        if(this.form.fkHospitalId != 0){
+
+        
+        if(this.form.fkHospitalId != -1){
+          this.hospital_options.map(e=>{
+            if(e.id == this.form.fkHospitalId){
+              this.form.memberhospital = e.name
+            }
+          })
+        }
+
+
+
+        if(this.form.fkHospitalId != -1){
           this.form.inputhospital = ""
           this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospitalById',{
             params:{

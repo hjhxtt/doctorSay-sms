@@ -1,11 +1,11 @@
 <template>
   <div class="vipTelVerify-wrapper">
     <el-form :model="qcform" ref="qcform" :rules="rules" :inline-message='true' size="mini" label-width="140px">
-      <el-form-item label="拨打科室电话次数" prop="telnum">
-        <el-input v-model="qcform.telnum" placeholder="请输入拨打电话科室次数" style="width: 200px"></el-input>
+      <el-form-item label="拨打科室电话次数" prop="departnum">
+        <el-input v-model="qcform.departnum" placeholder="请输入拨打电话科室次数" style="width: 200px"></el-input>
       </el-form-item>
-      <el-form-item label="拨打手机电话次数" prop="mobilenum">
-        <el-input v-model="qcform.mobilenum" placeholder="请输入拨打手机电话次数" style="width: 200px"></el-input>
+      <el-form-item label="拨打手机电话次数" prop="telnum">
+        <el-input v-model="qcform.telnum" placeholder="请输入拨打手机电话次数" style="width: 200px"></el-input>
       </el-form-item>
       <el-form-item label="QC结果" prop="state">
         <el-select v-model="qcform.state" placeholder="请选择" style="width: 200px">
@@ -106,7 +106,7 @@
           <el-option v-for="item in member_options" :label="item.label" :value="item.id" :key="item.id"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="证件号" prop="memberidcard">
+      <el-form-item label="证件号">
         <el-input v-model="form.memberidcard" style="width: 200px;margin-right: 10px;" ></el-input>
       </el-form-item>
 
@@ -125,21 +125,28 @@
         </el-select>
       </el-form-item>
       <el-form-item label="所在医院" prop="fkHospitalId">
-        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+        <el-select placeholder="请选择" v-model="form.memberProvince" style="width: 131px;" @change="getCityByProvince(form.memberProvince);clearByP();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in province_options" :label="item.provinceName" :value="item.provinceId" :key="item.provinceId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;"  @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+        <el-select placeholder="请选择" v-model="form.memberCity" style="width: 131px;"  @change="getDistrictByCity(form.memberProvince,form.memberCity);clearByC();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in city_options" :key="item.cityId" :label="item.cityName" :value="item.cityId"></el-option>
         </el-select>
-        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,null)">
+        <el-select placeholder="请选择" v-model="form.fkDistrictId" style="width: 130px;" @change="clearByD();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
           <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <br>
+        <br />
+          <el-form-item label="医院级别" style="margin-left:-120px;">
+            <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.memberhospitallevel" @change="clearByL();getHospital(form.memberProvince,form.memberCity,form.fkDistrictId,form.memberhospitallevel)">
+              <el-option v-for="item in hospitalLevelList" :key="item.id" :label="item.sysname" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
         <el-select placeholder="请选择" style="width: 400px;margin-top: 10px;" v-model="form.fkHospitalId"  @change="getHospitalById(form.fkHospitalId)">
           <el-option v-for="item in hospital_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          <el-option label="其他" :value="-1"></el-option>
+          <el-option label="其他" value="-1"></el-option>
         </el-select>
         <br>
+        <!-- {{form.memberhospital}} -->
         <el-input style="width: 400px;margin-top: 10px;" v-if="form.fkHospitalId == -1" v-model="form.memberhospital" ></el-input>
         
         
@@ -241,10 +248,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="执业证1">
-        <img style="max-width:400px;max-height:400px;" :src="form.filename" alt="">
+        <img style="max-width:400px;max-height:400px;" :src="'../upload/pic/pic_certificate/'+form.filename" alt="">
       </el-form-item>  
       <el-form-item label="执业证2">
-        <img style="max-width:400px;max-height:400px;" :src="form.secondfilename" alt="">
+        <img style="max-width:400px;max-height:400px;" :src="'../upload/pic/pic_certificate/'+form.secondfilename" alt="">
       </el-form-item>  
       <el-form-item>
         <el-button type="primary" @click="submitForm2('form')" :loading="isload">保存</el-button>
@@ -282,6 +289,7 @@
   export default {
     data() {
       return {
+        hospitalLevelList:null,
         member_options:[
           {label:"医师资格证", id:1},
           {label:"医师执业证", id:2},
@@ -293,12 +301,13 @@
         visi:false,
         qcform:{
           telnum:null,
-          mobilenum:null,
+          departnum:null,
           week:null,
           beginTime:null,
           endTime:null,
           state:null,
           comment:null,
+          id:null
         },
         form: {
           recommendcode:null,
@@ -335,10 +344,10 @@
           membercertificatetype:null
         },
         rules: {
-          telnum: [
+          departnum: [
             { required: true, message: '请输入拨打电话科室次数', trigger: 'blur' }
           ],
-          mobilenum: [
+          telnum: [
             { required: true, message: '请输入手机电话科室次数', trigger: 'blur' }
           ],
           state:[
@@ -374,9 +383,9 @@
           membersectionoffice:[
             { required: true, message: '请选择工作科室', trigger: 'change' }
           ],
-          memberidcard:[
-            { required: true, message: '请填写证件号', trigger: 'blur' }
-          ],
+          // memberidcard:[
+          //   { required: true, message: '请填写证件号', trigger: 'blur' }
+          // ],
           administrativeposition:[
             { required: true, message: '请选择行政职位', trigger: 'change' }
           ],
@@ -414,6 +423,7 @@
       };
     },
     mounted(){
+      this.getHospitalLevel()
       this.getStationDuties();
       this.getAdminiStraion();
       this.getParentFields();
@@ -424,7 +434,8 @@
       this.getSociety();
       if(Boolean(sessionStorage.getItem('qcinfo'))){
         var qcinfo = JSON.parse(sessionStorage.getItem('qcinfo'));
-        this.qcform.mobilenum = qcinfo.mobilenum;
+        this.qcform.departnum = qcinfo.departnum;
+        this.qcform.id = qcinfo.id;
         this.qcform.telnum = qcinfo.telnum;
         var nstate = qcinfo.state.toString()
         if(nstate == 5 || nstate == 6){
@@ -451,6 +462,17 @@
       }
     },
     methods: {
+      getHospitalLevel(){
+        this.axios.get(this.common.getApi() + '/sys/api/systemmaster/getHospitalLevel','',{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.hospitalLevelList = res.data.obj;
+          }
+        })        
+      }, 
       listSelect(){
         this.visi = false
       },
@@ -461,13 +483,19 @@
         this.form.memberCity = ''
       this.form.fkDistrictId = ''
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel= ''
       },
       clearByC(){
       this.form.fkDistrictId = ''
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel= ''
       },
       clearByD(){
       this.form.fkHospitalId = ''
+      this.form.memberhospitallevel= ''
+      },
+      clearByL(){
+        this.form.fkHospitalId = ''
       },
       clear2(){
         this.form.membersectionoffice = ''
@@ -539,7 +567,8 @@
                 graduationInstitutions: this.form.graduationInstitutions,
                 beginTime: beginTime,
                 endTime: endTime,
-                membercertificatetype:this.form.membercertificatetype//执业证
+                membercertificatetype:this.form.membercertificatetype,//执业证
+                memberhospitallevel:this.form.memberhospitallevel
               },
             }).then((res) => {
               this.isload = false                
@@ -554,7 +583,8 @@
             })
       },
       submitForm(formName) {
-        if(this.qcform.state == '3' && this.qcform.comment == ''){
+        debugger
+        if(this.qcform.state == '5' && this.qcform.comment == ''){
          this.$message.error('请填写审核备注') 
          return false
         }
@@ -565,9 +595,10 @@
 //          this.qcform.endTime = this.qcform.endTime?Number(this.qcform.endTime.slice(0,2)):null;
             this.axios.post(this.common.getApi() + '/sys/api/audit/executeQcMemberAudit',{
               params:{
+                id: Number(this.qcform.id),
                 memberid: Number(sessionStorage.getItem('id')),
                 telnum: Number(this.qcform.telnum),
-                mobilenum: Number(this.qcform.mobilenum),
+                departnum: Number(this.qcform.departnum),
                 week: Number(this.qcform.week),
                 beginTime: this.qcform.beginTime==null?'': Number(this.qcform.beginTime.slice(0,2)),
                 endTime: this.qcform.endTime==null?'': Number(this.qcform.endTime.slice(0,2)),
@@ -627,6 +658,9 @@
         }).then((res) => {
           if(res.data.code == '200'){
             console.log(res.data.obj);
+            if(Boolean(res.data.obj.memberhospitallevel)){
+              this.form.memberhospitallevel = res.data.obj.memberhospitallevel.toString()
+            }
             this.qcform.state = res.data.obj.isblackname.toString()
             this.form.memberHandphone = res.data.obj.memberHandphone;
             this.form.smscode = res.data.obj.smscode;
@@ -721,10 +755,10 @@
             this.form.graduationInstitutions = res.data.obj.graduationInstitutions;
             this.getGraduateById(Number(this.form.graduationInstitutions));
             if(Boolean(res.data.obj.filename)){
-              this.form.filename = this.common.getApi() + res.data.obj.filename
+              this.form.filename = res.data.obj.filename
             }
              if(Boolean(res.data.obj.secondfilename)){
-              this.form.secondfilename = this.common.getApi() + res.data.obj.secondfilename
+              this.form.secondfilename = res.data.obj.secondfilename
             }
             
           }
@@ -1019,6 +1053,16 @@
         })
       },
       getHospitalById(id){
+        debugger
+        if(this.form.fkHospitalId != -1){
+          this.hospital_options.map(e=>{
+            if(e.id == this.form.fkHospitalId){
+              this.form.memberhospital = e.name
+            }
+          })
+        }
+
+
         if(this.form.fkHospitalId != -1){
           this.axios.get(this.common.getApi() + '/sys/api/hospital/getHospitalById',{
             params:{

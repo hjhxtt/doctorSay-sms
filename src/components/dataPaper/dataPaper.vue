@@ -47,18 +47,18 @@
         pwd = md5(pwd);
         return pwd;
       }
-      var str = this.form.phone + this.form.type + "94F7899D-283D-46B5-90CD-747C9887F5281"
+      var str = this.form.phone + this.form.type + "18A2911D-563D-19B8-90CD-747C9887F5281"
 
       var sn = CalcuMD5(str)
       
       this.axios({
-        url:'http://47.102.194.98:8080/doctor_wechat_api/wechat/api/index',
+        url:'http://www.yishengshuo.com:8080/doctor_wechat_api/wechat/api/index',
         method:'post',
         data:{
           "data": [{
 			    "phone": this.form.phone
           }],
-          "fnType": this.form.type,
+          "FnType": this.form.type,
           "sn": sn
         }
       }).then((res) => {

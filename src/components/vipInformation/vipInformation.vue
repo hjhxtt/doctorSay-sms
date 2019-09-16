@@ -888,24 +888,37 @@
             'Content-Type': 'multipart/form-data'
           }
         }).then((res) => {
+          debugger
           console.log(res)
           loading.close();
-          if(res.data.success){
-            this.$message({
-              message: '上传成功',
-              type: 'success'
-            });
-          this.$refs.upload.clearFiles()
-          this.uploadForm = new FormData()
-          this.memberVisible = false
-          this.fileParam  = ''
-          }else{
+            if(res.data.success){
+              this.$message({
+                message: '上传成功',
+                type: 'success'
+              });
+            this.$refs.upload.clearFiles()
+            this.uploadForm = new FormData()
+            this.memberVisible = false
+            this.fileParam  = ''
+            }else{
+            //todo
+            
+            loading.close()
             this.$message({
               showClose: true,
-              message: res.data.msg,
+              message: '上传文件有误，请查看错误信息',
               type: 'error',
               duration:0
             });
+          // this.$message.error(res.data.msg);
+          let a = document.createElement('a');
+          let content="\ufeff"+res.data;
+          let url = window.URL.createObjectURL(new Blob([content],{type:'text/plain,charset=utf-8'}));
+          let filename = '错误信息.csv';
+          a.href = url;
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
           }
         })
       },

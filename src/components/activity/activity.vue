@@ -93,13 +93,21 @@
   },
   methods:{
     setFizz(){
+      const loading = this.$loading({
+          lock: true,
+          text: '活跃度更新中。。。',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
       this.axios({
         url:this.common.getApi() + '/sys/api/systemmaster/setFizz',
         method:'post',
       }).then((res) => {
         if(res.data.success){
+          loading.close()
           this.$message.success('更新成功')
         }else{
+          loading.close()
           this.$message.error(res.data.msg)
         }
       })

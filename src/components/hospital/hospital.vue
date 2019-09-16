@@ -13,8 +13,13 @@
             </el-select>
           </el-form-item>
           <el-form-item label="市："  prop="city" required>
-            <el-select style="width: 100%;"  v-model="addform.city">
+            <el-select style="width: 100%;"  v-model="addform.city" @change="getDistrictByCity(addform.province,addform.city)">
               <el-option v-for="item in cityList" :label="item.cityName" :value="item.cityId" :key="item.cityId"></el-option>
+            </el-select>
+          </el-form-item>  
+          <el-form-item label="区："  >
+            <el-select style="width: 100%;"  v-model="addform.fkDistrictId">
+              <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>  
           <el-form-item label="医院名称：" prop="hospitalName" required>
@@ -101,6 +106,11 @@
           <el-form-item label="市：" prop="city" required>
             <el-select  style="width: 100%;" v-model="editform.city">
               <el-option v-for="item in cityList" :label="item.cityName" :value="item.cityId" :key="item.cityId"></el-option>
+            </el-select>
+          </el-form-item> 
+          <el-form-item label="区："  >
+            <el-select style="width: 100%;"  v-model="editform.fkDistrictId">
+              <el-option v-for="item in region_options" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item> 
           <el-form-item label="医院名称：" prop="hospitalName" required>
@@ -375,6 +385,7 @@
           aka8:null,
           aka9:null,
           aka10:null,
+          fkDistrictId:null,
         },
         fileList: [],
         editform:{
@@ -399,7 +410,9 @@
           aka8:null,
           aka9:null,
           aka10:null,
+          fkDistrictId:null,
         },
+        region_options:[],
         categoryList:[],
         rules: {
           province:[
@@ -443,6 +456,24 @@
       this.getHospitalPage(this.pageIndex,this.pageSize)
     },
     methods:{
+      //获取地区
+      getDistrictByCity(provinceId,cityId){
+        this.axios.get(this.common.getApi() + '/sys/api/area/getDistrictByCity',{
+          params:{
+            params:{
+              cityId: cityId
+            }
+          }
+        },{
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if(res.data.code == '200'){
+            this.region_options = res.data.obj;
+          }
+        })      
+      },  
       exportHospital(){
         console.log(this.city);
         
@@ -532,7 +563,8 @@
                         "alias7": this.addform.aka7,
                         "alias8": this.addform.aka8,
                         "alias9": this.addform.aka9,
-                        "alias10": this.addform.aka10
+                        "alias10": this.addform.aka10,
+                        'fkDistrictId':Number(this.addform.fkDistrictId) 
                       }
                     }
                    
@@ -584,7 +616,8 @@
                         "alias7": this.editform.aka7,
                         "alias8": this.editform.aka8,
                         "alias9": this.editform.aka9,
-                        "alias10": this.editform.aka10
+                        "alias10": this.editform.aka10,
+                        'fkDistrictId':Number(this.editform.fkDistrictId)
                       }
                     }
               
@@ -741,12 +774,17 @@
       },
      
       editshow(row){
-        debugger
         this.editform.province = row.fkProvId.toString()
         if(Boolean(row.fkProvId)){
           this.getCityByProvince(row.fkProvId)
+          if(Boolean(row.fkCityId)){
+            debugger
+            this.getDistrictByCity(row.fkProvId,row.fkCityId)
+          }
         }
+        this.editform.fkDistrictId = row.fkDistrictId.toString()
         
+
         this.editform.city = row.fkCityId.toString()
         this.dialogEditVisible = true;
        this.editId = row.id

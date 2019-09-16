@@ -58,7 +58,7 @@
             <el-input v-model="addform.title"></el-input>
           </el-form-item>
           <el-form-item label="公告内容：" prop="content">
-            <quill-editor ref="myTextEditor" v-model="addform.content"></quill-editor>
+            <edit v-model="addform.content"></edit>
           </el-form-item>
         </el-form>
       </div>
@@ -77,7 +77,8 @@
             <el-input v-model="editform.title"></el-input>
           </el-form-item>
           <el-form-item label="公告内容：" prop="content">
-            <quill-editor ref="myTextEditor" v-model="editform.content"></quill-editor>
+            <!-- <quill-editor ref="myTextEditor" v-model="editform.content"></quill-editor> -->
+            <edit v-model="editform.content"  on-change="changge"></edit>
           </el-form-item>
         </el-form>
       </div>
@@ -99,7 +100,11 @@
 </template>
 
 <script>
+  import edit from '../wangeditor.vue'
   export default {
+    components:{
+      edit,
+    },
     data() {
       return {
         adddialogVisible: false,
@@ -136,6 +141,11 @@
       this.getMessageList(this.pageIndex,this.pageSize);
     },
     methods: {
+      clear(){
+        debugger
+        this.addform.title = null,
+        this.addform.content = ''
+      },
       upLine(ele){
         //todo
         var flag 
@@ -196,6 +206,7 @@
         this.suredialogVisible = true;
       },
       editshow(row){
+        var that = this
         this.axios.get(this.common.getApi() + '/sys/api/message/getMessage',{
           params:{
             params:{
@@ -209,9 +220,11 @@
         }).then((res) => {
           if(res.data.success){
             this.editform.title = res.data.obj.title;
+            debugger
             this.editform.content = res.data.obj.content;
             this.editdialogVisible = true;
             this.editform.id = row.id;
+            that.$forceUpdate()
           }else{
             this.$message.error(res.data.msg);
           }
@@ -233,6 +246,7 @@
                     type: 'success',
                     message: '添加成功'
                   })
+                  this.clear()
                   this.adddialogVisible = false;
                   this.getMessageList(this.pageIndex,this.pageSize);
                 }else{

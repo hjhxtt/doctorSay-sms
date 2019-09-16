@@ -61,8 +61,8 @@
       <el-table-column
         label="执业证书">
          <template slot-scope="scope">
-            <img style="height:60px;" :src="baseurl + scope.row.filename" alt="" @click="bigSize('first',scope.row)" />
-            <img style="height:60px;" :src="baseurl + scope.row.secondfilename" alt="" @click="bigSize('second',scope.row)" />
+            <img style="height:60px;" :src="'../upload/pic/pic_certificate/' + scope.row.filename" alt="" @click="bigSize('first',scope.row)" />
+            <img style="height:60px;" :src="'../upload/pic/pic_certificate/' + scope.row.secondfilename" alt="" @click="bigSize('second',scope.row)" />
         </template>
       </el-table-column>
       <el-table-column
@@ -119,9 +119,9 @@
         
         this.showPic = true
         if(type == "first"){
-          this.picUrl = this.baseurl + row.filename
+          this.picUrl = '../upload/pic/pic_certificate/' + row.filename
         }else{
-          this.picUrl = this.baseurl + row.secondfilename
+          this.picUrl = '../upload/pic/pic_certificate/' + row.secondfilename
         }
         console.log(this.picUrl);
         

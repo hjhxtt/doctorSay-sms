@@ -13,7 +13,7 @@ module.exports = {
     //做本地代理
     proxyTable: {
       '/doctor_sys_api': {
-        target: 'http://47.102.194.98:8080/doctor_sys_api',
+        target: 'http://www.yishengshuo.com:80/doctor_sys_api',
         changeOrigin: true,
         pathRewrite: {
           '^/doctor_sys_api': ''

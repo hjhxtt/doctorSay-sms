@@ -30,7 +30,7 @@
       <el-table-column
         label="缩略图">
         <template slot-scope="scope">
-          <img :src="baseurl + scope.row.picUrl" alt="" width="100%"/>
+          <img :src="'../upload/pic/pic_banner/' + scope.row.picUrl" alt="" width="100%"/>
         </template>
       </el-table-column> 
       <el-table-column

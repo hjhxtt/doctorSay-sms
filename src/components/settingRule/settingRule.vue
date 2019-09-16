@@ -54,7 +54,8 @@
             <el-input v-model="addform.ruleName"></el-input>
           </el-form-item>
           <el-form-item label="规则说明：" prop="ruleExplain">
-            <quill-editor ref="myTextEditor" v-model="addform.ruleExplain"></quill-editor>
+            <!-- <quill-editor ref="myTextEditor" v-model="addform.ruleExplain"></quill-editor> -->
+            <edit v-model="addform.ruleExplain"></edit>
           </el-form-item>
         </el-form>
       </div>  
@@ -73,7 +74,8 @@
             <el-input v-model="editform.ruleName"></el-input>
           </el-form-item>
           <el-form-item label="规则说明：" prop="ruleExplain">
-            <quill-editor ref="myTextEditor" v-model="editform.ruleExplain"></quill-editor>
+            <edit v-model="editform.ruleExplain"></edit>
+            <!-- <quill-editor ref="myTextEditor" v-model="editform.ruleExplain"></quill-editor> -->
           </el-form-item>
         </el-form>
       </div>  
@@ -95,7 +97,11 @@
 </template>
 
 <script>
+  import edit from '../wangeditor.vue'
   export default {
+    components:{
+      edit,
+    },
     methods: {
       handleClick(row) {
         console.log(row);
@@ -181,6 +187,8 @@
                         type: 'success',
                         message: '添加成功'
                       })
+                      this.addform.ruleName = null
+                      this.addform.ruleExplain = ''
                       this.adddialogVisible = false;
                       this.getExchangeRuleList(this.pageIndex,this.pageSize);
                     }else{

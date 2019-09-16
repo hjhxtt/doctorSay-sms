@@ -20,19 +20,19 @@
       </div>
       <div class="list">
         <span>回复率：</span>
-        <span>{{responseRate}}</span>
+        <span>{{responseRate}} %</span>
       </div>
       <div class="list">
         <span>渗透率：<br>C / ( C + S )</span>
-        <span>{{permeability}}</span>
+        <span>{{permeability}} %</span>
       </div>
       <div class="list">
         <span>难易度：<br>C / ( C + S + Q )</span>
-        <span>{{facilityValue}}</span>
+        <span>{{facilityValue}} %</span>
       </div>
       <div class="list">
         <span>丢失率：</span>
-        <span>{{lossRate}}</span>
+        <span>{{lossRate}} %</span>
       </div>
       <div class="list">
         <span>S状态：</span>

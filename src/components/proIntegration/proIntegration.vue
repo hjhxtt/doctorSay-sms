@@ -45,7 +45,7 @@
             </div>
           </el-col>
           <el-col :span="12">
-            <el-radio v-model="addGradeType" label="0">C/S/Q/l状态积分</el-radio>
+            <el-radio v-model="addGradeType" label="0">C/S/Q状态积分</el-radio>
             <el-radio v-model="addGradeType" label="1" @change="integrationForm.addSQValue=null;integrationForm.addCValue=null">现金发放</el-radio>
             <el-radio v-model="addGradeType" label="2" @change="integrationForm.addSQValue=null;integrationForm.addCValue=null">审核拒绝</el-radio>
           </el-col>
@@ -124,6 +124,35 @@
           this.$message.error('请选择文件')
           return false
         }
+
+
+
+      if(this.addGradeType == 0){
+        if(!Boolean(this.integrationForm.addSQValue)){
+          this.$message.error('请填写未完成会员加分分值')
+          return false
+        }
+        if(!Boolean(this.integrationForm.addCValue)){
+          this.$message.error('请填写完成会员加分分值')
+          return false
+        }
+
+        if(this.integrationForm.addSQValue<=0){
+          this.$message.error('分值必须大于0')
+          return false
+        }
+        if(this.integrationForm.addCValue<=0){
+          this.$message.error('分值必须大于0')
+          return false
+        }
+      }
+        
+
+
+
+
+
+
         this.openLoading()
         console.log(this.fileParam);
         console.log(sessionStorage.getItem('id'));
@@ -135,6 +164,7 @@
         this.uploadForm.append('addSQValue', Number(this.integrationForm.addSQValue));
         this.uploadForm.append('addCValue', Number(this.integrationForm.addCValue));
 
+          // addGradeType
 
         // console.log(this.uploadForm.get('file'));
         // console.log(this.uploadForm.get('id'));
@@ -161,6 +191,20 @@
             this.uploadForm = new FormData()
             
           }else{
+
+            if(Boolean(res.data.obj)){
+             var msg = res.data.obj.join(',')
+              this.$message({
+                showClose: true,
+                message: msg,
+                type: 'error',
+                duration:0
+              });
+              this.openLoading().close()
+              return false
+            }
+
+
             if(Boolean(res.data.msg)){
                this.$message({
                 showClose: true,

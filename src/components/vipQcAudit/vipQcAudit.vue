@@ -172,11 +172,11 @@
       label="拨打电话时段">
     </el-table-column>
     <el-table-column
-      prop="phoneNum"
+      prop="departnum"
       label="已拨打科室电话次数">
     </el-table-column>
     <el-table-column
-      prop="mobileNum"
+      prop="telnum"
       label="已拨打过手机次数">
     </el-table-column>
     <el-table-column
@@ -453,9 +453,12 @@
           }
         }).then((res) => {
           if(res.data.code == '200'){
+            debugger
             if(Boolean(res.data.obj)){
               debugger
               sessionStorage.setItem('qcinfo',JSON.stringify(res.data.obj));
+            }else{
+              sessionStorage.setItem('qcinfo','');
             }
             this.$router.push({ path: 'vipTelVerify'})            
           }else{

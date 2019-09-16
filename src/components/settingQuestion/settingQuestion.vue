@@ -49,7 +49,8 @@
             <el-input v-model="addform.questionName"></el-input>
           </el-form-item>
           <el-form-item label="问题说明：" prop="questionExplain">
-            <quill-editor ref="myTextEditor" v-model="addform.questionExplain"></quill-editor>
+            <!-- <quill-editor ref="myTextEditor" v-model="addform.questionExplain"></quill-editor> -->
+            <edit v-model="addform.questionExplain"></edit>
           </el-form-item>
         </el-form>
       </div>  
@@ -58,7 +59,7 @@
       </span>
     </el-dialog>
     <el-dialog
-      title="编辑网站公告"
+      title="编辑常见问题"
       :visible.sync="editdialogVisible"
       width="50%"
       center>
@@ -68,7 +69,8 @@
             <el-input v-model="editform.questionName"></el-input>
           </el-form-item>
           <el-form-item label="问题说明：" prop="questionExplain">
-            <quill-editor ref="myTextEditor" v-model="editform.questionExplain"></quill-editor>
+            <!-- <quill-editor ref="myTextEditor" v-model="editform.questionExplain"></quill-editor> -->
+            <edit v-model="editform.questionExplain"></edit>
           </el-form-item>
         </el-form>
       </div>  
@@ -90,7 +92,11 @@
 </template>
 
 <script>
+  import edit from '../wangeditor.vue'
   export default {
+    components:{
+      edit,
+    },
     methods: {
       handleClick(row) {
         console.log(row);
@@ -176,6 +182,8 @@
                         type: 'success',
                         message: '添加成功'
                       })
+                      this.addform.questionName = null
+                      this.addform.questionExplain = ''
                       this.adddialogVisible = false;
                       this.getQuestionList(this.pageIndex,this.pageSize);
                     }else{

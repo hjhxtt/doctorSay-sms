@@ -160,6 +160,7 @@
     <el-dialog
       title="订单审核"
       :visible.sync="editdialogVisible"
+      @close='close'
       width="30%"
       center>
       <div>
@@ -169,6 +170,7 @@
           </el-form-item>
           <el-form-item label="审核状态： " prop="auditType">
             <el-select v-model="editform.auditType" style="width: 80%;">
+              <el-option value='0' label='待支付'></el-option>
               <el-option value='1' label='已支付'></el-option>
               <el-option value='3' label='无效订单'></el-option>
             </el-select>
@@ -235,6 +237,9 @@
       this.getConvertGifsList(this.pageIndex,this.pageSize);
     },
     methods:{
+      close(){
+        this.editform.auditType = null
+      },
       handleExceed(files, fileList) {
         this.$message.warning(`最多只能选择1个文件`);
       },
@@ -353,13 +358,14 @@
           var convertEndTime = null
           var adminCheckTimeStartTime = null
           var adminCheckTimeEndTime = null
+          debugger
          if(Boolean(this.converttime)){
            convertStartTime = this.converttime[0],
            convertEndTime = this.converttime[1]
          }
          if(Boolean(this.adminCheckTime)){
-           adminCheckTimeStartTime = this.converttime[0],
-           adminCheckTimeEndTime = this.converttime[1]
+           adminCheckTimeStartTime = this.adminCheckTime[0],
+           adminCheckTimeEndTime = this.adminCheckTime[1]
          }
           this.id = this.id?Number(this.id): null;
           this.userid = this.userid?Number(this.userid): null;
@@ -532,6 +538,13 @@
         this.editform.name = row.memberRealname
         this.editform.remark = row.verfynote
         this.editdialogVisible = true;
+          if(row.deliverstatus == '待支付'){
+            this.editform.auditType = '0'
+          }else if(row.deliverstatus == '已支付'){
+            this.editform.auditType = '1'
+          }else if( row.deliverstatus == '无效订单'  ){
+            this.editform.auditType = '3'
+          }
       },
       getGiftCategoryList(){
         this.axios.get(this.common.getApi() + '/sys/api/giftcategory/getGiftCategoryList',{
